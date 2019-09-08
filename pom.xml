@@ -13,6 +13,7 @@
   <modules>
     <module>susu-core</module>
     <module>susu-netty</module>
+    <module>example</module>
   </modules>
 
   <properties>
