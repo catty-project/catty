@@ -6,16 +6,23 @@
 
   <groupId>com.nowcoder</groupId>
   <artifactId>susu</artifactId>
+  <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
 
   <description>手撸一个RPC框架</description>
+  <modules>
+    <module>susu-core</module>
+    <module>susu-netty</module>
+  </modules>
+
+  <properties>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>io.netty</groupId>
-      <artifactId>netty-all</artifactId>
-      <version>4.1.16.Final</version>
-    </dependency>
+
 
     <dependency>
       <groupId>com.alibaba</groupId>
@@ -23,10 +30,16 @@
       <version>1.2.58</version>
     </dependency>
 
+    <!--<dependency>-->
+      <!--<groupId>org.apache.commons</groupId>-->
+      <!--<artifactId>commons-lang3</artifactId>-->
+      <!--<version>3.9</version>-->
+    <!--</dependency>-->
+
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>3.9</version>
+      <groupId>org.apache.curator</groupId>
+      <artifactId>curator-framework</artifactId>
+      <version>4.0.1</version>
     </dependency>
 
   </dependencies>
