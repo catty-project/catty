@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <groupId>com.nowcoder</groupId>
-      <artifactId>susu-netty</artifactId>
+      <artifactId>susu-config</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>

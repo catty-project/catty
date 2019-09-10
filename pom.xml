@@ -12,8 +12,11 @@
   <description>手撸一个RPC框架</description>
   <modules>
     <module>susu-core</module>
-    <module>susu-netty</module>
+    <module>susu-transport</module>
     <module>example</module>
+    <module>susu-registry</module>
+    <module>susu-cluster</module>
+    <module>susu-config</module>
   </modules>
 
   <properties>
@@ -31,16 +34,11 @@
       <version>1.2.58</version>
     </dependency>
 
-    <!--<dependency>-->
-      <!--<groupId>org.apache.commons</groupId>-->
-      <!--<artifactId>commons-lang3</artifactId>-->
-      <!--<version>3.9</version>-->
-    <!--</dependency>-->
-
     <dependency>
-      <groupId>org.apache.curator</groupId>
-      <artifactId>curator-framework</artifactId>
-      <version>4.0.1</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
