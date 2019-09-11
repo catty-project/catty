@@ -205,9 +205,11 @@ public class ZookeeperRegistry implements Registry {
 
 
   /**
-   * zookeeper结构: /root: susu/group name/interface name/providers?consumer/url buildServerPath :
-   * /root: susu/group name/interface name buildPath :       /root: susu/group name/interface
-   * name/providers?consumer
+   * zookeeper结构: /root: susu/group name/interface name/providers?consumer/url
+   *
+   * buildServerPath : /root: susu/group name/interface name
+   *
+   * buildPath :       /root: susu/group name/interface name/providers?consumer
    */
   private String buildServerPath(URL url) {
     String root = url.getString(URL_CONFIG.ROOT);
