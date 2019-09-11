@@ -23,11 +23,11 @@ public class DefaultCluster implements Cluster {
   private volatile boolean init = false;
 
   /**
-   * 没有传入urls，说明url是一个注册中心地址，需要去注册中心拿真正的server url，如果不是注册中心，代表这是为一个server
+   * 没有传入urls, 会去registry中拿地址
    */
-//  public DefaultCluster(URL url) {
-//    this.url = url;
-//  }
+  public DefaultCluster(URL url) {
+    this.url = url;
+  }
 
   public DefaultCluster(URL url, List<URL> urls) {
     this.urls = urls;
@@ -52,12 +52,13 @@ public class DefaultCluster implements Cluster {
   @Override
   public void init() {
     // 初始化负载均衡策略
-    if("random".equals(url.getStringConfig(URL_CONFIG.LOAD_BALANCE))) {
+    if("random".equals(url.getString(URL_CONFIG.LOAD_BALANCE))) {
       loadBalance = new RandomLoadBalance();
     } else {
       loadBalance = new RandomLoadBalance();
     }
 
+    // 根据urls构建invoker
     if(urls != null && urls.size() > 0) {
       invokers = urls.stream().map(this::getInvokerFromUrl).collect(Collectors.toList());
     }
@@ -81,7 +82,7 @@ public class DefaultCluster implements Cluster {
 
   @Override
   public void notify(URL registryUrl, List<URL> urls) {
-
+    this.urls = urls;
   }
 
   /**

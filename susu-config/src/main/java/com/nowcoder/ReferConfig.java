@@ -4,7 +4,9 @@ import com.nowcoder.config.AllConfig.URL_CONFIG;
 import com.nowcoder.core.URL;
 import com.nowcoder.exception.SusuException;
 import com.nowcoder.proxy.ProxyFactory;
+import com.nowcoder.registry.Registry;
 import com.nowcoder.utils.NetUtils;
+import com.nowcoder.zk.ZookeeperRegistry;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +33,16 @@ public class ReferConfig<T> {
 
   private String group;
 
+  private RegistryConfig registryConfig;
+
   /**
    * direct connect.
    */
-  private List<URL> urls;
+  private List<URL> direct;
+
+  public void setRegistryConfig(RegistryConfig registryConfig) {
+    this.registryConfig = registryConfig;
+  }
 
   public void setInterfaceClass(Class<T> interfaceClass) {
     this.interfaceClass = interfaceClass;
@@ -51,31 +59,29 @@ public class ReferConfig<T> {
   /**
    * 前期使用的简单方法，主要用来测试
    */
-  public void addAddress(String address, int port) {
+  public void addAddress(String host, int port) {
     // interfaceName 为null则改方法不生效
     if(interfaceName == null) {
       return;
     }
-    if(urls == null) {
-      urls = new ArrayList<>();
+    if(direct == null) {
+      direct = new ArrayList<>();
     }
-    URL url = new URL(protocol, address, port, interfaceName);
+    URL url = new URL(protocol, host, port, interfaceName);
     url.setConfig(URL_CONFIG.IS_SERVER, String.valueOf(false));
-    urls.add(url);
+    direct.add(url);
   }
 
-  /**
-   * 前期使用的简单方法，主要用来测试
-   */
-  public void addAddress(URL url) {
-    // interfaceName 为null则改方法不生效
-    if(interfaceName == null) {
-      return;
-    }
-    if(urls == null) {
-      urls = new ArrayList<>();
-    }
-    urls.add(url);
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public void setGroup(String group) {
+    this.group = group;
+  }
+
+  public RegistryConfig getRegistryConfig() {
+    return registryConfig;
   }
 
   public T getRefer() {
@@ -89,13 +95,27 @@ public class ReferConfig<T> {
     if(interfaceClass == null || interfaceName == null || "".equals(interfaceName)) {
       throw new SusuException("ReferConfig: server interface info is not complete");
     }
+    if(registryConfig == null) {
+      throw new SusuException("ReferConfig: registryConfig can't be null");
+    }
+
     String localAddress = getLocalHostAddress(null);
     URL url = new URL(protocol, localAddress, 0, interfaceName);
-    cluster = new DefaultCluster(url, urls);
+    url.setConfig(URL_CONFIG.IS_SERVER, false);
+    url.setConfig(URL_CONFIG.VERSION, version);
+    url.setConfig(URL_CONFIG.GROUP, group);
+
+    URL registryUrl = registryConfig.toURL();
+    if(registryUrl != null) {
+      cluster = new DefaultCluster(url);
+      Registry registry = new ZookeeperRegistry(registryUrl);
+      registry.subscribe(url, cluster);
+    } else if(direct != null && direct.size() > 0){
+      cluster = new DefaultCluster(url, direct);
+    }
+
     ref = proxyFactory.getProxy(interfaceClass, url, cluster);
   }
-
-
 
   private String getLocalHostAddress(Map<String, Integer> remoteHostPorts) {
     String localAddress = null;

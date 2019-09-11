@@ -22,15 +22,15 @@ public class DefaultInvoker implements Invoker {
     this.url = url;
     Codec codec;
     // 检测传输层和编码层各用什么样的实现，如果没有使用默认实现代替
-    if("netty".equals(url.getStringConfig(URL_CONFIG.TRANSPORT))) {
-      if("susu".equals(url.getStringConfig(URL_CONFIG.CODEC))) {
+    if("netty".equals(url.getString(URL_CONFIG.TRANSPORT))) {
+      if("susu".equals(url.getString(URL_CONFIG.CODEC))) {
         codec = new SusuCodec();
       } else {
         codec = new SusuCodec();
       }
-      client = new NettyClient(codec, url.toRemoteConfig());
+      client = new NettyClient(codec, url);
     } else {
-      client = new NettyClient(new SusuCodec(), url.toRemoteConfig());
+      client = new NettyClient(new SusuCodec(), url);
     }
   }
 

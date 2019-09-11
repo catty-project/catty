@@ -1,21 +1,22 @@
 package com.nowcoder.zk;
 
 import com.nowcoder.common.constants.SusuConstants;
-import com.nowcoder.config.AllConfig.REGISTRY_CONFIG;
 import com.nowcoder.config.AllConfig.URL_CONFIG;
 import com.nowcoder.core.URL;
 import com.nowcoder.exception.RegistryException;
 import com.nowcoder.registry.NotifyListener;
 import com.nowcoder.registry.Registry;
-import com.nowcoder.config.RegistryConfig;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.CuratorEventType;
+import org.apache.curator.framework.api.CuratorListener;
 import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
@@ -26,29 +27,36 @@ import org.apache.zookeeper.ZooDefs;
  */
 public class ZookeeperRegistry implements Registry {
 
-  private RegistryConfig registryConfig;
+  private static final String PROVIDERS = "providers";
+  private static final String CONSUMERS = "consumers";
+  private static final Set<CuratorEventType> interested = new HashSet<>();
+
+  static {
+    // 只关心创建节点和删除节点
+    interested.add(CuratorEventType.CREATE);
+    interested.add(CuratorEventType.DELETE);
+  }
+
+  private URL registryUrl;
   private CuratorFramework client;
   private Map<String, Set<String>> registered;
 
-  public ZookeeperRegistry(RegistryConfig registryConfig) {
-    this.registryConfig = registryConfig;
+  public ZookeeperRegistry(URL url) {
+    registryUrl = url;
     registered = new ConcurrentHashMap<>();
+    init();
   }
 
   @Override
   public void init() {
     // todo: RetryPolicy 支持配置
     RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 5);
-    if (registryConfig.getStringConfig(REGISTRY_CONFIG.USERNAME) != null
-        && registryConfig.getStringConfig(REGISTRY_CONFIG.PASSWORD) != null) {
-      // todo : 账号密码支持
-    } else {
-      client = CuratorFrameworkFactory.builder()
-          .connectString(registryConfig.getStringConfig(REGISTRY_CONFIG.IP_PORT))
-          .sessionTimeoutMs(10000)
-          .retryPolicy(retryPolicy)
-          .build();
-    }
+    // todo : 账号密码支持
+    client = CuratorFrameworkFactory.builder()
+        .connectString(registryUrl.getIpPortString())
+        .sessionTimeoutMs(10000)
+        .retryPolicy(retryPolicy)
+        .build();
 
     client.start();
   }
@@ -72,35 +80,51 @@ public class ZookeeperRegistry implements Registry {
   @Override
   public void register(URL url) {
     checkClientStatus();
-    String path = buildPathFromConfig(url);
-    String dataStr = url.getIpPortString();
-    Set<String> pathData = registered.getOrDefault(path, Collections.newSetFromMap(new ConcurrentHashMap<>()));
-    pathData.add(dataStr);
-    registered.putIfAbsent(path, pathData);
-
-    if(!exist(path)) {
+    String path = buildPath(url);
+    if (!exist(path)) {
       buildPath(path);
     }
-    setData(path, getPathDataBytes(pathData));
+    path += SusuConstants.PATH_SEP + encodeUrl(url.getUrlString());
+    ephemeralPath(path);
   }
 
   @Override
   public void unregister(URL url) {
     checkClientStatus();
-    String path = buildPathFromConfig(url);
-    String dataStr = url.getIpPortString();
-    Set<String> pathData = registered.get(path);
-    if(pathData == null || pathData.size() == 0 || !exist(path)) {
-      // todo: log
-      return;
-    }
-    pathData.remove(dataStr);
-    setData(path, getPathDataBytes(pathData));
+    String path = buildPath(url) + SusuConstants.PATH_SEP + url.getUrlString();
+    delete(path);
   }
 
   @Override
   public void subscribe(URL url, NotifyListener listener) {
+    checkClientStatus();
+    String path = buildServerPath(url);
 
+    // 先同步的回调一次
+    try {
+      List<String> urls = client.getChildren().forPath(buildServerPath(url) + SusuConstants.PATH_SEP + PROVIDERS);
+      listener.notify(this.registryUrl, urls.stream()
+          .map(this::decodeUrl)
+          .map(URL::parse)
+          .collect(Collectors.toList()));
+    } catch (Exception e) {
+      throw new RegistryException("ZookeeperRegistry: getChildren error", e);
+    }
+
+    // 注册监听器
+    CuratorListener curatorListener = ((client0, event) -> {
+      if (interested.contains(event.getType())) {
+        if (event.getPath() != null && event.getPath().startsWith(path)) {
+          System.out.println(event);// todo: 调试删除
+          List<String> urls = event.getChildren();
+          listener.notify(this.registryUrl, urls.stream()
+              .map(this::decodeUrl)
+              .map(URL::parse)
+              .collect(Collectors.toList()));
+        }
+      }
+    });
+    client.getCuratorListenable().addListener(curatorListener);
   }
 
   @Override
@@ -118,8 +142,8 @@ public class ZookeeperRegistry implements Registry {
 
   private void checkClientStatus() {
     if (!isAvailable()) {
-      throw new RegistryException("ZookeeperRegistry: registry unavailable, url: " + registryConfig
-          .getStringConfig(REGISTRY_CONFIG.IP_PORT));
+      throw new RegistryException(
+          "ZookeeperRegistry: registry unavailable, url: " + registryUrl.getIpPortString());
     }
   }
 
@@ -143,47 +167,74 @@ public class ZookeeperRegistry implements Registry {
     }
   }
 
-  private void setData(String path, byte[] data) {
+  private void ephemeralPath(String path) {
     try {
-      client.setData()
-          .forPath(path, data);
+      client.create()
+          .withMode(CreateMode.EPHEMERAL)
+          .withACL(ZooDefs.Ids.OPEN_ACL_UNSAFE)
+          .forPath(path);
+    } catch (Exception e) {
+      throw new RegistryException("ZookeeperRegistry: ephemeralPath error", e);
+    }
+  }
+
+  private void delete(String path) {
+    try {
+      client.delete()
+          .guaranteed()
+          .forPath(path);
     } catch (Exception e) {
       throw new RegistryException("ZookeeperRegistry: buildPath error", e);
     }
   }
 
-  private void delete(String path, byte[] data) {
-    try {
-      client.setData()
-          .forPath(path, data);
-    } catch (Exception e) {
-      throw new RegistryException("ZookeeperRegistry: buildPath error", e);
-    }
-  }
-
-  private byte[] getPathDataBytes(Set<String> pathData) {
-    if(pathData == null || pathData.size() == 0) {
-      return null;
-    }
-    StringBuilder sb = new StringBuilder();
-    for(String str : pathData) {
-      sb.append(str).append(",");
-    }
-    if(sb.length() > 0) {
-      sb.setLength(sb.length() - ",".length());
-    }
-    return sb.toString().getBytes();
-  }
+//  @Deprecated
+//  private byte[] getPathDataBytes(Set<String> pathData) {
+//    if (pathData == null || pathData.size() == 0) {
+//      return null;
+//    }
+//    StringBuilder sb = new StringBuilder();
+//    for (String str : pathData) {
+//      sb.append(str).append(",");
+//    }
+//    if (sb.length() > 0) {
+//      sb.setLength(sb.length() - ",".length());
+//    }
+//    return sb.toString().getBytes();
+//  }
 
 
-
-  private String buildPathFromConfig(URL url) {
-    String root = registryConfig.getStringConfig(REGISTRY_CONFIG.ROOT);
-    String group = url.getStringConfig(URL_CONFIG.GROUP);
+  /**
+   * zookeeper结构: /root: susu/group name/interface name/providers?consumer/url buildServerPath :
+   * /root: susu/group name/interface name buildPath :       /root: susu/group name/interface
+   * name/providers?consumer
+   */
+  private String buildServerPath(URL url) {
+    String root = url.getString(URL_CONFIG.ROOT);
+    String group = url.getString(URL_CONFIG.GROUP);
     String path = url.getPath();
-    String serverOrClient = url.getBooleanConfig(URL_CONFIG.IS_SERVER) ? "providers" : "consumer";
-    return root + SusuConstants.PATH_SEP + group + SusuConstants.PATH_SEP + path
+    return root
+        + SusuConstants.PATH_SEP + group
+        + SusuConstants.PATH_SEP + path;
+  }
+
+  private String buildPath(URL url) {
+    String root = url.getString(URL_CONFIG.ROOT);
+    String group = url.getString(URL_CONFIG.GROUP);
+    String path = url.getPath();
+    String serverOrClient = url.getBoolean(URL_CONFIG.IS_SERVER) ? PROVIDERS : CONSUMERS;
+    return root
+        + SusuConstants.PATH_SEP + group
+        + SusuConstants.PATH_SEP + path
         + SusuConstants.PATH_SEP + serverOrClient;
+  }
+
+  private String encodeUrl(String url) {
+    return URL.encode(url);
+  }
+
+  private String decodeUrl(String url) {
+    return URL.decode(url);
   }
 
 }

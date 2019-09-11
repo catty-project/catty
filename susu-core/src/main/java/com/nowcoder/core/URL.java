@@ -1,11 +1,11 @@
 package com.nowcoder.core;
 
 import com.nowcoder.common.constants.SusuConstants;
-import com.nowcoder.config.AllConfig.CLIENT_CONFIG;
-import com.nowcoder.config.AllConfig.SERVER_CONFIG;
 import com.nowcoder.config.AllConfig.URL_CONFIG;
-import com.nowcoder.config.RemoteConfig;
 import com.nowcoder.exception.SusuException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,6 +45,23 @@ public class URL {
 
   /* constructor */
   public URL() {
+    parameters = new ConcurrentHashMap<>();
+    loadDefault();
+  }
+
+  public URL(String protocol, String address) {
+    this.protocol = protocol;
+    getHostPostFromAddress(address);
+    parameters = new ConcurrentHashMap<>();
+    loadDefault();
+  }
+
+  public URL(String protocol, String address, String path) {
+    this.protocol = protocol;
+    getHostPostFromAddress(address);
+    this.path = path;
+    parameters = new ConcurrentHashMap<>();
+    loadDefault();
   }
 
   public URL(String protocol, String host, int port, String path) {
@@ -53,13 +70,7 @@ public class URL {
     this.port = port;
     this.path = path;
     parameters = new ConcurrentHashMap<>();
-    for(URL_CONFIG config0 : URL_CONFIG.values()) {
-      // 没有默认值的设置不加载。
-      if(config0.getDefaultValue() == null) {
-        continue;
-      }
-      parameters.putIfAbsent(config0.getKey(), config0.getDefaultValue());
-    }
+    loadDefault();
   }
 
   public URL(String protocol, String host, int port, String path,
@@ -70,9 +81,57 @@ public class URL {
     this.path = path;
     this.parameters = parameters;
   }
+
+  private void loadDefault() {
+    for(URL_CONFIG config : URL_CONFIG.values()) {
+      if(config.getDefaultValue() == null) {
+        continue;
+      }
+      setConfig(config, config.getDefaultValue());
+    }
+  }
+
+  private void getHostPostFromAddress(String address) {
+    if(address == null || address.length() == 0 || !address.contains(":")) {
+      throw new IllegalArgumentException("URL: address error: " + address);
+    }
+    String[] split = address.split(":");
+    if(split.length != 2) {
+      throw new IllegalArgumentException("URL: address error: " + address);
+    }
+    this.host = split[0];
+    try {
+      this.port = Integer.valueOf(split[1]);
+    } catch (Exception e) {
+      throw new IllegalArgumentException("URL: address error: " + address, e);
+    }
+
+  }
   /* ------ */
 
   /* static method */
+
+  public static String encode(String url) {
+    if (url == null || "".equals(url)) {
+      return "";
+    }
+    try {
+      return URLEncoder.encode(url, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
+  public static String decode(String url) {
+    if (url == null || "".equals(url)) {
+      return "";
+    }
+    try {
+      return URLDecoder.decode(url, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
 
   /**
    * copy from motan, xixi
@@ -158,7 +217,7 @@ public class URL {
         SusuConstants.PATH_SEP + path;
   }
 
-  public String getString() {
+  public String getUrlString() {
     StringBuilder builder = new StringBuilder();
     builder.append(getUri()).append("?");
 
@@ -215,67 +274,66 @@ public class URL {
 
   /* --- */
 
-  public boolean getBooleanConfig(URL_CONFIG key) {
+  public boolean getBoolean(URL_CONFIG key) {
     String value = parameters.get(key.getKey());
     return Boolean.valueOf(value);
   }
 
-  public short getShortConfig(URL_CONFIG key) {
+  public short getShort(URL_CONFIG key) {
     String value = parameters.get(key.getKey());
     return Short.valueOf(value);
   }
 
-  public int getIntConfig(URL_CONFIG key) {
+  public int getInt(URL_CONFIG key) {
     String value = parameters.get(key.getKey());
     return Integer.valueOf(value);
   }
 
-  public long getLongConfig(URL_CONFIG key) {
+  public long getLong(URL_CONFIG key) {
     String value = parameters.get(key.getKey());
     return Long.valueOf(value);
   }
 
-  public String getStringConfig(URL_CONFIG key) {
+  public String getString(URL_CONFIG key) {
     return parameters.get(key.getKey());
   }
 
-  public Double getDoubleConfig(URL_CONFIG key) {
+  public double getDouble(URL_CONFIG key) {
     String value = parameters.get(key.getKey());
     return Double.valueOf(value);
   }
 
-  public void setConfig(String key, String value) {
-    parameters.put(key, value);
-  }
-
-  public void setConfig(URL_CONFIG key, String value) {
-    parameters.put(key.getKey(), value);
+  public void setConfig(URL_CONFIG key, Object value) {
+    if(value == null) {
+      value = key.getDefaultValue();
+    }
+    parameters.put(key.getKey(), String.valueOf(value));
   }
 
   /* convert to other config */
 
-  public RemoteConfig toRemoteConfig() {
-    Map<String, String> config = parameters;
-    boolean isServer = getBooleanConfig(URL_CONFIG.IS_SERVER);
-    RemoteConfig remoteConfig = new RemoteConfig(isServer);
-    if (isServer) {
-      for(SERVER_CONFIG config0 : SERVER_CONFIG.values()) {
-        String value = config.get(config0.getKey());
-        if(value != null) {
-          remoteConfig.setConfig(config0, value);
-        }
-      }
-    } else {
-      for(CLIENT_CONFIG config0 : CLIENT_CONFIG.values()) {
-        String value = config.get(config0.getKey());
-        if(value != null) {
-          remoteConfig.setConfig(config0, value);
-        }
-      }
-      remoteConfig.setConfig(CLIENT_CONFIG.REMOTE_IP, host);
-      remoteConfig.setConfig(CLIENT_CONFIG.REMOTE_PORT, String.valueOf(port));
-    }
-    return remoteConfig;
-  }
+//  public RemoteConfig toRemoteConfig() {
+//    Map<String, String> config = parameters;
+//    boolean isServer = getBoolean(URL_CONFIG.IS_SERVER);
+//    RemoteConfig remoteConfig = new RemoteConfig(isServer);
+//    if (isServer) {
+//      for(SERVER_CONFIG config0 : SERVER_CONFIG.values()) {
+//        String value = config.get(config0.getKey());
+//        if(value != null) {
+//          remoteConfig.setConfig(config0, value);
+//        }
+//      }
+//    } else {
+//      for(CLIENT_CONFIG config0 : CLIENT_CONFIG.values()) {
+//        String value = config.get(config0.getKey());
+//        if(value != null) {
+//          remoteConfig.setConfig(config0, value);
+//        }
+//      }
+//      remoteConfig.setConfig(CLIENT_CONFIG.REMOTE_IP, host);
+//      remoteConfig.setConfig(CLIENT_CONFIG.REMOTE_PORT, String.valueOf(port));
+//    }
+//    return remoteConfig;
+//  }
 
 }

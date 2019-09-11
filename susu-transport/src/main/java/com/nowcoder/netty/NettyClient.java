@@ -1,18 +1,17 @@
 package com.nowcoder.netty;
 
-import com.nowcoder.codec.Codec;
-import com.nowcoder.config.AllConfig.CLIENT_CONFIG;
-import com.nowcoder.exception.SusuException;
-import com.nowcoder.exception.TransportException;
-import com.nowcoder.netty.netty_codec.NettyDecoder;
-import com.nowcoder.netty.netty_codec.NettyEncoder;
 import com.nowcoder.api.remote.DefaultResponseFuture;
-import com.nowcoder.api.transport.Handler;
-import com.nowcoder.config.RemoteConfig;
 import com.nowcoder.api.remote.Request;
 import com.nowcoder.api.remote.Response;
 import com.nowcoder.api.remote.ResponseFuture;
 import com.nowcoder.api.transport.AbstractClient;
+import com.nowcoder.api.transport.Handler;
+import com.nowcoder.codec.Codec;
+import com.nowcoder.core.URL;
+import com.nowcoder.exception.SusuException;
+import com.nowcoder.exception.TransportException;
+import com.nowcoder.netty.netty_codec.NettyDecoder;
+import com.nowcoder.netty.netty_codec.NettyEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
@@ -37,8 +36,8 @@ public class NettyClient extends AbstractClient {
 
   private ExecutorService executor;
 
-  public NettyClient(Codec codec, RemoteConfig remoteConfig) {
-    super(codec, remoteConfig);
+  public NettyClient(Codec codec, URL url) {
+    super(codec, url);
     executor = Executors.newSingleThreadExecutor();
     nioEventLoopGroup = new NioEventLoopGroup();
   }
@@ -90,8 +89,7 @@ public class NettyClient extends AbstractClient {
 
     ChannelFuture future;
     try {
-      future = bootstrap.connect(getConfig().getStringConfig(CLIENT_CONFIG.REMOTE_IP),
-          getConfig().getIntConfig(CLIENT_CONFIG.REMOTE_PORT)).sync();
+      future = bootstrap.connect(getUrl().getHost(), getUrl().getPort()).sync();
     } catch (InterruptedException i) {
       close();
       // todo : log or retry

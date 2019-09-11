@@ -1,7 +1,7 @@
 package com.nowcoder.api.transport;
 
 import com.nowcoder.codec.Codec;
-import com.nowcoder.config.RemoteConfig;
+import com.nowcoder.core.URL;
 
 /**
  * 服务端
@@ -10,7 +10,7 @@ import com.nowcoder.config.RemoteConfig;
  */
 public class AbstractServer extends AbstractEndpoint implements Server {
 
-  public AbstractServer(Codec codec, RemoteConfig remoteConfig) {
-    super(codec, remoteConfig);
+  public AbstractServer(Codec codec, URL url) {
+    super(codec, url);
   }
 }

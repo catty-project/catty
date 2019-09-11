@@ -1,8 +1,8 @@
 package com.nowcoder.api.transport;
 
 import com.nowcoder.codec.Codec;
+import com.nowcoder.core.URL;
 import com.nowcoder.exception.CodecException;
-import com.nowcoder.config.RemoteConfig;
 
 /**
  * 一个可以通信的终端，需要有自己的编解码器：Codec。
@@ -26,13 +26,13 @@ abstract public class AbstractEndpoint implements Channel, Codec{
 
   private Codec codec;
 
-  private RemoteConfig remoteConfig;
+  private URL url;
 
   private volatile int CHANNEL_STATUS = 0;
 
-  public AbstractEndpoint(Codec codec, RemoteConfig remoteConfig) {
+  public AbstractEndpoint(Codec codec, URL url) {
     this.codec = codec;
-    this.remoteConfig = remoteConfig;
+    this.url = url;
   }
 
   @Override
@@ -41,12 +41,12 @@ abstract public class AbstractEndpoint implements Channel, Codec{
   }
 
   @Override
-  public RemoteConfig getConfig() {
-    return remoteConfig;
+  public URL getUrl() {
+    return url;
   }
 
-  public void setConfig(RemoteConfig remoteConfig) {
-    this.remoteConfig = remoteConfig;
+  public void setUrl(URL url) {
+    this.url = url;
   }
 
   @Override

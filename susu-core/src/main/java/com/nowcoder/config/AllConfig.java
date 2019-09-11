@@ -81,6 +81,7 @@ public interface AllConfig {
   }
 
   enum URL_CONFIG {
+    ROOT("registry_root", "/susu"),
     GROUP("registry_group", "default"),
     IS_SERVER("is_server", "true"),
     VERSION("version", "1.0"),
@@ -88,6 +89,7 @@ public interface AllConfig {
     TRANSPORT("transport", "netty"),
     LOAD_BALANCE("load_balance", "random"),
     CODEC("codec", "susu"),
+
 
     ;
     private String key;

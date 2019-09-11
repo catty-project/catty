@@ -1,15 +1,14 @@
 package com.nowcoder.netty;
 
-import com.nowcoder.codec.Codec;
-import com.nowcoder.config.AllConfig.SERVER_CONFIG;
-import com.nowcoder.exception.SusuException;
-import com.nowcoder.netty.netty_codec.NettyDecoder;
-import com.nowcoder.netty.netty_codec.NettyEncoder;
-import com.nowcoder.config.RemoteConfig;
 import com.nowcoder.api.remote.Request;
 import com.nowcoder.api.remote.Response;
 import com.nowcoder.api.transport.AbstractServer;
 import com.nowcoder.api.transport.Handler;
+import com.nowcoder.codec.Codec;
+import com.nowcoder.core.URL;
+import com.nowcoder.exception.SusuException;
+import com.nowcoder.netty.netty_codec.NettyDecoder;
+import com.nowcoder.netty.netty_codec.NettyEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
@@ -33,9 +32,9 @@ public class NettyServer extends AbstractServer {
 
   private Handler handler;
 
-  public NettyServer(Codec codec, RemoteConfig remoteConfig,
+  public NettyServer(Codec codec, URL url,
       Handler handler) {
-    super(codec, remoteConfig);
+    super(codec, url);
     this.handler = handler;
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
@@ -57,7 +56,7 @@ public class NettyServer extends AbstractServer {
     serverBootstrap.childOption(ChannelOption.TCP_NODELAY, true);
     serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
     try {
-      ChannelFuture f = serverBootstrap.bind(getConfig().getIntConfig(SERVER_CONFIG.SERVER_PORT)).sync();
+      ChannelFuture f = serverBootstrap.bind(getUrl().getPort()).sync();
       serverChannel = f.channel();
     } catch (Exception e) {
       // todo: log

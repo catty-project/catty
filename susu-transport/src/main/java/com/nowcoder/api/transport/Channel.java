@@ -1,7 +1,7 @@
 package com.nowcoder.api.transport;
 
 import com.nowcoder.codec.Codec;
-import com.nowcoder.config.RemoteConfig;
+import com.nowcoder.core.URL;
 
 /**
  * 表示一个客户端与服务端的链接（或者说一个信道），用于管理这个链接的通用功能和生命周期。
@@ -18,7 +18,7 @@ public interface Channel {
   /**
    * 该传输层的设置
    */
-  RemoteConfig getConfig();
+  URL getUrl();
 
   boolean isOpened();
 
