@@ -1,7 +1,7 @@
 package com.nowcoder.lb;
 
 import com.nowcoder.LoadBalance;
-import com.nowcoder.api.remote.Invoker;
+import com.nowcoder.Invoker;
 import java.util.List;
 import java.util.Random;
 

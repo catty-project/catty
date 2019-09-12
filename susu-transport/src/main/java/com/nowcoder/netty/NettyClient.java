@@ -36,8 +36,8 @@ public class NettyClient extends AbstractClient {
 
   private ExecutorService executor;
 
-  public NettyClient(Codec codec, URL url) {
-    super(codec, url);
+  public NettyClient(Codec codec, URL serverUrl) {
+    super(codec, serverUrl);
     executor = Executors.newSingleThreadExecutor();
     nioEventLoopGroup = new NioEventLoopGroup();
   }
@@ -118,6 +118,9 @@ public class NettyClient extends AbstractClient {
    */
   @Override
   public void close() {
+    if(isClosed()) {
+      return;
+    }
     if (clientChannel != null) {
       clientChannel.close();
     }

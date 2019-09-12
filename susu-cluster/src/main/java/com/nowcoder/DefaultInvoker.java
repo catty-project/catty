@@ -5,7 +5,6 @@ import com.nowcoder.susu.SusuCodec;
 import com.nowcoder.config.AllConfig.URL_CONFIG;
 import com.nowcoder.core.URL;
 import com.nowcoder.netty.NettyClient;
-import com.nowcoder.api.remote.Invoker;
 import com.nowcoder.api.remote.Request;
 import com.nowcoder.api.remote.Response;
 import com.nowcoder.api.transport.Client;
@@ -16,10 +15,10 @@ import com.nowcoder.api.transport.Client;
 public class DefaultInvoker implements Invoker {
 
   private Client client;
-  private URL url;
+  private URL serverUrl;
 
   public DefaultInvoker(URL url) {
-    this.url = url;
+    serverUrl = url;
     Codec codec;
     // 检测传输层和编码层各用什么样的实现，如果没有使用默认实现代替
     if("netty".equals(url.getString(URL_CONFIG.TRANSPORT))) {
@@ -28,9 +27,9 @@ public class DefaultInvoker implements Invoker {
       } else {
         codec = new SusuCodec();
       }
-      client = new NettyClient(codec, url);
+      client = new NettyClient(codec, serverUrl);
     } else {
-      client = new NettyClient(new SusuCodec(), url);
+      client = new NettyClient(new SusuCodec(), serverUrl);
     }
   }
 
@@ -42,7 +41,7 @@ public class DefaultInvoker implements Invoker {
 
   @Override
   public URL getURL() {
-    return url;
+    return serverUrl;
   }
 
   @Override

@@ -4,6 +4,7 @@ import com.nowcoder.Cluster;
 import com.nowcoder.api.remote.Request;
 import com.nowcoder.api.remote.Response;
 import com.nowcoder.core.URL;
+import com.nowcoder.utils.RequestIdGenerator;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
@@ -27,6 +28,7 @@ public class ProxyHandler implements InvocationHandler {
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
     Request request = new Request();
+    request.setRequestId(RequestIdGenerator.next());
     request.setInterfaceName(method.getDeclaringClass().getName());
     request.setMethodName(method.getName());
     request.setArgsType(getArgsTypeString(args));

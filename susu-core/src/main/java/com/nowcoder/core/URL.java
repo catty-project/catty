@@ -8,6 +8,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -310,30 +311,74 @@ public class URL {
     parameters.put(key.getKey(), String.valueOf(value));
   }
 
-  /* convert to other config */
 
-//  public RemoteConfig toRemoteConfig() {
-//    Map<String, String> config = parameters;
-//    boolean isServer = getBoolean(URL_CONFIG.IS_SERVER);
-//    RemoteConfig remoteConfig = new RemoteConfig(isServer);
-//    if (isServer) {
-//      for(SERVER_CONFIG config0 : SERVER_CONFIG.values()) {
-//        String value = config.get(config0.getKey());
-//        if(value != null) {
-//          remoteConfig.setConfig(config0, value);
-//        }
-//      }
-//    } else {
-//      for(CLIENT_CONFIG config0 : CLIENT_CONFIG.values()) {
-//        String value = config.get(config0.getKey());
-//        if(value != null) {
-//          remoteConfig.setConfig(config0, value);
-//        }
-//      }
-//      remoteConfig.setConfig(CLIENT_CONFIG.REMOTE_IP, host);
-//      remoteConfig.setConfig(CLIENT_CONFIG.REMOTE_PORT, String.valueOf(port));
-//    }
-//    return remoteConfig;
-//  }
+  public boolean canServe(URL refUrl) {
+    if (refUrl == null || !this.getPath().equals(refUrl.getPath())) {
+      return false;
+    }
 
+    if (!Objects.equals(protocol, refUrl.protocol)) {
+      return false;
+    }
+    if (!getBoolean(URL_CONFIG.IS_SERVER)) {
+      return false;
+    }
+    // 这里可能有问题，version要向下兼容，而不要完全一致
+    String version = getString(URL_CONFIG.VERSION);
+    String refVersion = refUrl.getString(URL_CONFIG.VERSION);
+    if (!version.equals(refVersion)) {
+      return false;
+    }
+    // 检查服务端和客户端的序列化是否一致，否则不能反序列化
+    String serialize = getString(URL_CONFIG.CODEC);
+    String refSerialize = refUrl.getString(URL_CONFIG.CODEC);
+    if (!serialize.equals(refSerialize)) {
+      return false;
+    }
+
+    // 不检查组，需要跨组调用，组只是用来方便管理
+
+    return true;
+  }
+
+
+  @Override
+  public boolean equals(Object obj) {
+    if(!(obj instanceof URL)) {
+      return false;
+    }
+    try {
+      URL o = (URL) obj;
+      if(!Objects.equals(o.protocol, protocol)) {
+        return false;
+      }
+      if(!Objects.equals(o.host, host)) {
+        return false;
+      }
+      if(!Objects.equals(o.port, port)) {
+        return false;
+      }
+      if(!Objects.equals(o.path, path)) {
+        return false;
+      }
+      if(!Objects.equals(o.parameters, parameters)) {
+        return false;
+      }
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    int factor = 31;
+    int rs = 1;
+    rs = factor * rs + Objects.hashCode(protocol);
+    rs = factor * rs + Objects.hashCode(host);
+    rs = factor * rs + Objects.hashCode(port);
+    rs = factor * rs + Objects.hashCode(path);
+    rs = factor * rs + Objects.hashCode(parameters);
+    return rs;
+  }
 }

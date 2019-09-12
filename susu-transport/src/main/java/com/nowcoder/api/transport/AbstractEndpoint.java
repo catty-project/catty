@@ -26,13 +26,13 @@ abstract public class AbstractEndpoint implements Channel, Codec{
 
   private Codec codec;
 
-  private URL url;
+  private URL serverUrl;
 
   private volatile int CHANNEL_STATUS = 0;
 
-  public AbstractEndpoint(Codec codec, URL url) {
+  public AbstractEndpoint(Codec codec, URL serverUrl) {
     this.codec = codec;
-    this.url = url;
+    this.serverUrl = serverUrl;
   }
 
   @Override
@@ -42,11 +42,11 @@ abstract public class AbstractEndpoint implements Channel, Codec{
 
   @Override
   public URL getUrl() {
-    return url;
+    return serverUrl;
   }
 
   public void setUrl(URL url) {
-    this.url = url;
+    this.serverUrl = url;
   }
 
   @Override

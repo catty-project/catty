@@ -8,9 +8,7 @@ import com.nowcoder.registry.NotifyListener;
 import com.nowcoder.registry.Registry;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -39,11 +37,9 @@ public class ZookeeperRegistry implements Registry {
 
   private URL registryUrl;
   private CuratorFramework client;
-  private Map<String, Set<String>> registered;
 
   public ZookeeperRegistry(URL url) {
     registryUrl = url;
-    registered = new ConcurrentHashMap<>();
     init();
   }
 
@@ -130,11 +126,6 @@ public class ZookeeperRegistry implements Registry {
   @Override
   public void unsubscribe(URL url, NotifyListener listener) {
 
-  }
-
-  @Override
-  public List<URL> discover(URL url) {
-    return null;
   }
 
 

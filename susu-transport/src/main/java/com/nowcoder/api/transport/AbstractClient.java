@@ -15,8 +15,8 @@ abstract public class AbstractClient extends AbstractEndpoint implements Client 
 
   private Map<Long, ResponseFuture> currentTask = new ConcurrentHashMap<>();
 
-  public AbstractClient(Codec codec, URL url) {
-    super(codec, url);
+  public AbstractClient(Codec codec, URL serverUrl) {
+    super(codec, serverUrl);
   }
 
   protected ResponseFuture getResponseFuture(long requestId) {

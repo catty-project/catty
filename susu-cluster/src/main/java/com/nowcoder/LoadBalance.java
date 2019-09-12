@@ -1,6 +1,5 @@
 package com.nowcoder;
 
-import com.nowcoder.api.remote.Invoker;
 import java.util.List;
 
 /**

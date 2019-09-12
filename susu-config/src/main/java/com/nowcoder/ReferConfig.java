@@ -112,6 +112,8 @@ public class ReferConfig<T> {
       registry.subscribe(url, cluster);
     } else if(direct != null && direct.size() > 0){
       cluster = new DefaultCluster(url, direct);
+    } else {
+      throw new SusuException("ReferConfig: registryConfig & direct can't both be null");
     }
 
     ref = proxyFactory.getProxy(interfaceClass, url, cluster);

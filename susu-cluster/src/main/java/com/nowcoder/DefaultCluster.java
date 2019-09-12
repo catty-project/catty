@@ -1,14 +1,16 @@
 package com.nowcoder;
 
+import com.nowcoder.api.remote.Request;
+import com.nowcoder.api.remote.Response;
 import com.nowcoder.config.AllConfig.URL_CONFIG;
 import com.nowcoder.core.URL;
 import com.nowcoder.exception.SusuException;
 import com.nowcoder.lb.RandomLoadBalance;
-import com.nowcoder.api.remote.Invoker;
-import com.nowcoder.api.remote.Request;
-import com.nowcoder.api.remote.Response;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author zrj CreateDate: 2019/9/10
@@ -19,6 +21,8 @@ public class DefaultCluster implements Cluster {
   private List<Invoker> invokers;
   private List<URL> urls;
   private URL url;
+
+  private Map<URL, Invoker> invokerMap = new ConcurrentHashMap<>();
 
   private volatile boolean init = false;
 
@@ -60,7 +64,11 @@ public class DefaultCluster implements Cluster {
 
     // 根据urls构建invoker
     if(urls != null && urls.size() > 0) {
-      invokers = urls.stream().map(this::getInvokerFromUrl).collect(Collectors.toList());
+      for(URL url : urls) {
+        Invoker invoker = getInvokerFromUrl(url);
+        invokers.add(invoker);
+        invokerMap.put(url, invoker);
+      }
     }
     init = true;
   }
@@ -81,8 +89,32 @@ public class DefaultCluster implements Cluster {
   }
 
   @Override
-  public void notify(URL registryUrl, List<URL> urls) {
+  public synchronized void notify(URL registryUrl, List<URL> urls) {
     this.urls = urls;
+    if(invokers != null) {
+      Map<URL, Invoker> newMap = new ConcurrentHashMap<>();
+      List<URL> oldStillAvailable = new ArrayList<>();
+      for(Entry<URL, Invoker> entry : invokerMap.entrySet()) {
+        URL url = entry.getKey();
+        if(urls.contains(url)) {
+          // 继续存在的服务
+          oldStillAvailable.add(url);
+          newMap.put(entry.getKey(), entry.getValue());
+        } else {
+          // 销毁已经不存在的服务
+          entry.getValue().destroy();
+        }
+      }
+
+      // 找到新增的服务
+      urls.removeAll(oldStillAvailable);
+      for(URL url : urls) {
+        newMap.put(url, getInvokerFromUrl(url));
+      }
+      // 替换新的服务列表
+      invokerMap = newMap;
+      invokers = new ArrayList<>(newMap.values());
+    }
   }
 
   /**

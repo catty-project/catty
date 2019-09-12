@@ -25,6 +25,10 @@ public class RegistryConfig {
     this.protocol = protocol;
   }
 
+  public boolean isDisabled() {
+    return disabled.equals(protocol);
+  }
+
   public URL toURL() {
     if(!isValidAddress() || disabled.equals(address)) {
       return null;

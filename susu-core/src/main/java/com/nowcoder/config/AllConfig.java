@@ -85,7 +85,6 @@ public interface AllConfig {
     GROUP("registry_group", "default"),
     IS_SERVER("is_server", "true"),
     VERSION("version", "1.0"),
-
     TRANSPORT("transport", "netty"),
     LOAD_BALANCE("load_balance", "random"),
     CODEC("codec", "susu"),
