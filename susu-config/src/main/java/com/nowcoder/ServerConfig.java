@@ -2,9 +2,9 @@ package com.nowcoder;
 
 import com.nowcoder.core.URL;
 import com.nowcoder.exception.SusuException;
-import com.nowcoder.netty.NettyServer;
 import com.nowcoder.registry.Registry;
-import com.nowcoder.susu.SusuCodec;
+import com.nowcoder.router.DefaultRouter;
+import com.nowcoder.router.Provider;
 import com.nowcoder.utils.NetUtils;
 import com.nowcoder.zk.ZookeeperRegistry;
 import java.net.InetAddress;
@@ -59,12 +59,19 @@ public class ServerConfig<T> {
   public void export() {
     String host = getLocalHostAddress(null);
     URL url = new URL(protocol, host, port, interfaceName);
+
+    DefaultRouter router = new DefaultRouter(url);
+    router.init();
+
+    Provider<T> provider = new Provider<>(ref, interfaceClass);
+    router.addNewProvider(url, provider);
+
     URL registryUrl = registryConfig.toURL();
     Registry registry = new ZookeeperRegistry(registryUrl);
     registry.register(url);
-    NettyServer nettyServer = new NettyServer(new SusuCodec(), url,
-        new Provider<>(ref, interfaceClass));
-    nettyServer.open();
+//    NettyServer nettyServer = new NettyServer(new SusuCodec(), url,
+//        new Provider<>(ref, interfaceClass));
+//    nettyServer.open();
   }
 
   private String getLocalHostAddress(Map<String, Integer> remoteHostPorts) {

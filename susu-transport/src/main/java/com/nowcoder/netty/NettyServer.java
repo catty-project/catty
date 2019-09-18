@@ -19,11 +19,15 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author zrj CreateDate: 2019/9/4
  */
 public class NettyServer extends AbstractServer {
+
+  private static Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
   private io.netty.channel.Channel serverChannel;
   private NioEventLoopGroup bossGroup;
@@ -60,6 +64,7 @@ public class NettyServer extends AbstractServer {
       serverChannel = f.channel();
     } catch (Exception e) {
       // todo: log
+      logger.error("NettyServer bind error", e);
     }
   }
 
@@ -90,10 +95,10 @@ public class NettyServer extends AbstractServer {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
       Object object = decode((byte[]) msg);
-      if (!(object instanceof Request) && !(object instanceof Response)) {
-        throw new SusuException("NettyChannelHandler: unsupported message type when encode: " + object.getClass());
+      if (!(object instanceof Request)) {
+        throw new SusuException("ServerChannelHandler: unsupported message type when decode: " + object.getClass());
       }
-        processRequest(ctx, (Request) object);
+      processRequest(ctx, (Request) object);
     }
 
     private void processRequest(ChannelHandlerContext ctx, Request msg) {

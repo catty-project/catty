@@ -38,8 +38,8 @@ public class ZookeeperRegistry implements Registry {
   private URL registryUrl;
   private CuratorFramework client;
 
-  public ZookeeperRegistry(URL url) {
-    registryUrl = url;
+  public ZookeeperRegistry(URL registryUrl) {
+    this.registryUrl = registryUrl;
     init();
   }
 

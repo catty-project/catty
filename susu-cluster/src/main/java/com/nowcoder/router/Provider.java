@@ -1,18 +1,19 @@
-package com.nowcoder;
+package com.nowcoder.router;
 
+import com.nowcoder.Invoker;
+import com.nowcoder.api.remote.Request;
+import com.nowcoder.api.remote.Response;
 import com.nowcoder.exception.SusuException;
-import com.nowcoder.api.transport.Handler;
+import com.nowcoder.utils.ReflectUtils;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import com.nowcoder.api.remote.Request;
-import com.nowcoder.utils.ReflectUtils;
 
 /**
  * @author zrj CreateDate: 2019/9/5
  */
-public class Provider<T> implements Handler {
+public class Provider<T> implements Invoker {
 
   protected Map<String, Method> methodMap = new ConcurrentHashMap<>();
 
@@ -37,24 +38,38 @@ public class Provider<T> implements Handler {
   }
 
   @Override
-  public Object handle(Object message) {
-    if(!(message instanceof Request)) {
-      throw new SusuException("Provider: handle unsupported message type: " + message.getClass());
-    }
-    Request request = (Request) message;
+  public Response invoke(Request request) {
+    Response response = new Response();
+    response.setRequestId(request.getRequestId());
     String methodName = ReflectUtils.getMethodDesc(request.getMethodName(), request.getArgsType());
     Method method = methodMap.get(methodName);
     if(method == null) {
-      return new SusuException("Provider: can't find method: " + methodName);
+      response.setException(new SusuException("Provider: can't find method: " + methodName));
+      return response;
     }
     try {
-      return method.invoke(ref, request.getArgsValue());
+      Object value =  method.invoke(ref, request.getArgsValue());
+      response.setReturnValue(value);
     } catch (Exception e) {
-      return new SusuException("Provider: com.nowcoder.exception when invoke method: " + methodName, e);
+      response.setException(new SusuException("Provider: com.nowcoder.exception when invoke method: " + methodName, e));
     } catch (Error e) {
-      return new SusuException("Provider: error when invoke method: " + methodName, e);
+      response.setException(new SusuException("Provider: error when invoke method: " + methodName, e));
     }
+    return response;
   }
 
+  @Override
+  public void init() {
 
+  }
+
+  @Override
+  public void destroy() {
+
+  }
+
+  @Override
+  public boolean isAvailable() {
+    return false;
+  }
 }

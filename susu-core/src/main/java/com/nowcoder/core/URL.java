@@ -84,12 +84,12 @@ public class URL {
   }
 
   private void loadDefault() {
-    for(URL_CONFIG config : URL_CONFIG.values()) {
-      if(config.getDefaultValue() == null) {
-        continue;
-      }
-      setConfig(config, config.getDefaultValue());
-    }
+//    for(URL_CONFIG config : URL_CONFIG.values()) {
+//      if(config.getDefaultValue() == null) {
+//        continue;
+//      }
+//      setConfig(config, config.getDefaultValue());
+//    }
   }
 
   private void getHostPostFromAddress(String address) {
