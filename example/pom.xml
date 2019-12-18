@@ -12,11 +12,7 @@
   <artifactId>example</artifactId>
 
   <dependencies>
-    <dependency>
-      <groupId>com.nowcoder</groupId>
-      <artifactId>susu-config</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
+
   </dependencies>
 
 </project>

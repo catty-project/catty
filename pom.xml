@@ -16,7 +16,6 @@
     <module>example</module>
     <module>susu-registry</module>
     <module>susu-cluster</module>
-    <module>susu-config</module>
   </modules>
 
   <properties>

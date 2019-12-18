@@ -1,0 +1,30 @@
+syntax="proto3";
+
+package org.fire.core.codec;
+
+import "google/protobuf/any.proto";
+
+option java_package = "org.fire.core.codec.generated";
+option java_outer_classname="SusuProtocol";
+
+message Request {
+    int64 requestId = 1;
+    string interfaceName = 2;
+    string methodName = 3;
+    repeated google.protobuf.Any args = 4;
+};
+
+message Response {
+    int64 requestId = 1;
+    Status status = 2;
+    oneof returnValue {
+        google.protobuf.Any result = 3;
+        string errorMessage = 4;
+    };
+};
+
+enum Status {
+    OK = 0; // OK;
+    OUTER_ERROR = 1; // Outer error;
+    INNER_ERROR = 2; // Inner error;
+};

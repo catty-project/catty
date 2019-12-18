@@ -1,3 +1,20 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# Idea
 *.iml
 /target
 /.idea
+
+# generated files
+**/generated/*
+
+# macOS
+*/.DS_Store
+
+# target files
+/*/target
+target/
