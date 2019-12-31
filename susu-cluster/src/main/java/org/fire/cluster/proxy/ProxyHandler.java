@@ -72,7 +72,7 @@ public class ProxyHandler<T> implements InvocationHandler {
     }
 
     // sync-method
-    if (response.getThrowable() != null) {
+    if (response.isError()) {
       throw response.getThrowable();
     }
     return resolveReturnValue(response.getValue(), returnType);
@@ -85,6 +85,9 @@ public class ProxyHandler<T> implements InvocationHandler {
       return ((Any) returnValue).unpack(
           (Class<? extends Message>) ((ParameterizedType) resolvedReturnType)
               .getActualTypeArguments()[0]);
+    } else if (returnValue instanceof Any && Message.class
+        .isAssignableFrom((Class<?>) resolvedReturnType)) {
+      return ((Any) returnValue).unpack((Class<Message>) resolvedReturnType);
     } else {
       return returnValue;
     }

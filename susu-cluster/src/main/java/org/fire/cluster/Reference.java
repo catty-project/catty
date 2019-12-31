@@ -27,6 +27,7 @@ public class Reference<T> {
 
   public T refer() {
     client = new NettyClient(clientConfig);
+    client.open();
     Invoker invoker = new DefaultInvoker(client, interfaceClass);
     return new ProxyFactory<T>().getProxy(interfaceClass, invoker);
   }
