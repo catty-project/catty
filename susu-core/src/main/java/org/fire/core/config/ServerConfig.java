@@ -1,6 +1,6 @@
 package org.fire.core.config;
 
-import org.fire.core.common.ServerAddress;
+import org.fire.core.ServerAddress;
 import org.fire.core.utils.NetUtils;
 import lombok.Builder;
 

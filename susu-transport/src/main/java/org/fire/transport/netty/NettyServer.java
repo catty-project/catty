@@ -32,7 +32,7 @@ public class NettyServer extends AbstractServer {
 
   public NettyServer(ServerConfig serverConfig, List<Invoker> handlers) {
     super(serverConfig, new SusuCodec(new ProtoBufSerialization()));
-    handlers.forEach((handler) -> getInvokerCollection().registerInvoker(handler));
+    handlers.forEach(this::registerInvoker);
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
   }

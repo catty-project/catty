@@ -1,4 +1,4 @@
-package org.fire.core.common;
+package org.fire.core;
 
 import java.util.Objects;
 

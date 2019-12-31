@@ -16,7 +16,7 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import org.fire.core.codec.Codec.DataTypeEnum;
 import org.fire.core.config.ClientConfig;
-import org.fire.core.constants.GlobalConstants;
+import org.fire.core.GlobalConstants;
 import org.fire.core.exception.SusuException;
 import org.fire.core.exception.TransportException;
 import org.fire.transport.api.AbstractClient;

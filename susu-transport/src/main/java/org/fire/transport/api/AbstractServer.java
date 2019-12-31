@@ -1,11 +1,16 @@
 package org.fire.transport.api;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import org.fire.core.GlobalConstants;
+import org.fire.core.Invoker;
+import org.fire.core.Request;
+import org.fire.core.Response;
 import org.fire.core.codec.Codec;
 import org.fire.core.config.ServerConfig;
-import org.fire.core.constants.GlobalConstants;
 import org.fire.transport.api.worker.ConsistentHashLoopGroup;
-import org.fire.transport.api.worker.HashableExecutor;
 import org.fire.transport.api.worker.HashableChooserFactory;
+import org.fire.transport.api.worker.HashableExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,30 +25,30 @@ public abstract class AbstractServer implements Server {
   private ServerConfig serverConfig;
   private volatile int status = NEW;
   private Codec codec;
-  private InvokerCollection invokerCollection;
+
+  private Map<String, Invoker> handlerMap;
 
   /**
-   * HashableExecutor is needed, because if a request just be submitted randomly to a
-   * generic executor such as ThreadPollExecutor, then the a series of requests can't
-   * be able to be executed by the origin order even if they are transformed by the same
-   * TCP link. And in some cases, this will cause severe problem.
+   * HashableExecutor is needed, because if a request just be submitted randomly to a generic
+   * executor such as ThreadPollExecutor, then the a series of requests can't be able to be executed
+   * by the origin order even if they are transformed by the same TCP link. And in some cases, this
+   * will cause severe problem.
    *
    * To fix this problem, we introduce HashableExecutor.
    *
-   * When you need keep order for a series of requests, you can invoke
-   * {@link HashableExecutor#submit(int, Runnable)} and pass a same hash number as the first
-   * argument of those tasks, as result, those requests will be executed by submitting
-   * order.
+   * When you need keep order for a series of requests, you can invoke {@link
+   * HashableExecutor#submit(int, Runnable)} and pass a same hash number as the first argument of
+   * those tasks, as result, those requests will be executed by submitting order.
    *
-   * If you use the hash feature to keep order, the requests will be executed by a same thread.
-   * In some cases, it could cause performance problem.
+   * If you use the hash feature to keep order, the requests will be executed by a same thread. In
+   * some cases, it could cause performance problem.
    */
   private HashableExecutor executor;
 
   public AbstractServer(ServerConfig serverConfig, Codec codec) {
     this.serverConfig = serverConfig;
     this.codec = codec;
-    invokerCollection = new DefaultInvokerCollection();
+    handlerMap = new ConcurrentHashMap<>();
     createExecutor();
   }
 
@@ -53,8 +58,15 @@ public abstract class AbstractServer implements Server {
   }
 
   @Override
-  public InvokerCollection getInvokerCollection() {
-    return invokerCollection;
+  public Response invoke(Request request) {
+    String serviceName = request.getInterfaceName();
+    return handlerMap.getOrDefault(serviceName, DefaultInvoker.INSTANCE).invoke(request);
+  }
+
+  @Override
+  public void registerInvoker(Invoker invoker) {
+    String serverIdentify = invoker.getInterface().getSimpleName();
+    handlerMap.put(serverIdentify, invoker);
   }
 
   @Override
@@ -91,6 +103,24 @@ public abstract class AbstractServer implements Server {
     int workerNum = serverConfig.getWorkerThreadNum() > 0 ? serverConfig.getWorkerThreadNum()
         : GlobalConstants.THREAD_NUMBER * 2;
     executor = new ConsistentHashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
+  }
+
+  public static class DefaultInvoker implements Invoker {
+
+    private static Invoker INSTANCE = new DefaultInvoker();
+
+    private DefaultInvoker() {
+    }
+
+    @Override
+    public Class getInterface() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Response invoke(Request request) {
+      throw new UnsupportedOperationException();
+    }
   }
 
 }

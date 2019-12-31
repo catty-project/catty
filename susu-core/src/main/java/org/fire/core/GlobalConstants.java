@@ -1,4 +1,4 @@
-package org.fire.core.constants;
+package org.fire.core;
 
 
 public interface GlobalConstants {

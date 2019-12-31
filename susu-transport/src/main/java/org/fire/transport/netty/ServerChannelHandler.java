@@ -41,7 +41,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
   }
 
   private void processRequest(ChannelHandlerContext ctx, Request request) {
-    Response response = nettyServer.getInvokerCollection().invoke(request);
+    Response response = nettyServer.invoke(request);
     response.setRequestId(request.getRequestId());
     Object value = response.getValue();
     if (value == null || value instanceof Void) {
