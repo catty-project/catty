@@ -1,4 +1,4 @@
-package org.fire.cluster.proxy;
+package org.fire.cluster;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
@@ -8,24 +8,34 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
-import org.fire.cluster.Invoker;
+import org.fire.core.Invoker;
+import org.fire.core.Request;
+import org.fire.core.Response;
 import org.fire.core.exception.SusuException;
 import org.fire.core.utils.RequestIdGenerator;
 import org.fire.transport.api.AsyncResponse;
 import org.fire.transport.api.ProtobufRequestDelegate;
-import org.fire.transport.api.Request;
-import org.fire.transport.api.Response;
 
 
-public class ProxyHandler<T> implements InvocationHandler {
+public class InvokerProxyAdapter<T> implements InvocationHandler, Invoker<T> {
 
   private Invoker invoker;
 
   private Class<T> interfaceClazz;
 
-  public ProxyHandler(Class<T> clazz, Invoker invoker) {
-    interfaceClazz = clazz;
+  public InvokerProxyAdapter(Class<T> clazz, Invoker invoker) {
+    this.interfaceClazz = clazz;
     this.invoker = invoker;
+  }
+
+  @Override
+  public Class<T> getInterface() {
+    return interfaceClazz;
+  }
+
+  @Override
+  public Response invoke(Request request) {
+    return invoker.invoke(request);
   }
 
   @Override
@@ -43,7 +53,7 @@ public class ProxyHandler<T> implements InvocationHandler {
     request.build();
 
     Class<?> returnType = method.getReturnType();
-    Response response = invoker.invoke(request);
+    Response response = invoke(request);
     if (returnType == Void.TYPE) {
       return null;
     }

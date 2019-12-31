@@ -7,18 +7,15 @@ import io.netty.channel.ChannelHandlerContext;
 import java.util.concurrent.CompletableFuture;
 import org.fire.core.codec.Codec.DataTypeEnum;
 import org.fire.core.exception.SusuException;
-import org.fire.transport.api.Handler;
-import org.fire.transport.api.Request;
-import org.fire.transport.api.Response;
+import org.fire.core.Request;
+import org.fire.core.Response;
 
 public class ServerChannelHandler extends ChannelDuplexHandler {
 
-  private Handler handler;
   private NettyServer nettyServer;
 
   public ServerChannelHandler(NettyServer nettyServer) {
     this.nettyServer = nettyServer;
-    this.handler = nettyServer.getRoutableHandler();
   }
 
   @Override
@@ -44,7 +41,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
   }
 
   private void processRequest(ChannelHandlerContext ctx, Request request) {
-    Response response = (Response) handler.handle(request);
+    Response response = nettyServer.getInvokerCollection().invoke(request);
     response.setRequestId(request.getRequestId());
     Object value = response.getValue();
     if (value == null || value instanceof Void) {

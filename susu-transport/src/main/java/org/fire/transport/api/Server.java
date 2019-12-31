@@ -16,7 +16,7 @@ public interface Server {
 
   Codec getCodec();
 
-  RoutableHandler getRoutableHandler();
+  InvokerCollection getInvokerCollection();
 
   HashableExecutor getExecutor();
 

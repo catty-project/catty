@@ -7,15 +7,16 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.fire.core.Invoker;
 import org.fire.core.codec.generated.SusuProtocol.Status;
 import org.fire.core.exception.SusuException;
 import org.fire.core.utils.ReflectUtils;
 import org.fire.transport.api.DefaultResponse;
-import org.fire.transport.api.Request;
-import org.fire.transport.api.Response;
+import org.fire.core.Request;
+import org.fire.core.Response;
 
 
-public class ServerImpl<T> implements Invoker<T> {
+public class Provider<T> implements Invoker<T> {
 
   protected Map<String, Method> methodMap = new ConcurrentHashMap<>();
 
@@ -26,9 +27,9 @@ public class ServerImpl<T> implements Invoker<T> {
   /**
    * cache all interface's methods
    */
-  public ServerImpl(T ref, Class<T> interfaceClazz) {
+  public Provider(T ref, Class<T> interfaceClazz) {
     if (!interfaceClazz.isInterface()) {
-      throw new SusuException("ServerImpl: interfaceClazz is not a interface!");
+      throw new SusuException("Provider: interfaceClazz is not a interface!");
     }
     this.ref = ref;
     this.interfaceClazz = interfaceClazz;
@@ -58,7 +59,7 @@ public class ServerImpl<T> implements Invoker<T> {
     Method method = methodMap.get(methodName);
     if (method == null) {
       response.setStatus(Status.OUTER_ERROR);
-      response.setThrowable(new SusuException("ServerImpl: can't find method: " + methodName));
+      response.setThrowable(new SusuException("Provider: can't find method: " + methodName));
       return response;
     }
     try {
@@ -73,12 +74,12 @@ public class ServerImpl<T> implements Invoker<T> {
     } catch (Exception e) {
       response.setStatus(Status.INNER_ERROR);
       response.setThrowable(
-          new SusuException("ServerImpl: exception when invoke method: " + methodName, e));
+          new SusuException("Provider: exception when invoke method: " + methodName, e));
     } catch (Error e) {
       response.setStatus(Status.INNER_ERROR);
       response
           .setThrowable(
-              new SusuException("ServerImpl: error when invoke method: " + methodName, e));
+              new SusuException("Provider: error when invoke method: " + methodName, e));
     }
     response.build();
     return response;

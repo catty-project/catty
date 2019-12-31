@@ -3,6 +3,7 @@ package org.fire.transport.api;
 import com.google.protobuf.Any;
 import com.google.protobuf.Any.Builder;
 import com.google.protobuf.Message;
+import org.fire.core.Response;
 import org.fire.core.codec.generated.SusuProtocol;
 import org.fire.core.exception.SusuException;
 

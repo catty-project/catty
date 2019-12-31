@@ -1,5 +1,7 @@
 package org.fire.transport.api;
 
+import org.fire.core.Response;
+
 public class DefaultResponse implements Response {
 
   private long requestId;

@@ -23,8 +23,8 @@ import org.fire.transport.api.AbstractClient;
 import org.fire.transport.api.AsyncResponse;
 import org.fire.transport.api.DefaultAsyncResponse;
 import org.fire.transport.api.ProtobufResponseDelegate;
-import org.fire.transport.api.Request;
-import org.fire.transport.api.Response;
+import org.fire.core.Request;
+import org.fire.core.Response;
 import org.fire.transport.codec.ProtoBufSerialization;
 import org.fire.transport.codec.SusuCodec;
 

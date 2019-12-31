@@ -20,7 +20,7 @@ public abstract class AbstractServer implements Server {
   private ServerConfig serverConfig;
   private volatile int status = NEW;
   private Codec codec;
-  private RoutableHandler routableHandler;
+  private InvokerCollection invokerCollection;
 
   /**
    * HashableExecutor is needed, because if a request just be submitted randomly to a
@@ -43,7 +43,7 @@ public abstract class AbstractServer implements Server {
   public AbstractServer(ServerConfig serverConfig, Codec codec) {
     this.serverConfig = serverConfig;
     this.codec = codec;
-    routableHandler = new DefaultRoutableHandler();
+    invokerCollection = new DefaultInvokerCollection();
     createExecutor();
   }
 
@@ -53,8 +53,8 @@ public abstract class AbstractServer implements Server {
   }
 
   @Override
-  public RoutableHandler getRoutableHandler() {
-    return routableHandler;
+  public InvokerCollection getInvokerCollection() {
+    return invokerCollection;
   }
 
   @Override

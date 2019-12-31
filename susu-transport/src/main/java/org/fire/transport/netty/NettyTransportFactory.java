@@ -1,8 +1,8 @@
 package org.fire.transport.netty;
 
 import java.util.List;
+import org.fire.core.Invoker;
 import org.fire.core.config.ServerConfig;
-import org.fire.transport.api.Handler;
 import org.fire.transport.api.Server;
 import org.fire.transport.api.ServerFactory;
 
@@ -21,7 +21,7 @@ public class NettyTransportFactory extends ServerFactory {
   }
 
   @Override
-  protected Server doCreateServer(ServerConfig serverConfig, List<Handler> handlers) {
+  protected Server doCreateServer(ServerConfig serverConfig, List<Invoker> handlers) {
     return new NettyServer(serverConfig, handlers);
   }
 }

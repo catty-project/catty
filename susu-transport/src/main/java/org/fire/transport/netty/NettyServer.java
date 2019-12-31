@@ -12,9 +12,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import java.util.List;
+import org.fire.core.Invoker;
 import org.fire.core.config.ServerConfig;
 import org.fire.transport.api.AbstractServer;
-import org.fire.transport.api.Handler;
 import org.fire.transport.codec.ProtoBufSerialization;
 import org.fire.transport.codec.SusuCodec;
 import org.slf4j.Logger;
@@ -30,9 +30,9 @@ public class NettyServer extends AbstractServer {
   private NioEventLoopGroup workerGroup;
 
 
-  public NettyServer(ServerConfig serverConfig, List<Handler> handlers) {
+  public NettyServer(ServerConfig serverConfig, List<Invoker> handlers) {
     super(serverConfig, new SusuCodec(new ProtoBufSerialization()));
-    handlers.forEach((handler) -> getRoutableHandler().registerHandler(handler));
+    handlers.forEach((handler) -> getInvokerCollection().registerInvoker(handler));
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
   }

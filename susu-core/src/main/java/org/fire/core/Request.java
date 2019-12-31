@@ -1,4 +1,4 @@
-package org.fire.transport.api;
+package org.fire.core;
 
 public interface Request {
 

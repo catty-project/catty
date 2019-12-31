@@ -1,5 +1,6 @@
 package org.fire.transport.api;
 
+import org.fire.core.Response;
 import org.fire.core.codec.Codec;
 import org.fire.core.config.ClientConfig;
 import java.util.Map;

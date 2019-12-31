@@ -1,6 +1,5 @@
 package org.fire.cluster;
 
-import org.fire.cluster.proxy.ProxyFactory;
 import org.fire.core.config.ClientConfig;
 import org.fire.transport.api.Client;
 import org.fire.transport.netty.NettyClient;
@@ -28,8 +27,11 @@ public class Reference<T> {
   public T refer() {
     client = new NettyClient(clientConfig);
     client.open();
-    Invoker invoker = new DefaultInvoker(client, interfaceClass);
-    return new ProxyFactory<T>().getProxy(interfaceClass, invoker);
+    return new ProxyFactory<T>().getProxy(interfaceClass, client);
+  }
+
+  public void derefer() {
+    client.close();
   }
 
 }

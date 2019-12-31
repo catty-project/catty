@@ -1,5 +1,6 @@
 package org.fire.transport.api;
 
+import org.fire.core.Response;
 import org.fire.core.exception.SusuException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
