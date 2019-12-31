@@ -23,11 +23,13 @@ public interface Server extends Invoker {
 
   @Override
   default Class getInterface() {
-    return null;
+    return getInvoker().getInterface();
   }
 
   @Override
-  Response invoke(Request request);
+  default Response invoke(Request request) {
+    return getInvoker().invoke(request);
+  }
 
-  void registerInvoker(Invoker invoker);
+  Invoker getInvoker();
 }

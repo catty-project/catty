@@ -1,11 +1,7 @@
 package org.fire.transport.api;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.fire.core.GlobalConstants;
 import org.fire.core.Invoker;
-import org.fire.core.Request;
-import org.fire.core.Response;
 import org.fire.core.codec.Codec;
 import org.fire.core.config.ServerConfig;
 import org.fire.transport.api.worker.ConsistentHashLoopGroup;
@@ -25,8 +21,7 @@ public abstract class AbstractServer implements Server {
   private ServerConfig serverConfig;
   private volatile int status = NEW;
   private Codec codec;
-
-  private Map<String, Invoker> handlerMap;
+  private Invoker invoker;
 
   /**
    * HashableExecutor is needed, because if a request just be submitted randomly to a generic
@@ -45,28 +40,21 @@ public abstract class AbstractServer implements Server {
    */
   private HashableExecutor executor;
 
-  public AbstractServer(ServerConfig serverConfig, Codec codec) {
+  public AbstractServer(ServerConfig serverConfig, Codec codec, Invoker invoker) {
     this.serverConfig = serverConfig;
     this.codec = codec;
-    handlerMap = new ConcurrentHashMap<>();
+    this.invoker = invoker;
     createExecutor();
+  }
+
+  @Override
+  public Invoker getInvoker() {
+    return invoker;
   }
 
   @Override
   public Codec getCodec() {
     return codec;
-  }
-
-  @Override
-  public Response invoke(Request request) {
-    String serviceName = request.getInterfaceName();
-    return handlerMap.getOrDefault(serviceName, DefaultInvoker.INSTANCE).invoke(request);
-  }
-
-  @Override
-  public void registerInvoker(Invoker invoker) {
-    String serverIdentify = invoker.getInterface().getSimpleName();
-    handlerMap.put(serverIdentify, invoker);
   }
 
   @Override
@@ -103,24 +91,6 @@ public abstract class AbstractServer implements Server {
     int workerNum = serverConfig.getWorkerThreadNum() > 0 ? serverConfig.getWorkerThreadNum()
         : GlobalConstants.THREAD_NUMBER * 2;
     executor = new ConsistentHashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
-  }
-
-  public static class DefaultInvoker implements Invoker {
-
-    private static Invoker INSTANCE = new DefaultInvoker();
-
-    private DefaultInvoker() {
-    }
-
-    @Override
-    public Class getInterface() {
-      throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Response invoke(Request request) {
-      throw new UnsupportedOperationException();
-    }
   }
 
 }

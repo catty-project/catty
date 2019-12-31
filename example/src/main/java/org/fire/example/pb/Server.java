@@ -11,7 +11,7 @@ public class Server {
         .build();
     Exporter exporter = new Exporter(serverConfig);
     exporter.registerService(IService.class, new IServiceImpl());
-    exporter.run();
+    exporter.export();
   }
 
 }
