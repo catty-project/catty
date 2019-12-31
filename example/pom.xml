@@ -12,7 +12,39 @@
   <artifactId>example</artifactId>
 
   <dependencies>
-
+    <dependency>
+      <groupId>com.nowcoder</groupId>
+      <artifactId>susu-cluster</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.os72</groupId>
+        <artifactId>protoc-jar-maven-plugin</artifactId>
+        <version>3.6.0.1</version>
+        <executions>
+          <execution>
+            <id>generate-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <protocVersion>3.5.1</protocVersion>
+              <addSources>none</addSources>
+              <includeStdTypes>true</includeStdTypes>
+              <outputDirectory>src/main/java</outputDirectory>
+              <inputDirectories>
+                <include>src/main/resources/protobuf</include>
+              </inputDirectories>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

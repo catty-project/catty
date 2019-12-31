@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package org.fire.example;
+
+option java_package = "org.fire.example.pb.generated";
+option java_outer_classname = "EchoProtocol";
+
+message Request {
+  string value = 1;
+};
+
+message Response {
+  string value = 1;
+};
+

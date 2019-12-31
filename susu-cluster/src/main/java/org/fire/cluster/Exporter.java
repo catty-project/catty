@@ -7,16 +7,13 @@ import org.fire.transport.api.Server;
 import org.fire.transport.netty.NettyTransportFactory;
 
 
-/**
- * The class that represents a drpc server.
- */
-public class DrpcServer {
+public class Exporter {
 
   private CopyOnWriteArrayList<Handler> serviceHandlers = new CopyOnWriteArrayList<>();
 
   private ServerConfig serverConfig;
 
-  public DrpcServer(ServerConfig serverConfig) {
+  public Exporter(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
   }
 

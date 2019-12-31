@@ -9,7 +9,7 @@
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
 
-  <description>手撸一个RPC框架</description>
+  <description>RPC framework</description>
   <modules>
     <module>susu-core</module>
     <module>susu-transport</module>
@@ -25,21 +25,11 @@
   </properties>
 
   <dependencies>
-
-
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
       <version>1.2.58</version>
     </dependency>
-
-    <!--<dependency>-->
-      <!--<groupId>junit</groupId>-->
-      <!--<artifactId>junit</artifactId>-->
-      <!--<version>4.5</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-
   </dependencies>
 
 </project>
