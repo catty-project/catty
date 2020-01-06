@@ -1,6 +1,9 @@
 package io.catty.netty;
 
-import io.catty.codec.ProtoBufSerialization;
+import io.catty.Invoker;
+import io.catty.api.AbstractServer;
+import io.catty.codec.CattyCodec;
+import io.catty.config.ServerConfig;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -12,10 +15,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import io.catty.Invoker;
-import io.catty.config.ServerConfig;
-import io.catty.api.AbstractServer;
-import io.catty.codec.SusuCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +29,7 @@ public class NettyServer extends AbstractServer {
 
 
   public NettyServer(ServerConfig serverConfig, Invoker invoker) {
-    super(serverConfig, new SusuCodec(new ProtoBufSerialization()), invoker);
+    super(serverConfig, new CattyCodec(), invoker);
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
   }

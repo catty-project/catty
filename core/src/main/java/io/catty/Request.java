@@ -18,6 +18,4 @@ public interface Request {
 
   void setArgsValue(Object[] argsValue);
 
-  byte[] toBytes();
-
 }

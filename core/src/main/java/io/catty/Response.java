@@ -10,16 +10,17 @@ public interface Response {
 
   void setValue(Object value);
 
-  Throwable getThrowable();
+  ResponseStatus getStatus();
 
-  void setThrowable(Throwable throwable);
-
-  Enum<?> getStatus();
-
-  void setStatus(Enum<?> status);
+  void setStatus(ResponseStatus status);
 
   boolean isError();
 
-  byte[] toBytes();
+  enum ResponseStatus {
+    OK,
+    INNER_ERROR,
+    OUTER_ERROR,
+    ;
+  }
 
 }

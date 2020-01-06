@@ -52,7 +52,7 @@
               <includeStdTypes>true</includeStdTypes>
               <outputDirectory>src/main/java</outputDirectory>
               <inputDirectories>
-                <include>src/main/java/org/fire/core/codec</include>
+                <include>src/main/java/io/catty/codec</include>
               </inputDirectories>
             </configuration>
           </execution>

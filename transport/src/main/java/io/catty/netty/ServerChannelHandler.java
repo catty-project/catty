@@ -6,7 +6,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.concurrent.CompletableFuture;
 import io.catty.codec.Codec.DataTypeEnum;
-import io.catty.exception.SusuException;
+import io.catty.exception.CattyException;
 import io.catty.Request;
 import io.catty.Response;
 
@@ -26,7 +26,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
     byteBuf.release();
     Object object = nettyServer.getCodec().decode(data, DataTypeEnum.REQUEST);
     if (!(object instanceof Request)) {
-      throw new SusuException(
+      throw new CattyException(
           "ServerChannelHandler: unsupported message type when decode: " + object.getClass());
     }
     if (nettyServer.getExecutor() != null) {
@@ -51,7 +51,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
       CompletableFuture future = (CompletableFuture) value;
       future.whenComplete((r, t) -> {
         if (t != null) {
-          response.setThrowable((Throwable) t);
+          response.setValue(t);
         } else {
           response.setValue(r);
         }
@@ -64,7 +64,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
 
   private ChannelFuture sendResponse(ChannelHandlerContext ctx, Response response) {
     try {
-      byte[] msg = nettyServer.getCodec().encode(response);
+      byte[] msg = nettyServer.getCodec().encode(response, DataTypeEnum.RESPONSE);
       ByteBuf byteBuf = ctx.channel().alloc().heapBuffer();
       byteBuf.writeBytes(msg);
       if (ctx.channel().isActive()) {

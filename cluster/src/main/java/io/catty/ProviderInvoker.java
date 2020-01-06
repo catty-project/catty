@@ -2,15 +2,15 @@ package io.catty;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
+import io.catty.Response.ResponseStatus;
+import io.catty.api.DefaultResponse;
+import io.catty.exception.CattyException;
+import io.catty.utils.ReflectUtils;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import io.catty.codec.generated.SusuProtocol.Status;
-import io.catty.exception.SusuException;
-import io.catty.utils.ReflectUtils;
-import io.catty.api.DefaultResponse;
 
 
 public class ProviderInvoker<T> implements Invoker<T> {
@@ -26,7 +26,7 @@ public class ProviderInvoker<T> implements Invoker<T> {
    */
   public ProviderInvoker(T ref, Class<T> interfaceClazz) {
     if (!interfaceClazz.isInterface()) {
-      throw new SusuException("ProviderInvoker: interfaceClazz is not a interface!");
+      throw new CattyException("ProviderInvoker: interfaceClazz is not a interface!");
     }
     this.ref = ref;
     this.interfaceClazz = interfaceClazz;
@@ -36,7 +36,7 @@ public class ProviderInvoker<T> implements Invoker<T> {
       String methodName = method.getName();
       methodMap.putIfAbsent(methodDesc, method);
       if (methodMap.containsKey(methodName)) {
-        throw new SusuException(
+        throw new CattyException(
             "Duplicated method name: " + method.getDeclaringClass() + "#" + method
                 + ". Method name excepted unique.");
       }
@@ -55,8 +55,8 @@ public class ProviderInvoker<T> implements Invoker<T> {
     String methodName = request.getMethodName();
     Method method = methodMap.get(methodName);
     if (method == null) {
-      response.setStatus(Status.OUTER_ERROR);
-      response.setThrowable(new SusuException("ProviderInvoker: can't find method: " + methodName));
+      response.setStatus(ResponseStatus.OUTER_ERROR);
+      response.setValue(new CattyException("ProviderInvoker: can't find method: " + methodName));
       return response;
     }
     try {
@@ -67,18 +67,17 @@ public class ProviderInvoker<T> implements Invoker<T> {
       } else {
         response.setValue(value);
       }
-      response.setStatus(Status.OK);
+      response.setStatus(ResponseStatus.OK);
     } catch (Exception e) {
-      response.setStatus(Status.INNER_ERROR);
-      response.setThrowable(
-          new SusuException("ProviderInvoker: exception when invoke method: " + methodName, e));
+      response.setStatus(ResponseStatus.INNER_ERROR);
+      response.setValue(
+          new CattyException("ProviderInvoker: exception when invoke method: " + methodName, e));
     } catch (Error e) {
-      response.setStatus(Status.INNER_ERROR);
+      response.setStatus(ResponseStatus.INNER_ERROR);
       response
-          .setThrowable(
-              new SusuException("ProviderInvoker: error when invoke method: " + methodName, e));
+          .setValue(
+              new CattyException("ProviderInvoker: error when invoke method: " + methodName, e));
     }
-    response.build();
     return response;
   }
 

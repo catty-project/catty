@@ -2,11 +2,11 @@ package io.catty.api;
 
 import io.catty.GlobalConstants;
 import io.catty.Invoker;
-import io.catty.api.worker.ConsistentHashLoopGroup;
-import io.catty.api.worker.HashableExecutor;
 import io.catty.codec.Codec;
 import io.catty.config.ServerConfig;
-import io.catty.api.worker.HashableChooserFactory;
+import io.catty.worker.ConsistentHashLoopGroup;
+import io.catty.worker.HashableChooserFactory;
+import io.catty.worker.HashableExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

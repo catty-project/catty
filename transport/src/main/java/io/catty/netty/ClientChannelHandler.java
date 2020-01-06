@@ -5,7 +5,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.catty.Response;
 import io.catty.codec.Codec.DataTypeEnum;
-import io.catty.exception.SusuException;
+import io.catty.exception.CattyException;
 
 public class ClientChannelHandler extends ChannelDuplexHandler {
 
@@ -23,7 +23,7 @@ public class ClientChannelHandler extends ChannelDuplexHandler {
     byteBuf.release();
     Object object = nettyClient.getCodec().decode(data, DataTypeEnum.RESPONSE);
     if (!(object instanceof Response)) {
-      throw new SusuException(
+      throw new CattyException(
           "NettyChannelHandler: unsupported message type when encode: " + object
               .getClass());
     }

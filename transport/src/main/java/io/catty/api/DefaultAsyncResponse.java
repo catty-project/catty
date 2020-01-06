@@ -1,7 +1,7 @@
 package io.catty.api;
 
 import io.catty.Response;
-import io.catty.exception.SusuException;
+import io.catty.exception.CattyException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +13,7 @@ public class DefaultAsyncResponse extends CompletableFuture<Response> implements
   private Response response;
 
   public DefaultAsyncResponse(long requestId) {
-    response = new ProtobufResponseDelegate();
+    response = new DefaultResponse();
     response.setRequestId(requestId);
   }
 
@@ -39,43 +39,21 @@ public class DefaultAsyncResponse extends CompletableFuture<Response> implements
         this.get().setValue(value);
       } else {
         response.setValue(value);
-        build();
         super.complete(response);
       }
     } catch (Exception e) {
       // This should not happen
-      throw new SusuException(e);
+      throw new CattyException(e);
     }
   }
 
   @Override
-  public Throwable getThrowable() {
-    return getDefaultResponse().getThrowable();
-  }
-
-  @Override
-  public void setThrowable(Throwable throwable) {
-    try {
-      if (this.isDone()) {
-        this.get().setThrowable(throwable);
-      } else {
-        response.setThrowable(throwable);
-        build();
-        super.complete(response);
-      }
-    } catch (Exception e) {
-      // This should not happen
-      throw new SusuException(e);
-    }
-  }
-
-  @Override
-  public Enum<?> getStatus() {
+  public ResponseStatus getStatus() {
     return getDefaultResponse().getStatus();
   }
 
   @Override
-  public void setStatus(Enum<?> status) {
+  public void setStatus(ResponseStatus status) {
     response.setStatus(status);
   }
 
@@ -93,7 +71,6 @@ public class DefaultAsyncResponse extends CompletableFuture<Response> implements
   /**
    * this method should not be invoked in any other places
    * except {@link DefaultAsyncResponse#setValue}
-   * and {@link DefaultAsyncResponse#setThrowable}
    */
   @Override
   public boolean complete(Response value) {
@@ -110,7 +87,7 @@ public class DefaultAsyncResponse extends CompletableFuture<Response> implements
 
   private void checkDone() {
     if (!isDone()) {
-      throw new SusuException("Must check 'isDone()' first");
+      throw new CattyException("Must check 'isDone()' first");
     }
   }
 
@@ -123,13 +100,8 @@ public class DefaultAsyncResponse extends CompletableFuture<Response> implements
       return get();
     } catch (Exception e) {
       // This should not happen
-      throw new SusuException(e);
+      throw new CattyException(e);
     }
-  }
-
-  @Override
-  public void build() {
-    response.build();
   }
 
   @Override

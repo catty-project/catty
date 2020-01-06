@@ -1,8 +1,16 @@
 package io.catty.netty;
 
+import io.catty.GlobalConstants;
+import io.catty.Request;
+import io.catty.Response;
+import io.catty.Response.ResponseStatus;
+import io.catty.api.AbstractClient;
 import io.catty.api.DefaultAsyncResponse;
-import io.catty.api.ProtobufResponseDelegate;
-import io.catty.codec.ProtoBufSerialization;
+import io.catty.codec.Codec.DataTypeEnum;
+import io.catty.codec.CattyCodec;
+import io.catty.config.ClientConfig;
+import io.catty.exception.CattyException;
+import io.catty.exception.TransportException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -15,14 +23,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import io.catty.GlobalConstants;
-import io.catty.Request;
-import io.catty.Response;
-import io.catty.config.ClientConfig;
-import io.catty.exception.SusuException;
-import io.catty.exception.TransportException;
-import io.catty.api.AbstractClient;
-import io.catty.codec.SusuCodec;
 
 public class NettyClient extends AbstractClient {
 
@@ -30,7 +30,7 @@ public class NettyClient extends AbstractClient {
   private NioEventLoopGroup nioEventLoopGroup;
 
   public NettyClient(ClientConfig clientConfig) {
-    super(clientConfig, new SusuCodec(new ProtoBufSerialization()));
+    super(clientConfig, new CattyCodec());
     nioEventLoopGroup = new NioEventLoopGroup(GlobalConstants.THREAD_NUMBER + 1);
   }
 
@@ -83,21 +83,20 @@ public class NettyClient extends AbstractClient {
     Response response = new DefaultAsyncResponse(request.getRequestId());
     addCurrentTask(request.getRequestId(), response);
     try {
-      byte[] msg = getCodec().encode(request);
+      byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
       ByteBuf byteBuf = clientChannel.alloc().heapBuffer();
       byteBuf.writeBytes(msg);
       if (clientChannel.isActive()) {
         clientChannel.writeAndFlush(byteBuf).sync();
       } else {
-        throw new SusuException("ClientChannel closed");
+        throw new CattyException("ClientChannel closed");
       }
       return response;
     } catch (Exception e) {
-      Response errorResponse = new ProtobufResponseDelegate();
-      errorResponse.setRequestId(request.getRequestId());
-      errorResponse
-          .setThrowable(new TransportException("NettyClient: response.getValue interrupted!"));
-      return errorResponse;
+      response.setStatus(ResponseStatus.INNER_ERROR);
+      response
+          .setValue(new TransportException("NettyClient: response.getValue interrupted!"));
+      return response;
     }
   }
 }

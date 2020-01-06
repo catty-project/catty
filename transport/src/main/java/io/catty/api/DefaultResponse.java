@@ -6,17 +6,17 @@ public class DefaultResponse implements Response {
 
   private long requestId;
 
-  private Enum<?> status;
+  private ResponseStatus status;
 
   private Object value;
-
-  private Throwable throwable;
 
   public DefaultResponse() {
   }
 
-  public DefaultResponse(long requestId) {
+  public DefaultResponse(long requestId, ResponseStatus status, Object value) {
     this.requestId = requestId;
+    this.status = status;
+    this.value = value;
   }
 
   @Override
@@ -40,32 +40,17 @@ public class DefaultResponse implements Response {
   }
 
   @Override
-  public Throwable getThrowable() {
-    return throwable;
-  }
-
-  @Override
-  public void setThrowable(Throwable throwable) {
-    this.throwable = throwable;
-  }
-
-  @Override
-  public Enum<?> getStatus() {
+  public ResponseStatus getStatus() {
     return status;
   }
 
   @Override
-  public void setStatus(Enum<?> status) {
+  public void setStatus(ResponseStatus status) {
     this.status = status;
   }
 
   @Override
-  public void build() {
-    // do nothing;
-  }
-
-  @Override
   public boolean isError() {
-    return throwable != null;
+    return ResponseStatus.OK != status;
   }
 }

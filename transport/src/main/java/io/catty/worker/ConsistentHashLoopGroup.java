@@ -1,4 +1,4 @@
-package io.catty.api.worker;
+package io.catty.worker;
 
 import io.netty.util.concurrent.DefaultEventExecutor;
 import io.netty.util.concurrent.EventExecutor;

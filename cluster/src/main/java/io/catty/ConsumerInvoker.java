@@ -2,16 +2,16 @@ package io.catty;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
+import io.catty.api.AsyncResponse;
+import io.catty.api.DefaultRequest;
+import io.catty.exception.CattyException;
+import io.catty.utils.RequestIdGenerator;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
-import io.catty.exception.SusuException;
-import io.catty.utils.RequestIdGenerator;
-import io.catty.api.AsyncResponse;
-import io.catty.api.ProtobufRequestDelegate;
 
 
 public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
@@ -39,15 +39,14 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
     if (isLocalMethod(method)) {
-      throw new SusuException("Can not invoke local method: " + method.getName());
+      throw new CattyException("Can not invoke local method: " + method.getName());
     }
 
-    Request request = new ProtobufRequestDelegate();
+    Request request = new DefaultRequest();
     request.setRequestId(RequestIdGenerator.next());
     request.setInterfaceName(method.getDeclaringClass().getName());
     request.setMethodName(method.getName());
     request.setArgsValue(args);
-    request.build();
 
     Class<?> returnType = method.getReturnType();
     Response response = invoke(request);
@@ -64,7 +63,7 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
           future.completeExceptionally(t);
         } else {
           if (v.isError()) {
-            future.completeExceptionally(v.getThrowable());
+            future.completeExceptionally((Exception) v.getValue());
           } else {
             try {
               Type returnGenericType = method.getGenericReturnType();
@@ -80,7 +79,7 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
 
     // sync-method
     if (response.isError()) {
-      throw response.getThrowable();
+      throw (Exception) response.getValue();
     }
     return resolveReturnValue(response.getValue(), returnType);
   }
