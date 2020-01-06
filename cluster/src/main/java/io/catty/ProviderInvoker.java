@@ -1,9 +1,8 @@
 package io.catty;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.Message;
 import io.catty.Response.ResponseStatus;
 import io.catty.api.DefaultResponse;
+import io.catty.codec.Serialization;
 import io.catty.exception.CattyException;
 import io.catty.utils.ReflectUtils;
 import java.io.IOException;
@@ -16,9 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProviderInvoker<T> implements Invoker<T> {
 
   protected Map<String, Method> methodMap = new ConcurrentHashMap<>();
-
   private T ref;
-
+  private Serialization serialization;
   private Class<T> interfaceClazz;
 
   /**
@@ -56,27 +54,25 @@ public class ProviderInvoker<T> implements Invoker<T> {
     Method method = methodMap.get(methodName);
     if (method == null) {
       response.setStatus(ResponseStatus.OUTER_ERROR);
-      response.setValue(new CattyException("ProviderInvoker: can't find method: " + methodName));
+      response.setValue(serialization
+          .serialize(new CattyException("ProviderInvoker: can't find method: " + methodName)));
       return response;
     }
     try {
       Object[] argsValue = resolveArgsValue(request.getArgsValue(), method);
       Object value = method.invoke(ref, argsValue);
-      if (value == null) {
-        response.setValue(Void.TYPE);
-      } else {
-        response.setValue(value);
+      if (value != null) {
+        response.setValue(serialization.serialize(value));
       }
       response.setStatus(ResponseStatus.OK);
     } catch (Exception e) {
       response.setStatus(ResponseStatus.INNER_ERROR);
-      response.setValue(
-          new CattyException("ProviderInvoker: exception when invoke method: " + methodName, e));
+      response.setValue(serialization.serialize(
+          new CattyException("ProviderInvoker: exception when invoke method: " + methodName, e)));
     } catch (Error e) {
       response.setStatus(ResponseStatus.INNER_ERROR);
-      response
-          .setValue(
-              new CattyException("ProviderInvoker: error when invoke method: " + methodName, e));
+      response.setValue(serialization.serialize(
+          new CattyException("ProviderInvoker: error when invoke method: " + methodName, e)));
     }
     return response;
   }
@@ -89,10 +85,8 @@ public class ProviderInvoker<T> implements Invoker<T> {
     Object[] resolvedArgs = new Object[args.length];
     Class<?>[] parameterTypes = method.getParameterTypes();
     for (int i = 0; i < args.length; i++) {
-      if (args[i] instanceof Any && Message.class.isAssignableFrom(parameterTypes[i])) {
-        resolvedArgs[i] = ((Any) args[i]).unpack((Class<Message>) parameterTypes[i]);
-      } else {
-        resolvedArgs[i] = args[i];
+      if (args[i] instanceof byte[]) {
+        resolvedArgs[i] = serialization.deserialize((byte[]) args[i], parameterTypes[i]);
       }
     }
     return resolvedArgs;

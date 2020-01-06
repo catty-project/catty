@@ -36,7 +36,6 @@ public class CattyCodec implements Codec {
           .setReturnValue(ByteString.copyFrom((byte[]) response.getValue()))
           .build()
           .toByteArray();
-
     }
     throw new IllegalArgumentException();
   }

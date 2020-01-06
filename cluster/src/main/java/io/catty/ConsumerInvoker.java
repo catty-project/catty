@@ -1,12 +1,10 @@
 package io.catty;
 
-import com.google.protobuf.Any;
-import com.google.protobuf.Message;
 import io.catty.api.AsyncResponse;
 import io.catty.api.DefaultRequest;
+import io.catty.codec.Serialization;
 import io.catty.exception.CattyException;
 import io.catty.utils.RequestIdGenerator;
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -17,12 +15,13 @@ import java.util.concurrent.CompletableFuture;
 public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
 
   private Invoker invoker;
-
   private Class<T> interfaceClazz;
+  private Serialization serialization;
 
-  public ConsumerInvoker(Class<T> clazz, Invoker invoker) {
+  public ConsumerInvoker(Class<T> clazz, Invoker invoker, Serialization serialization) {
     this.interfaceClazz = clazz;
     this.invoker = invoker;
+    this.serialization = serialization;
   }
 
   @Override
@@ -46,14 +45,17 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
     request.setRequestId(RequestIdGenerator.next());
     request.setInterfaceName(method.getDeclaringClass().getName());
     request.setMethodName(method.getName());
-    request.setArgsValue(args);
+    Object[] argBytes = new Object[args.length];
+    for (int i = 0; i < args.length; i++) {
+      argBytes[i] = serialization.serialize(args[i]);
+    }
+    request.setArgsValue(argBytes);
 
     Class<?> returnType = method.getReturnType();
     Response response = invoke(request);
     if (returnType == Void.TYPE) {
       return null;
     }
-
     // async-method
     if (CompletableFuture.class.isAssignableFrom(returnType)) {
       CompletableFuture future = new CompletableFuture();
@@ -85,18 +87,22 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
   }
 
   @SuppressWarnings("unchecked")
-  private Object resolveReturnValue(Object returnValue, Type resolvedReturnType)
-      throws IOException {
-    if (returnValue instanceof Any && resolvedReturnType instanceof ParameterizedType) {
-      return ((Any) returnValue).unpack(
-          (Class<? extends Message>) ((ParameterizedType) resolvedReturnType)
-              .getActualTypeArguments()[0]);
-    } else if (returnValue instanceof Any && Message.class
-        .isAssignableFrom((Class<?>) resolvedReturnType)) {
-      return ((Any) returnValue).unpack((Class<Message>) resolvedReturnType);
-    } else {
+  private Object resolveReturnValue(Object returnValue, Type resolvedReturnType) {
+    if (!(returnValue instanceof byte[])) {
       return returnValue;
     }
+    byte[] returnValueBytes = (byte[]) returnValue;
+    Class<?> returnType = null;
+    if (resolvedReturnType instanceof ParameterizedType) {
+      returnType = (Class<?>) ((ParameterizedType) resolvedReturnType)
+          .getActualTypeArguments()[0];
+    } else if (resolvedReturnType instanceof Class) {
+      returnType = (Class<?>) resolvedReturnType;
+    }
+    if (returnType == null) {
+      throw new IllegalArgumentException();
+    }
+    return serialization.deserialize(returnValueBytes, returnType);
   }
 
   private boolean isLocalMethod(Method method) {
