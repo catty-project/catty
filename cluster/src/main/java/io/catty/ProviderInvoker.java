@@ -22,7 +22,7 @@ public class ProviderInvoker<T> implements Invoker<T> {
   /**
    * cache all interface's methods
    */
-  public ProviderInvoker(T ref, Class<T> interfaceClazz) {
+  public ProviderInvoker(T ref, Class<T> interfaceClazz, Serialization serialization) {
     if (!interfaceClazz.isInterface()) {
       throw new CattyException("ProviderInvoker: interfaceClazz is not a interface!");
     }
@@ -40,11 +40,7 @@ public class ProviderInvoker<T> implements Invoker<T> {
       }
       methodMap.put(method.getName(), method);
     }
-  }
-
-  @Override
-  public Class<T> getInterface() {
-    return interfaceClazz;
+    this.serialization = serialization;
   }
 
   @Override

@@ -25,11 +25,6 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
   }
 
   @Override
-  public Class<T> getInterface() {
-    return interfaceClazz;
-  }
-
-  @Override
   public Response invoke(Request request) {
     return invoker.invoke(request);
   }
@@ -53,13 +48,15 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
 
     Class<?> returnType = method.getReturnType();
     Response response = invoke(request);
+
+    AsyncResponse asyncResponse = (AsyncResponse) response;
+
     if (returnType == Void.TYPE) {
       return null;
     }
     // async-method
     if (CompletableFuture.class.isAssignableFrom(returnType)) {
       CompletableFuture future = new CompletableFuture();
-      AsyncResponse asyncResponse = (AsyncResponse) response;
       asyncResponse.whenComplete((v, t) -> {
         if (t != null) {
           future.completeExceptionally(t);
@@ -79,9 +76,13 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
       return future;
     }
 
+    if(response instanceof AsyncResponse) {
+      ((AsyncResponse) response).await();
+    }
     // sync-method
+    //
     if (response.isError()) {
-      throw (Exception) response.getValue();
+      throw (Exception) resolveReturnValue(response.getValue(), Exception.class);
     }
     return resolveReturnValue(response.getValue(), returnType);
   }

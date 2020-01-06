@@ -19,11 +19,6 @@ public interface Client extends Invoker {
   Codec getCodec();
 
   @Override
-  default Class getInterface() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   Response invoke(Request request);
 
 }

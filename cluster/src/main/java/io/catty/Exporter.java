@@ -1,11 +1,12 @@
 package io.catty;
 
+import io.catty.api.Server;
+import io.catty.codec.CattySerialization;
+import io.catty.config.ServerConfig;
+import io.catty.netty.NettyServer;
 import io.catty.router.ServerRouterInvoker;
 import java.util.ArrayList;
 import java.util.List;
-import io.catty.config.ServerConfig;
-import io.catty.api.Server;
-import io.catty.netty.NettyServer;
 
 
 public class Exporter {
@@ -21,7 +22,8 @@ public class Exporter {
   }
 
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
-    serviceHandlers.add(new ProviderInvoker<>(serviceObject, interfaceClass));
+    serviceHandlers
+        .add(new ProviderInvoker<>(serviceObject, interfaceClass, new CattySerialization()));
   }
 
   public void export() {

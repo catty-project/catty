@@ -19,10 +19,5 @@ public interface Server extends Invoker {
 
   HashableExecutor getExecutor();
 
-  @Override
-  default Class getInterface() {
-    return getInvoker().getInterface();
-  }
-
   Invoker getInvoker();
 }

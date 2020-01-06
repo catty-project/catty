@@ -22,7 +22,7 @@ public class ServerConfig {
    *
    * Actually, there are rarely conditions you should set this option true.
    */
-  private boolean needOrder = true;
+  private boolean needOrder = false;
 
   public int getPort() {
     return port;

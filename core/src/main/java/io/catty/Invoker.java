@@ -7,8 +7,6 @@ package io.catty;
  */
 public interface Invoker<T> {
 
-  Class<T> getInterface();
-
   Response invoke(Request request);
 
 }

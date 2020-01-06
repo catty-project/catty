@@ -13,8 +13,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.nowcoder</groupId>
-      <artifactId>susu-core</artifactId>
+      <groupId>io.catty</groupId>
+      <artifactId>catty-core</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
 
