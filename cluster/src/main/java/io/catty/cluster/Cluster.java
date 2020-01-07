@@ -28,6 +28,8 @@ public class Cluster implements Invoker, NotifyListener {
 
   public Cluster(LoadBalance loadBalance) {
     this.loadBalance = loadBalance;
+    invokersMap = new HashMap<>();
+    invokers = new ArrayList<>();
   }
 
   @Override

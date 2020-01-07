@@ -22,6 +22,7 @@ import org.apache.zookeeper.ZooDefs;
 
 public class ZookeeperRegistry implements Registry {
 
+  private static final String ROOT = "/catty";
   private static final String PATH_SEP = "/";
   private static final String PROVIDERS = "providers";
   private static final String CONSUMERS = "consumers";
@@ -175,7 +176,7 @@ public class ZookeeperRegistry implements Registry {
   }
 
   private String buildPath(EndpointMetaInfo config) {
-    String root = "catty";
+    String root = ROOT;
     String path = config.getString(MetaInfoEnum.SERVER_NAME.toString());
     String serverOrClient;
     if(config.getEndpointTypeEnum() == EndpointTypeEnum.CLIENT) {

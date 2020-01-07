@@ -40,11 +40,16 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
     request.setRequestId(RequestIdGenerator.next());
     request.setInterfaceName(method.getDeclaringClass().getName());
     request.setMethodName(method.getName());
-    Object[] argBytes = new Object[args.length];
-    for (int i = 0; i < args.length; i++) {
-      argBytes[i] = serialization.serialize(args[i]);
+    if(args != null && args.length > 0) {
+      Object[] argBytes = new Object[args.length];
+      for (int i = 0; i < args.length; i++) {
+        argBytes[i] = serialization.serialize(args[i]);
+      }
+      request.setArgsValue(argBytes);
+    } else {
+      request.setArgsValue(null);
     }
-    request.setArgsValue(argBytes);
+
 
     Class<?> returnType = method.getReturnType();
     Response response = invoke(request);

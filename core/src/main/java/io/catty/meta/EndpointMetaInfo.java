@@ -31,8 +31,7 @@ public class EndpointMetaInfo {
       if(entry == null || "".equals(entry)) {
         continue;
       }
-      String[] metaInfoPair = entry.split(":");
-      map.put(metaInfoPair[0], metaInfoPair[1]);
+      map.put(entry.substring(0, entry.indexOf(":")), entry.substring(entry.indexOf(":") + 1));
     }
     return new EndpointMetaInfo(map, endpointTypeEnum);
   }

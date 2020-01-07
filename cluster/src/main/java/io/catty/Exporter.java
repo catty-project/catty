@@ -43,6 +43,7 @@ public class Exporter {
   public void export() {
     if(registry == null && registryConfig != null) {
       registry = new ZookeeperRegistry(registryConfig);
+      registry.open();
     }
     ServerRouterInvoker serverRouterInvoker = new ServerRouterInvoker();
     serviceHandlers.forEach((s, invoker) -> {

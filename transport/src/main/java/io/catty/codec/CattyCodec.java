@@ -16,17 +16,26 @@ public class CattyCodec implements Codec {
   public byte[] encode(Object message, DataTypeEnum dataTypeEnum) throws CodecException {
     if (dataTypeEnum == DataTypeEnum.REQUEST) {
       Request request = (Request) message;
-      ArrayList<ByteString> values = new ArrayList<>(request.getArgsValue().length);
-      for (int i = 0; i < request.getArgsValue().length; i++) {
-        values.add(ByteString.copyFrom((byte[]) request.getArgsValue()[i]));
+      if (request.getArgsValue() != null) {
+        ArrayList<ByteString> values = new ArrayList<>(request.getArgsValue().length);
+        for (int i = 0; i < request.getArgsValue().length; i++) {
+          values.add(ByteString.copyFrom((byte[]) request.getArgsValue()[i]));
+        }
+        return CattyProtocol.Request.newBuilder()
+            .setRequestId(request.getRequestId())
+            .addAllArguments(values)
+            .setInterfaceName(request.getInterfaceName())
+            .setMethodName(request.getMethodName())
+            .build()
+            .toByteArray();
+      } else {
+        return CattyProtocol.Request.newBuilder()
+            .setRequestId(request.getRequestId())
+            .setInterfaceName(request.getInterfaceName())
+            .setMethodName(request.getMethodName())
+            .build()
+            .toByteArray();
       }
-      return CattyProtocol.Request.newBuilder()
-          .setRequestId(request.getRequestId())
-          .addAllArguments(values)
-          .setInterfaceName(request.getInterfaceName())
-          .setMethodName(request.getMethodName())
-          .build()
-          .toByteArray();
     }
     if (dataTypeEnum == DataTypeEnum.RESPONSE) {
       Response response = (Response) message;
