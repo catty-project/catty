@@ -37,6 +37,10 @@ public class Cluster implements Invoker, Registry.NotifyListener {
     return loadBalance.select(invokers).invoke(request);
   }
 
+  public void close() {
+    invokers.forEach(Client::close);
+  }
+
   @Override
   public synchronized void notify(RegistryConfig registryConfig,
       List<EndpointMetaInfo> metaInfoCollection) {

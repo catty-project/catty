@@ -72,7 +72,15 @@ public class Reference<T> {
 
   // fixme : registry ?
   public void derefer() {
-    client.close();
+    if(client != null) {
+      client.close();
+    }
+    if(registry != null) {
+      registry.close();
+    }
+    if(cluster != null) {
+      cluster.close();
+    }
   }
 
 }

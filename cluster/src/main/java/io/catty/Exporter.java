@@ -62,5 +62,13 @@ public class Exporter {
 
   public void unexport() {
     server.close();
+    serviceHandlers.forEach((s, invoker) -> {
+      EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
+      metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME.toString(), s);
+      metaInfo
+          .addMetaInfo(MetaInfoEnum.ADDRESS.toString(), serverConfig.getServerAddress().toString());
+      registry.unregister(metaInfo);
+    });
+    registry.close();
   }
 }
