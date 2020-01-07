@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface LoadBalance {
 
-  Invoker select(List<Invoker> invokers);
+  Invoker select(List<? extends Invoker> invokers);
 
 }

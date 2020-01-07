@@ -3,6 +3,7 @@ package io.catty;
 import io.catty.api.Client;
 import io.catty.api.Registry;
 import io.catty.cluster.Cluster;
+import io.catty.cluster.lbs.RandomLoadBalance;
 import io.catty.config.ClientConfig;
 import io.catty.config.RegistryConfig;
 import io.catty.meta.EndpointMetaInfo;
@@ -55,7 +56,7 @@ public class Reference<T> {
             ref = new ProxyFactory<T>().getProxy(interfaceClass, client);
           } else {
             registry = new ZookeeperRegistry(registryConfig);
-            cluster = new Cluster();
+            cluster = new Cluster(new RandomLoadBalance());
             registry.open();
             EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
             metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME.toString(), interfaceClass.getName());
@@ -69,6 +70,7 @@ public class Reference<T> {
     return ref;
   }
 
+  // fixme : registry ?
   public void derefer() {
     client.close();
   }
