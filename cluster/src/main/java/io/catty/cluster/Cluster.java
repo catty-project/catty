@@ -4,7 +4,7 @@ import io.catty.Invoker;
 import io.catty.Request;
 import io.catty.Response;
 import io.catty.api.Client;
-import io.catty.api.Registry.NotifyListener;
+import io.catty.api.Registry;
 import io.catty.config.ClientConfig;
 import io.catty.config.RegistryConfig;
 import io.catty.meta.EndpointMetaInfo;
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class Cluster implements Invoker, NotifyListener {
+public class Cluster implements Invoker, Registry.NotifyListener {
 
   private LoadBalance loadBalance;
 

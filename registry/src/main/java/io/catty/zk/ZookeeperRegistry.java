@@ -159,9 +159,9 @@ public class ZookeeperRegistry implements Registry {
 
 
   /**
-   * zookeeper path: /root: susu/group name/interface name/providers?consumer/url;
+   * zookeeper path: /root: catty/group name/interface name/providers?consumer/meta;
    *
-   * buildPath :       /root: susu/group name/interface name/providers?consumer
+   * buildPath :     /root: catty/group name/interface name/providers?consumer
    */
   private void buildPath(String path) {
     try {
