@@ -40,4 +40,9 @@ public class ServerAddress {
     }
     return Objects.equals(port, other.port);
   }
+
+  @Override
+  public String toString() {
+    return ip + ":" + port;
+  }
 }

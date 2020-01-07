@@ -37,7 +37,6 @@ public class ZookeeperRegistry implements Registry {
 
   public ZookeeperRegistry(RegistryConfig registryConfig) {
     this.registryConfig = registryConfig;
-    open();
   }
 
   @Override
@@ -103,8 +102,8 @@ public class ZookeeperRegistry implements Registry {
     CuratorListener curatorListener = ((client0, event) -> {
       if (interested.contains(event.getType())) {
         if (event.getPath() != null && event.getPath().startsWith(path)) {
-          List<String> urls = event.getChildren();
-          listener.notify(registryConfig, urls.stream()
+          List<String> metaInfos = event.getChildren();
+          listener.notify(registryConfig, metaInfos.stream()
               .map(s -> EndpointMetaInfo.parse(s, metaInfo.getEndpointTypeEnum()))
               .collect(Collectors.toList()));
         }

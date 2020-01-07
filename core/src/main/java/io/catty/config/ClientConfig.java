@@ -8,6 +8,8 @@ public class ClientConfig {
 
   private String address;
 
+  private boolean keepOrder;
+
   private int timeout;
 
   public int getServerPort() {
@@ -38,7 +40,15 @@ public class ClientConfig {
     return ipPort[0];
   }
 
+  public String getAddress() {
+    return address;
+  }
+
   public int getTimeout() {
     return timeout;
+  }
+
+  public boolean isKeepOrder() {
+    return keepOrder;
   }
 }

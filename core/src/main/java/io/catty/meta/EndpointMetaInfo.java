@@ -23,7 +23,7 @@ public class EndpointMetaInfo {
     return endpointTypeEnum;
   }
 
-  // todo : robust
+  // todo : need more robust
   public static EndpointMetaInfo parse(String metaInfoStr, EndpointTypeEnum endpointTypeEnum) {
     Map<String, String> map = new HashMap<>();
     String[] metaInfoEntryArray = metaInfoStr.split(";");
@@ -37,7 +37,7 @@ public class EndpointMetaInfo {
     return new EndpointMetaInfo(map, endpointTypeEnum);
   }
 
-  public void addInfo(String key, String value) {
+  public void addMetaInfo(String key, String value) {
     info.put(key, value);
   }
 
@@ -125,6 +125,19 @@ public class EndpointMetaInfo {
       sb.append(entry.getKey()).append(":").append(entry.getValue()).append(";");
     }
     return sb.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    return info.hashCode();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if(!(o instanceof EndpointMetaInfo)) {
+      return false;
+    }
+    return info.equals(((EndpointMetaInfo) o).info);
   }
 
 }
