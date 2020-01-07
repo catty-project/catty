@@ -20,14 +20,8 @@ public class ServerRouterInvoker implements Invoker {
     return handlerMap.getOrDefault(serviceName, DefaultInvoker.INSTANCE).invoke(request);
   }
 
-  public void registerInvoker(Invoker invoker) {
-    String serverIdentify = invoker.getInterface().getName();
+  public void registerInvoker(String serverIdentify, Invoker invoker) {
     handlerMap.put(serverIdentify, invoker);
-  }
-
-  @Override
-  public Class getInterface() {
-    return null;
   }
 
   public static class DefaultInvoker implements Invoker {
@@ -35,11 +29,6 @@ public class ServerRouterInvoker implements Invoker {
     private static Invoker INSTANCE = new DefaultInvoker();
 
     private DefaultInvoker() {
-    }
-
-    @Override
-    public Class getInterface() {
-      throw new UnsupportedOperationException();
     }
 
     @Override

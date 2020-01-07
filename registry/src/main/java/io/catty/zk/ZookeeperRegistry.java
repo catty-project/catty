@@ -1,9 +1,11 @@
 package io.catty.zk;
 
 import io.catty.api.Registry;
+import io.catty.meta.EndpointMetaInfo;
 import io.catty.config.RegistryConfig;
-import io.catty.config.ServerConfig;
 import io.catty.exception.RegistryException;
+import io.catty.meta.EndpointTypeEnum;
+import io.catty.meta.MetaInfoEnum;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,11 +20,9 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
 
-/**
- * @author zrj CreateDate: 2019/9/9
- */
 public class ZookeeperRegistry implements Registry {
 
+  private static final String PATH_SEP = "/";
   private static final String PROVIDERS = "providers";
   private static final String CONSUMERS = "consumers";
   private static final Set<CuratorEventType> interested = new HashSet<>();
@@ -42,11 +42,9 @@ public class ZookeeperRegistry implements Registry {
 
   @Override
   public void open() {
-    // todo: RetryPolicy 支持配置
     RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 5);
-    // todo : 账号密码支持
     client = CuratorFrameworkFactory.builder()
-        .connectString(registryConfig.getIpPortString())
+        .connectString(registryConfig.getAddress())
         .sessionTimeoutMs(10000)
         .retryPolicy(retryPolicy)
         .build();
@@ -71,33 +69,32 @@ public class ZookeeperRegistry implements Registry {
   }
 
   @Override
-  public void register(ServerConfig serverConfig) {
+  public void register(EndpointMetaInfo metaInfo) {
     checkClientStatus();
-    String path = buildPath(serverConfig);
+    String path = buildPath(metaInfo);
     if (!exist(path)) {
       buildPath(path);
     }
-    path += SusuConstants.PATH_SEP + encodeUrl(url.getUrlString());
+    path += PATH_SEP + metaInfo.toString();
     ephemeralPath(path);
   }
 
   @Override
-  public void unregister(ServerConfig serverConfig) {
+  public void unregister(EndpointMetaInfo metaInfo) {
     checkClientStatus();
-    String path = buildPath(url) + SusuConstants.PATH_SEP + url.getUrlString();
+    String path = buildPath(metaInfo) + PATH_SEP + metaInfo.toString();
     delete(path);
   }
 
   @Override
-  public void subscribe(ServerConfig serverConfig, NotifyListener listener) {
+  public void subscribe(EndpointMetaInfo metaInfo, NotifyListener listener) {
     checkClientStatus();
-    String path = buildServerPath(url);
 
+    String path = buildPath(metaInfo);
     try {
-      List<String> urls = client.getChildren().forPath(buildServerPath(url) + SusuConstants.PATH_SEP + PROVIDERS);
-      listener.notify(this.registryUrl, urls.stream()
-          .map(this::decodeUrl)
-          .map(URL::parse)
+      List<String> metaInfos = client.getChildren().forPath(path);
+      listener.notify(registryConfig, metaInfos.stream()
+          .map(s -> EndpointMetaInfo.parse(s, metaInfo.getEndpointTypeEnum()))
           .collect(Collectors.toList()));
     } catch (Exception e) {
       throw new RegistryException("ZookeeperRegistry: getChildren error", e);
@@ -106,11 +103,9 @@ public class ZookeeperRegistry implements Registry {
     CuratorListener curatorListener = ((client0, event) -> {
       if (interested.contains(event.getType())) {
         if (event.getPath() != null && event.getPath().startsWith(path)) {
-          System.out.println(event);// todo: 调试删除
           List<String> urls = event.getChildren();
-          listener.notify(this.registryUrl, urls.stream()
-              .map(this::decodeUrl)
-              .map(URL::parse)
+          listener.notify(registryConfig, urls.stream()
+              .map(s -> EndpointMetaInfo.parse(s, metaInfo.getEndpointTypeEnum()))
               .collect(Collectors.toList()));
         }
       }
@@ -119,7 +114,7 @@ public class ZookeeperRegistry implements Registry {
   }
 
   @Override
-  public void unsubscribe(ServerConfig serverConfig, NotifyListener listener) {
+  public void unsubscribe(EndpointMetaInfo metaInfo, NotifyListener listener) {
 
   }
 
@@ -129,7 +124,7 @@ public class ZookeeperRegistry implements Registry {
   private void checkClientStatus() {
     if (!isOpen()) {
       throw new RegistryException(
-          "ZookeeperRegistry: registry unavailable, url: " + registryUrl.getIpPortString());
+          "ZookeeperRegistry: registry unavailable, url: " + registryConfig.getAddress());
     }
   }
 
@@ -164,21 +159,10 @@ public class ZookeeperRegistry implements Registry {
 
 
   /**
-   * zookeeper path: /root: susu/group name/interface name/providers?consumer/url
-   *
-   * buildServerPath : /root: susu/group name/interface name
+   * zookeeper path: /root: susu/group name/interface name/providers?consumer/url;
    *
    * buildPath :       /root: susu/group name/interface name/providers?consumer
    */
-  private String buildServerPath(URL url) {
-    String root = url.getString(URL_CONFIG.ROOT);
-    String group = url.getString(URL_CONFIG.GROUP);
-    String path = url.getPath();
-    return root
-        + SusuConstants.PATH_SEP + group
-        + SusuConstants.PATH_SEP + path;
-  }
-
   private void buildPath(String path) {
     try {
       client.create()
@@ -191,22 +175,20 @@ public class ZookeeperRegistry implements Registry {
     }
   }
 
-  private String buildPath(ServerConfig config) {
+  private String buildPath(EndpointMetaInfo config) {
     String root = "catty";
-    String path = config.get;
-    String serverOrClient = url.getBoolean(URL_CONFIG.IS_SERVER) ? PROVIDERS : CONSUMERS;
+    String path = config.getString(MetaInfoEnum.SERVER_NAME.toString());
+    String serverOrClient;
+    if(config.getEndpointTypeEnum() == EndpointTypeEnum.CLIENT) {
+      serverOrClient = CONSUMERS;
+    } else if(config.getEndpointTypeEnum() == EndpointTypeEnum.SERVER) {
+      serverOrClient = PROVIDERS;
+    } else {
+      throw new IllegalArgumentException();
+    }
     return root
-        + SusuConstants.PATH_SEP + group
-        + SusuConstants.PATH_SEP + path
-        + SusuConstants.PATH_SEP + serverOrClient;
-  }
-
-  private String encodeUrl(String url) {
-    return URL.encode(url);
-  }
-
-  private String decodeUrl(String url) {
-    return URL.decode(url);
+        + PATH_SEP + path
+        + PATH_SEP + serverOrClient;
   }
 
 }

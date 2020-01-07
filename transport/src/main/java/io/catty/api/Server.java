@@ -18,6 +18,5 @@ public interface Server extends Invoker {
   Codec getCodec();
 
   HashableExecutor getExecutor();
-
-  Invoker getInvoker();
+  
 }

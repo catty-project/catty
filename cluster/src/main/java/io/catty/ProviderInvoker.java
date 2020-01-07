@@ -17,7 +17,6 @@ public class ProviderInvoker<T> implements Invoker<T> {
   protected Map<String, Method> methodMap = new ConcurrentHashMap<>();
   private T ref;
   private Serialization serialization;
-  private Class<T> interfaceClazz;
 
   /**
    * cache all interface's methods
@@ -27,7 +26,6 @@ public class ProviderInvoker<T> implements Invoker<T> {
       throw new CattyException("ProviderInvoker: interfaceClazz is not a interface!");
     }
     this.ref = ref;
-    this.interfaceClazz = interfaceClazz;
     List<Method> methods = ReflectUtils.parseMethod(interfaceClazz);
     for (Method method : methods) {
       String methodDesc = ReflectUtils.getMethodDesc(method);

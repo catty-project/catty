@@ -50,13 +50,8 @@ public abstract class AbstractServer implements Server {
   }
 
   @Override
-  public Invoker getInvoker() {
-    return invoker;
-  }
-
-  @Override
   public Response invoke(Request request) {
-    return getInvoker().invoke(request);
+    return invoker.invoke(request);
   }
 
   @Override

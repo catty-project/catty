@@ -1,7 +1,8 @@
 package io.catty.api;
 
 import io.catty.config.RegistryConfig;
-import io.catty.config.ServerConfig;
+import io.catty.meta.EndpointMetaInfo;
+import java.util.List;
 
 public interface Registry {
 
@@ -11,17 +12,17 @@ public interface Registry {
 
   boolean isOpen();
 
-  void register(ServerConfig serverConfig);
+  void register(EndpointMetaInfo metaInfo);
 
-  void unregister(ServerConfig serverConfig);
+  void unregister(EndpointMetaInfo metaInfo);
 
-  void subscribe(ServerConfig serverConfig, NotifyListener listener);
+  void subscribe(EndpointMetaInfo metaInfo, NotifyListener listener);
 
-  void unsubscribe(ServerConfig serverConfig, NotifyListener listener);
+  void unsubscribe(EndpointMetaInfo metaInfo, NotifyListener listener);
 
   interface NotifyListener {
 
-    void notify(RegistryConfig registryConfig, String config);
+    void notify(RegistryConfig registryConfig, List<EndpointMetaInfo> metaInfoCollection);
   }
 
 }

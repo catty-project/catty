@@ -71,6 +71,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
         return ctx.channel().writeAndFlush(byteBuf).sync();
       }
     } catch (Exception e) {
+      // fixme: fix this
       e.printStackTrace();
     }
 
