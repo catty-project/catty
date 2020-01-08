@@ -3,7 +3,7 @@ package io.catty;
 import io.catty.api.Registry;
 import io.catty.api.Server;
 import io.catty.codec.CattySerialization;
-import io.catty.config.RegistryConfig;
+import io.catty.api.RegistryConfig;
 import io.catty.config.ServerConfig;
 import io.catty.meta.EndpointMetaInfo;
 import io.catty.meta.EndpointTypeEnum;

@@ -2,7 +2,7 @@ package io.catty.registry;
 
 import io.catty.Reference;
 import io.catty.config.ClientConfig;
-import io.catty.config.RegistryConfig;
+import io.catty.api.RegistryConfig;
 
 public class Client {
 

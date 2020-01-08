@@ -6,7 +6,7 @@ import io.catty.Response;
 import io.catty.api.Client;
 import io.catty.api.Registry;
 import io.catty.config.ClientConfig;
-import io.catty.config.RegistryConfig;
+import io.catty.api.RegistryConfig;
 import io.catty.meta.EndpointMetaInfo;
 import io.catty.meta.MetaInfoEnum;
 import io.catty.netty.NettyClient;

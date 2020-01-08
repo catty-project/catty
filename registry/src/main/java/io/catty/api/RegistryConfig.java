@@ -1,4 +1,4 @@
-package io.catty.config;
+package io.catty.api;
 
 public class RegistryConfig {
 

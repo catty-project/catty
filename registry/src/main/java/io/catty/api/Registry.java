@@ -1,6 +1,5 @@
 package io.catty.api;
 
-import io.catty.config.RegistryConfig;
 import io.catty.meta.EndpointMetaInfo;
 import java.util.List;
 
