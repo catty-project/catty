@@ -20,7 +20,12 @@ public class CattySerialization implements Serialization {
     if (object instanceof Message) {
       result = ((Message) object).toByteArray();
     } else {
-      result = backupSerialize(object);
+      SerializeWriter out = new SerializeWriter();
+      JSONSerializer serializer = new JSONSerializer(out);
+      serializer.config(SerializerFeature.WriteEnumUsingToString, true);
+      serializer.config(SerializerFeature.WriteClassName, true);
+      serializer.write(object);
+      result = out.toBytes("UTF-8");
     }
     return result;
   }
@@ -33,7 +38,7 @@ public class CattySerialization implements Serialization {
       Method method = clazz.getMethod("newBuilder");
       builder = (Builder) method.invoke(null, null);
     } catch (Exception e) {
-      return backupDeserialize(bytes, clazz);
+      return JSON.parseObject(new String(bytes), clazz);
     }
     try {
       builder.mergeFrom(bytes);
@@ -42,18 +47,4 @@ public class CattySerialization implements Serialization {
     }
     return (T) builder.build();
   }
-
-  private byte[] backupSerialize(Object object) {
-    SerializeWriter out = new SerializeWriter();
-    JSONSerializer serializer = new JSONSerializer(out);
-    serializer.config(SerializerFeature.WriteEnumUsingToString, true);
-    serializer.config(SerializerFeature.WriteClassName, true);
-    serializer.write(object);
-    return out.toBytes("UTF-8");
-  }
-
-  private <T> T backupDeserialize(byte[] bytes, Class<T> clazz) {
-    return JSON.parseObject(new String(bytes), clazz);
-  }
-
 }
