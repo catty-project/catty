@@ -70,7 +70,6 @@ public class Reference<T> {
     return ref;
   }
 
-  // fixme : registry ?
   public void derefer() {
     if(client != null) {
       client.close();
