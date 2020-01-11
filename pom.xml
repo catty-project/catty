@@ -18,6 +18,7 @@
     <module>registry</module>
     <module>test</module>
     <module>benchmark</module>
+    <module>all</module>
   </modules>
 
   <properties>
