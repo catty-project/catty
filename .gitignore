@@ -13,7 +13,7 @@
 **/generated/*
 
 # macOS
-*/.DS_Store
+**/.DS_Store
 
 # target files
 /*/target
