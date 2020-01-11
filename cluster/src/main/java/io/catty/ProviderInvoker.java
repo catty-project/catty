@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class ProviderInvoker<T> implements Invoker<T> {
+public class ProviderInvoker<T> implements Invoker {
 
   protected Map<String, Method> methodMap = new ConcurrentHashMap<>();
   private T ref;
@@ -42,7 +42,7 @@ public class ProviderInvoker<T> implements Invoker<T> {
   }
 
   @Override
-  public Response invoke(Request request) {
+  public Response invoke(Request request, Runtime runtime) {
     Response response = new DefaultResponse();
     String methodName = request.getMethodName();
     Method method = methodMap.get(methodName);

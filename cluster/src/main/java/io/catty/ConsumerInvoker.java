@@ -12,7 +12,7 @@ import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
 
 
-public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
+public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
 
   private Invoker invoker;
   private Class<T> interfaceClazz;
@@ -25,8 +25,8 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
   }
 
   @Override
-  public Response invoke(Request request) {
-    return invoker.invoke(request);
+  public Response invoke(Request request, Runtime runtime) {
+    return invoker.invoke(request, runtime);
   }
 
   @Override
@@ -50,9 +50,11 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker<T> {
       request.setArgsValue(null);
     }
 
-
     Class<?> returnType = method.getReturnType();
-    Response response = invoke(request);
+
+    Runtime runtime = new Runtime();
+    runtime.setInvokedMethod(method);
+    Response response = invoke(request, runtime);
 
     AsyncResponse asyncResponse = (AsyncResponse) response;
 

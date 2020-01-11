@@ -1,10 +1,11 @@
 package io.catty.router;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import io.catty.Invoker;
 import io.catty.Request;
 import io.catty.Response;
+import io.catty.Runtime;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerRouterInvoker implements Invoker {
 
@@ -15,9 +16,9 @@ public class ServerRouterInvoker implements Invoker {
   }
 
   @Override
-  public Response invoke(Request request) {
+  public Response invoke(Request request, Runtime runtime) {
     String serviceName = request.getInterfaceName();
-    return handlerMap.getOrDefault(serviceName, DefaultInvoker.INSTANCE).invoke(request);
+    return handlerMap.getOrDefault(serviceName, DefaultInvoker.INSTANCE).invoke(request, runtime);
   }
 
   public void registerInvoker(String serverIdentify, Invoker invoker) {
@@ -32,7 +33,7 @@ public class ServerRouterInvoker implements Invoker {
     }
 
     @Override
-    public Response invoke(Request request) {
+    public Response invoke(Request request, Runtime runtime) {
       throw new UnsupportedOperationException();
     }
   }

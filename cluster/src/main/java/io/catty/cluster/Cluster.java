@@ -3,6 +3,7 @@ package io.catty.cluster;
 import io.catty.Invoker;
 import io.catty.Request;
 import io.catty.Response;
+import io.catty.Runtime;
 import io.catty.api.Client;
 import io.catty.api.Registry;
 import io.catty.config.ClientConfig;
@@ -33,8 +34,8 @@ public class Cluster implements Invoker, Registry.NotifyListener {
   }
 
   @Override
-  public Response invoke(Request request) {
-    return loadBalance.select(invokers).invoke(request);
+  public Response invoke(Request request, Runtime runtime) {
+    return loadBalance.select(invokers).invoke(request, runtime);
   }
 
   public void close() {

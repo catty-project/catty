@@ -4,6 +4,7 @@ import io.catty.GlobalConstants;
 import io.catty.Invoker;
 import io.catty.Request;
 import io.catty.Response;
+import io.catty.Runtime;
 import io.catty.codec.Codec;
 import io.catty.config.ServerConfig;
 import io.catty.worker.ConsistentHashLoopGroup;
@@ -50,8 +51,8 @@ public abstract class AbstractServer implements Server {
   }
 
   @Override
-  public Response invoke(Request request) {
-    return invoker.invoke(request);
+  public Response invoke(Request request, Runtime runtime) {
+    return invoker.invoke(request, runtime);
   }
 
   @Override

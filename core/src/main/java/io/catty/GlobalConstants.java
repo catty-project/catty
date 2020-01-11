@@ -1,5 +1,6 @@
 package io.catty;
 
+import java.lang.Runtime;
 
 public interface GlobalConstants {
 
