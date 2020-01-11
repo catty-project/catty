@@ -12,6 +12,7 @@ import io.catty.codec.CattyCodec;
 import io.catty.config.ClientConfig;
 import io.catty.exception.CattyException;
 import io.catty.exception.TransportException;
+import io.catty.utils.ExceptionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -96,7 +97,7 @@ public class NettyClient extends AbstractClient {
     } catch (Exception e) {
       response.setStatus(ResponseStatus.INNER_ERROR);
       response
-          .setValue(new TransportException("NettyClient: response.getValue interrupted!"));
+          .setValue(ExceptionUtils.toString(e));
       return response;
     }
   }
