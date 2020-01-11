@@ -1,7 +1,7 @@
-package io.catty.pb;
+package io.catty.example.pb;
 
-import io.catty.pb.generated.EchoProtocol.Request;
-import io.catty.pb.generated.EchoProtocol.Response;
+import io.catty.example.pb.generated.EchoProtocol.Request;
+import io.catty.example.pb.generated.EchoProtocol.Response;
 
 public class IServiceImpl implements IService {
 

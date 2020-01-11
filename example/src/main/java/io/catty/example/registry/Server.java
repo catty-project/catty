@@ -1,4 +1,4 @@
-package io.catty.registry;
+package io.catty.example.registry;
 
 import io.catty.Exporter;
 import io.catty.api.RegistryConfig;

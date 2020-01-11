@@ -1,4 +1,4 @@
-package io.catty.registry;
+package io.catty.example.registry;
 
 public class IServiceImpl implements IService {
 

@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -70,7 +71,11 @@ public class ProviderInvoker<T> implements Invoker {
       Object[] argsValue = resolveArgsValue(request.getArgsValue(), method);
       Object value = method.invoke(ref, argsValue);
       if (value != null) {
-        response.setValue(serialization.serialize(value));
+        if(value instanceof CompletableFuture) {
+          response.setValue(value);
+        } else {
+          response.setValue(serialization.serialize(value));
+        }
       }
       response.setStatus(ResponseStatus.OK);
     } catch (Exception e) {

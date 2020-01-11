@@ -1,4 +1,4 @@
-package io.catty.pb;
+package io.catty.example.pb;
 
 import io.catty.Exporter;
 import io.catty.config.ServerConfig;

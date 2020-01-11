@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package io.catty.benchmark;
+
+option java_package = "io.catty.benchmark.generated";
+option java_outer_classname = "BenchmarkProtocol";
+
+message Request {
+  string value = 1;
+};
+
+message Response {
+  string value = 1;
+};
+

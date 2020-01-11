@@ -1,8 +1,9 @@
-package io.catty.pb;
+package io.catty.example.pb;
 
 import io.catty.Reference;
 import io.catty.config.ClientConfig;
-import io.catty.pb.generated.EchoProtocol;
+import io.catty.example.pb.generated.EchoProtocol;
+import io.catty.example.pb.generated.EchoProtocol.Request;
 
 public class Client {
 
@@ -15,7 +16,7 @@ public class Client {
     reference.setClientConfig(clientConfig);
     reference.setInterfaceClass(IService.class);
 
-    EchoProtocol.Request request = EchoProtocol.Request.newBuilder()
+    Request request = EchoProtocol.Request.newBuilder()
         .setValue("123321")
         .build();
 
