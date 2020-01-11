@@ -31,9 +31,18 @@ public class EndpointMetaInfo {
       if(entry == null || "".equals(entry)) {
         continue;
       }
-      map.put(entry.substring(0, entry.indexOf(":")), entry.substring(entry.indexOf(":") + 1));
+      map.put(entry.substring(0, entry.indexOf("=")), entry.substring(entry.indexOf("=") + 1));
     }
     return new EndpointMetaInfo(map, endpointTypeEnum);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    for(Entry<String, String> entry : info.entrySet()) {
+      sb.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
+    }
+    return sb.toString();
   }
 
   public void addMetaInfo(String key, String value) {
@@ -115,15 +124,6 @@ public class EndpointMetaInfo {
       return Double.valueOf(info.get(key));
     }
     return def;
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for(Entry<String, String> entry : info.entrySet()) {
-      sb.append(entry.getKey()).append(":").append(entry.getValue()).append(";");
-    }
-    return sb.toString();
   }
 
   @Override
