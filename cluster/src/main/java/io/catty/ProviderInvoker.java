@@ -4,17 +4,23 @@ import io.catty.Response.ResponseStatus;
 import io.catty.api.DefaultResponse;
 import io.catty.codec.Serialization;
 import io.catty.exception.CattyException;
+import io.catty.utils.ExceptionUtils;
 import io.catty.utils.ReflectUtils;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ProviderInvoker<T> implements Invoker {
 
-  protected Map<String, Method> methodMap = new ConcurrentHashMap<>();
+  private Map<String, Method> methodCache = new ConcurrentHashMap<>();
+  private Map<Method, Set<Class<?>>> methodExceptionsCache = new ConcurrentHashMap<>();
+
   private T ref;
   private Serialization serialization;
 
@@ -30,13 +36,17 @@ public class ProviderInvoker<T> implements Invoker {
     for (Method method : methods) {
       String methodDesc = ReflectUtils.getMethodDesc(method);
       String methodName = method.getName();
-      methodMap.putIfAbsent(methodDesc, method);
-      if (methodMap.containsKey(methodName)) {
+      methodCache.putIfAbsent(methodDesc, method);
+      if (methodCache.containsKey(methodName)) {
         throw new CattyException(
             "Duplicated method name: " + method.getDeclaringClass() + "#" + method
                 + ". Method name excepted unique.");
       }
-      methodMap.put(method.getName(), method);
+      methodCache.put(method.getName(), method);
+      Class<?>[] exceptionTypes = method.getExceptionTypes();
+      if (exceptionTypes != null && exceptionTypes.length > 0) {
+        methodExceptionsCache.put(method, new HashSet<>(Arrays.asList(exceptionTypes)));
+      }
     }
     this.serialization = serialization;
   }
@@ -45,13 +55,17 @@ public class ProviderInvoker<T> implements Invoker {
   public Response invoke(Request request, Runtime runtime) {
     Response response = new DefaultResponse();
     String methodName = request.getMethodName();
-    Method method = methodMap.get(methodName);
+    Method method = methodCache.get(methodName);
+
     if (method == null) {
       response.setStatus(ResponseStatus.OUTER_ERROR);
-      response.setValue(serialization
-          .serialize(new CattyException("ProviderInvoker: can't find method: " + methodName)));
+      response.setValue(ExceptionUtils
+          .toString(new CattyException("ProviderInvoker: can't find method: " + methodName)));
       return response;
     }
+
+    Set<Class<?>> exceptionTypes = methodExceptionsCache.get(method);
+
     try {
       Object[] argsValue = resolveArgsValue(request.getArgsValue(), method);
       Object value = method.invoke(ref, argsValue);
@@ -60,13 +74,16 @@ public class ProviderInvoker<T> implements Invoker {
       }
       response.setStatus(ResponseStatus.OK);
     } catch (Exception e) {
-      response.setStatus(ResponseStatus.INNER_ERROR);
-      response.setValue(serialization.serialize(
-          new CattyException("ProviderInvoker: exception when invoke method: " + methodName, e)));
+      if(exceptionTypes.contains(e.getClass())) {
+        response.setStatus(ResponseStatus.EXCEPTED_ERROR);
+        response.setValue(ExceptionUtils.toString(e));
+      } else {
+        response.setStatus(ResponseStatus.INNER_ERROR);
+        response.setValue(ExceptionUtils.toString(e));
+      }
     } catch (Error e) {
-      response.setStatus(ResponseStatus.INNER_ERROR);
-      response.setValue(serialization.serialize(
-          new CattyException("ProviderInvoker: error when invoke method: " + methodName, e)));
+      response.setStatus(ResponseStatus.UNKNOWN_ERROR);
+      response.setValue(ExceptionUtils.toString("Unknown Error!", e));
     }
     return response;
   }

@@ -20,6 +20,8 @@ public interface Response {
     OK,
     INNER_ERROR,
     OUTER_ERROR,
+    UNKNOWN_ERROR,
+    EXCEPTED_ERROR,
     ;
   }
 

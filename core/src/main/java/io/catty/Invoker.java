@@ -23,6 +23,14 @@ package io.catty;
  */
 public interface Invoker {
 
+  /**
+   *
+   * @param request rpc request
+   * @param runtime rpc invoke runtime arguments.
+   * @return rpc return
+   * @throws io.catty.exception.CattyException If inner error occurred. CattyException will be
+   * thrown.
+   */
   Response invoke(Request request, Runtime runtime);
 
 }
