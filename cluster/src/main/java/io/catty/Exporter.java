@@ -58,7 +58,7 @@ public class Exporter {
     if (serviceRouterMap.containsKey(address)) {
       server = serverMap.get(address);
       if (server == null) {
-        throw new NullPointerException("Server is null");
+        throw new NullPointerException("Server is not exist");
       }
       serverRouterInvoker = serviceRouterMap.get(address);
     } else {
@@ -73,9 +73,8 @@ public class Exporter {
       if (registry != null) {
         EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
         metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME.toString(), s);
-        metaInfo
-            .addMetaInfo(MetaInfoEnum.ADDRESS.toString(),
-                serverConfig.getServerAddress().toString());
+        metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS.toString(),
+            serverConfig.getServerAddress().toString());
         registry.register(metaInfo);
       }
     });

@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Service meta info.
+ *
+ * Cache service's interface info to mark easy to entry.
+ */
 public class ServiceMeta {
 
   private Class<?> interfaceClass;
@@ -33,8 +38,8 @@ public class ServiceMeta {
       }
       methodMap.put(methodSign, method);
       validMethod.add(method);
+      methodMetaMap.put(method, new MethodMeta(method));
     }
-    // todo method meta
   }
 
   public Class<?> getInterfaceClass() {
