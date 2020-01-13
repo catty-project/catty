@@ -49,4 +49,8 @@ public class ServiceMeta {
     return methodMetaMap.get(method);
   }
 
+  public Method getMethodBySign(String methodSign) {
+    return methodMap.get(methodSign);
+  }
+
 }
