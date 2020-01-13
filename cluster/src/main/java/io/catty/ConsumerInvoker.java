@@ -25,8 +25,8 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
   }
 
   @Override
-  public Response invoke(Request request, Runtime runtime) {
-    return invoker.invoke(request, runtime);
+  public Response invoke(Request request, Invocation invocation) {
+    return invoker.invoke(request, invocation);
   }
 
   @Override
@@ -52,9 +52,9 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
 
     Class<?> returnType = method.getReturnType();
 
-    Runtime runtime = new Runtime();
-    runtime.setInvokedMethod(method);
-    Response response = invoke(request, runtime);
+    Invocation invocation = new Invocation();
+    invocation.setInvokedMethod(method);
+    Response response = invoke(request, invocation);
 
     AsyncResponse asyncResponse = (AsyncResponse) response;
 
@@ -83,11 +83,8 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
       return future;
     }
 
-    if(response instanceof AsyncResponse) {
-      ((AsyncResponse) response).await();
-    }
     // sync-method
-    //
+    asyncResponse.await();
     if (response.isError()) {
       throw (Exception) resolveReturnValue(response.getValue(), Exception.class);
     }

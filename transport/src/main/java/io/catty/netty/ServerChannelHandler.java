@@ -1,6 +1,6 @@
 package io.catty.netty;
 
-import io.catty.Runtime;
+import io.catty.Invocation;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
@@ -42,7 +42,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
   }
 
   private void processRequest(ChannelHandlerContext ctx, Request request) {
-    Response response = nettyServer.invoke(request, new Runtime());
+    Response response = nettyServer.invoke(request, new Invocation());
     response.setRequestId(request.getRequestId());
     Object value = response.getValue();
     if (value == null || value instanceof Void) {

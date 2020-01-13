@@ -3,7 +3,7 @@ package io.catty.cluster;
 import io.catty.Invoker;
 import io.catty.Request;
 import io.catty.Response;
-import io.catty.Runtime;
+import io.catty.Invocation;
 import io.catty.api.Client;
 import io.catty.api.Registry;
 import io.catty.config.ClientConfig;
@@ -34,8 +34,12 @@ public class Cluster implements Invoker, Registry.NotifyListener {
   }
 
   @Override
-  public Response invoke(Request request, Runtime runtime) {
-    return loadBalance.select(invokers).invoke(request, runtime);
+  public Response invoke(Request request, Invocation invocation) {
+    Client client = loadBalance.select(invokers);
+    if(!client.isOpen()) {
+      client.open();
+    }
+    return client.invoke(request, invocation);
   }
 
   public void close() {
@@ -57,7 +61,6 @@ public class Cluster implements Invoker, Registry.NotifyListener {
     }
     for (EndpointMetaInfo metaInfo : newList) {
       Client client = createClientFromMetaInfo(metaInfo);
-      client.open();
       newInvokerMap.put(metaInfo, client);
       newInvokerList.add(client);
     }

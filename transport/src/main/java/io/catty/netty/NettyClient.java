@@ -4,7 +4,7 @@ import io.catty.GlobalConstants;
 import io.catty.Request;
 import io.catty.Response;
 import io.catty.Response.ResponseStatus;
-import io.catty.Runtime;
+import io.catty.Invocation;
 import io.catty.api.AbstractClient;
 import io.catty.api.DefaultAsyncResponse;
 import io.catty.codec.Codec.DataTypeEnum;
@@ -81,7 +81,7 @@ public class NettyClient extends AbstractClient {
   }
 
   @Override
-  public Response invoke(Request request, Runtime runtime) {
+  public Response invoke(Request request, Invocation invocation) {
     Response response = new DefaultAsyncResponse(request.getRequestId());
     addCurrentTask(request.getRequestId(), response);
     try {
@@ -96,8 +96,7 @@ public class NettyClient extends AbstractClient {
       return response;
     } catch (Exception e) {
       response.setStatus(ResponseStatus.INNER_ERROR);
-      response
-          .setValue(ExceptionUtils.toString(e));
+      response.setValue(ExceptionUtils.toString(e));
       return response;
     }
   }

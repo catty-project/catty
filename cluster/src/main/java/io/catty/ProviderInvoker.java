@@ -53,7 +53,7 @@ public class ProviderInvoker<T> implements Invoker {
   }
 
   @Override
-  public Response invoke(Request request, Runtime runtime) {
+  public Response invoke(Request request, Invocation invocation) {
     Response response = new DefaultResponse();
     String methodName = request.getMethodName();
     Method method = methodCache.get(methodName);

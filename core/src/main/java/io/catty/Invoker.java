@@ -19,18 +19,18 @@ package io.catty;
  * A RPC invoke will be wrapped as a Request, and the return of the RPC invoke will be wrapped as a
  * Response.
  *
- * Runtime contains the whole information of the current invocation.
+ * Invocation contains the whole information of the current invocation.
  */
 public interface Invoker {
 
   /**
    *
    * @param request rpc request
-   * @param runtime rpc invoke runtime arguments.
+   * @param invocation rpc invoke invocation arguments.
    * @return rpc return
    * @throws io.catty.exception.CattyException If inner error occurred. CattyException will be
    * thrown.
    */
-  Response invoke(Request request, Runtime runtime);
+  Response invoke(Request request, Invocation invocation);
 
 }
