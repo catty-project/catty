@@ -33,7 +33,7 @@ public class ProviderInvoker<T> implements Invoker {
       throw new CattyException("ProviderInvoker: interfaceClazz is not a interface!");
     }
     this.ref = ref;
-    List<Method> methods = ReflectUtils.parseMethod(interfaceClazz);
+    List<Method> methods = ReflectUtils.getPublicMethod(interfaceClazz);
     for (Method method : methods) {
       String methodDesc = ReflectUtils.getMethodDesc(method);
       String methodName = method.getName();

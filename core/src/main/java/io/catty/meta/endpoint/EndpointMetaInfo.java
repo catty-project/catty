@@ -1,4 +1,4 @@
-package io.catty.meta;
+package io.catty.meta.endpoint;
 
 import java.util.HashMap;
 import java.util.Map;

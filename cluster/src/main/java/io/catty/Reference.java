@@ -6,9 +6,9 @@ import io.catty.api.RegistryConfig;
 import io.catty.cluster.Cluster;
 import io.catty.cluster.lbs.RandomLoadBalance;
 import io.catty.config.ClientConfig;
-import io.catty.meta.EndpointMetaInfo;
-import io.catty.meta.EndpointTypeEnum;
-import io.catty.meta.MetaInfoEnum;
+import io.catty.meta.endpoint.EndpointMetaInfo;
+import io.catty.meta.endpoint.EndpointTypeEnum;
+import io.catty.meta.endpoint.MetaInfoEnum;
 import io.catty.netty.NettyClient;
 import io.catty.zk.ZookeeperRegistry;
 

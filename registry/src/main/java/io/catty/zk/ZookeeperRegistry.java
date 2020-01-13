@@ -1,11 +1,11 @@
 package io.catty.zk;
 
 import io.catty.api.Registry;
-import io.catty.meta.EndpointMetaInfo;
+import io.catty.meta.endpoint.EndpointMetaInfo;
 import io.catty.api.RegistryConfig;
 import io.catty.exception.RegistryException;
-import io.catty.meta.EndpointTypeEnum;
-import io.catty.meta.MetaInfoEnum;
+import io.catty.meta.endpoint.EndpointTypeEnum;
+import io.catty.meta.endpoint.MetaInfoEnum;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;

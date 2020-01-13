@@ -29,7 +29,7 @@ public class ReflectUtils {
     nameToClassCache.put("void", void.class);
   }
 
-  public static List<Method> parseMethod(Class clazz) {
+  public static List<Method> getPublicMethod(Class clazz) {
     Method[] methods = clazz.getMethods();
     List<Method> ret = new ArrayList<>();
     for (Method method : methods) {
