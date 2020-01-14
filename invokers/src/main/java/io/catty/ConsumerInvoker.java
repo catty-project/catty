@@ -1,7 +1,11 @@
 package io.catty;
 
 import io.catty.Invocation.InvokerLinkTypeEnum;
+import io.catty.Response.ResponseStatus;
 import io.catty.codec.Serialization;
+import io.catty.meta.service.MethodMeta;
+import io.catty.meta.service.ServiceMeta;
+import io.catty.utils.ExceptionUtils;
 import io.catty.utils.RequestIdGenerator;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -10,21 +14,18 @@ import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
 
 
-public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
+public class ConsumerInvoker<T> implements InvocationHandler {
 
   private Invoker invoker;
   private Class<T> interfaceClazz;
+  private ServiceMeta serviceMeta;
   private Serialization serialization;
 
   public ConsumerInvoker(Class<T> clazz, Invoker invoker, Serialization serialization) {
     this.interfaceClazz = clazz;
     this.invoker = invoker;
     this.serialization = serialization;
-  }
-
-  @Override
-  public Response invoke(Request request, Invocation invocation) {
-    return invoker.invoke(request, invocation);
+    this.serviceMeta = new ServiceMeta(clazz);
   }
 
   @Override
@@ -34,11 +35,16 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
       throw new CattyException("Can not invoke local method: " + method.getName());
     }
 
+    MethodMeta methodMeta = serviceMeta.getMethodMeta(method);
+    if (methodMeta == null) {
+      throw new CattyException("Method is invalid, method: " + method.getName());
+    }
+
     Request request = new DefaultRequest();
     request.setRequestId(RequestIdGenerator.next());
     request.setInterfaceName(method.getDeclaringClass().getName());
     request.setMethodName(method.getName());
-    if(args != null && args.length > 0) {
+    if (args != null && args.length > 0) {
       Object[] argBytes = new Object[args.length];
       for (int i = 0; i < args.length; i++) {
         argBytes[i] = serialization.serialize(args[i]);
@@ -52,7 +58,7 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
 
     Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
     invocation.setInvokedMethod(method);
-    Response response = invoke(request, invocation);
+    Response response = invoker.invoke(request, invocation);
 
     AsyncResponse asyncResponse = (AsyncResponse) response;
 
@@ -60,7 +66,8 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
       return null;
     }
     // async-method
-    if (CompletableFuture.class.isAssignableFrom(returnType)) {
+    // todo : fix exception.
+    if (methodMeta.isAsync()) {
       CompletableFuture future = new CompletableFuture();
       asyncResponse.whenComplete((v, t) -> {
         if (t != null) {
@@ -84,7 +91,12 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
     // sync-method
     asyncResponse.await();
     if (response.isError()) {
-      throw (Exception) resolveReturnValue(response.getValue(), Exception.class);
+      String[] exceptionInfo = ExceptionUtils.parseExceptionString((String) response.getValue());
+      if (response.getStatus() == ResponseStatus.EXCEPTED_ERROR) {
+        throw ExceptionUtils
+            .getInstance(methodMeta.getCheckedExceptionByName(exceptionInfo[0]), exceptionInfo[1]);
+      }
+      throw new CattyException(exceptionInfo[1]);
     }
     return resolveReturnValue(response.getValue(), returnType);
   }

@@ -33,11 +33,28 @@ public class MethodMeta {
      *
      * NOTICE: Future interface could not imply an async method.
      */
-    if(CompletionStage.class.isAssignableFrom(returnType)) {
-      isAsync = true;
-    }
-
+    isAsync = CompletionStage.class.isAssignableFrom(returnType);
     resolveReturnTypes(method);
+  }
+
+  public Class<?> getCheckedExceptionByName(String className) {
+    return checkedExceptions.get(className);
+  }
+
+  public Method getMethod() {
+    return method;
+  }
+
+  public boolean isAsync() {
+    return isAsync;
+  }
+
+  public Class<?> getReturnType() {
+    return returnType;
+  }
+
+  public Class<?> getGenericReturnType() {
+    return genericReturnType;
   }
 
   // fixme : bug.
