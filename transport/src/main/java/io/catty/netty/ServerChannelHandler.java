@@ -1,13 +1,14 @@
 package io.catty.netty;
 
 import io.catty.Invocation;
+import io.catty.Invocation.InvokerLinkTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.concurrent.CompletableFuture;
 import io.catty.codec.Codec.DataTypeEnum;
-import io.catty.exception.CattyException;
+import io.catty.CattyException;
 import io.catty.Request;
 import io.catty.Response;
 
@@ -42,7 +43,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
   }
 
   private void processRequest(ChannelHandlerContext ctx, Request request) {
-    Response response = nettyServer.invoke(request, new Invocation());
+    Response response = nettyServer.invoke(request, new Invocation(InvokerLinkTypeEnum.PROVIDER));
     response.setRequestId(request.getRequestId());
     Object value = response.getValue();
     if (value == null || value instanceof Void) {

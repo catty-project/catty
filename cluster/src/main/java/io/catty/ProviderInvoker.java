@@ -3,7 +3,6 @@ package io.catty;
 import io.catty.Response.ResponseStatus;
 import io.catty.api.DefaultResponse;
 import io.catty.codec.Serialization;
-import io.catty.exception.CattyException;
 import io.catty.utils.ExceptionUtils;
 import io.catty.utils.ReflectUtils;
 import java.io.IOException;

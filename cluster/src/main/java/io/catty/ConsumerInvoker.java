@@ -1,9 +1,9 @@
 package io.catty;
 
+import io.catty.Invocation.InvokerLinkTypeEnum;
 import io.catty.api.AsyncResponse;
 import io.catty.api.DefaultRequest;
 import io.catty.codec.Serialization;
-import io.catty.exception.CattyException;
 import io.catty.utils.RequestIdGenerator;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -52,7 +52,7 @@ public class ConsumerInvoker<T> implements InvocationHandler, Invoker {
 
     Class<?> returnType = method.getReturnType();
 
-    Invocation invocation = new Invocation();
+    Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
     invocation.setInvokedMethod(method);
     Response response = invoke(request, invocation);
 

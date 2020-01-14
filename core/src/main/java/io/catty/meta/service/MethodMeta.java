@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Future;
+import java.util.concurrent.CompletionStage;
 
 public class MethodMeta {
 
@@ -24,7 +24,13 @@ public class MethodMeta {
     Arrays.stream(method.getExceptionTypes())
         .forEach(aClass -> checkedExceptions.put(aClass.getName(), aClass));
     this.returnType = method.getReturnType();
-    if(Future.class.isAssignableFrom(returnType)) {
+
+    /*
+     * If CompletionStage is super-interface of return type, this method is an async method.
+     *
+     * NOTICE: Future interface could not indicated an async method.
+     */
+    if(CompletionStage.class.isAssignableFrom(returnType)) {
       isAsync = true;
     }
   }

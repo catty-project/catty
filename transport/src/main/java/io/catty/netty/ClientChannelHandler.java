@@ -2,7 +2,7 @@ package io.catty.netty;
 
 import io.catty.Response;
 import io.catty.codec.Codec.DataTypeEnum;
-import io.catty.exception.CattyException;
+import io.catty.CattyException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;

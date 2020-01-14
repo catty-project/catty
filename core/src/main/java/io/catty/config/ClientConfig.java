@@ -1,7 +1,7 @@
 package io.catty.config;
 
 import lombok.Builder;
-import io.catty.exception.IllegalAddressException;
+import io.catty.IllegalAddressException;
 
 @Builder
 public class ClientConfig {

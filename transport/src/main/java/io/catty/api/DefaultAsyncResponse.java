@@ -1,7 +1,7 @@
 package io.catty.api;
 
 import io.catty.Response;
-import io.catty.exception.CattyException;
+import io.catty.CattyException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

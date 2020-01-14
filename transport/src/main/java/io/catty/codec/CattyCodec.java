@@ -7,7 +7,7 @@ import io.catty.Response.ResponseStatus;
 import io.catty.api.DefaultRequest;
 import io.catty.api.DefaultResponse;
 import io.catty.codec.generated.CattyProtocol;
-import io.catty.exception.CodecException;
+import io.catty.CodecException;
 import java.util.ArrayList;
 
 public class CattyCodec implements Codec {

@@ -1,4 +1,4 @@
-package io.catty.exception;
+package io.catty;
 
 
 public class CattyException extends RuntimeException {

@@ -3,7 +3,7 @@ package io.catty.zk;
 import io.catty.api.Registry;
 import io.catty.meta.endpoint.EndpointMetaInfo;
 import io.catty.api.RegistryConfig;
-import io.catty.exception.RegistryException;
+import io.catty.RegistryException;
 import io.catty.meta.endpoint.EndpointTypeEnum;
 import io.catty.meta.endpoint.MetaInfoEnum;
 import java.util.HashSet;

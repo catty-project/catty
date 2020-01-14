@@ -1,7 +1,7 @@
 package io.catty.codec;
 
 
-import io.catty.exception.CodecException;
+import io.catty.CodecException;
 
 public interface Codec {
 
