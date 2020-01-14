@@ -34,7 +34,7 @@ public class ServiceMeta {
       String methodSign = ReflectUtils.getMethodDesc(method);
       if(methodMap.containsKey(methodSign)) {
         throw new Error("Duplicated method sign: " + methodSign + "#" + method
-            + ". Method name excepted unique.");
+            + ". Method's signature excepted unique.");
       }
       methodMap.put(methodSign, method);
       validMethod.add(method);
