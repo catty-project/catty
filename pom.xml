@@ -12,7 +12,7 @@
   <description>RPC framework</description>
   <modules>
     <module>core</module>
-    <module>cluster</module>
+    <module>invokers</module>
     <module>example</module>
     <module>transport</module>
     <module>registry</module>

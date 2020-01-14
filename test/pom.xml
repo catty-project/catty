@@ -20,7 +20,7 @@
     </dependency>
     <dependency>
       <groupId>io.catty</groupId>
-      <artifactId>catty-cluster</artifactId>
+      <artifactId>catty-invokers</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
