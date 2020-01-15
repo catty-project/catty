@@ -14,7 +14,6 @@
     <module>core</module>
     <module>invokers</module>
     <module>example</module>
-    <module>transport</module>
     <module>registry</module>
     <module>test</module>
     <module>benchmark</module>
