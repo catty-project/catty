@@ -1,7 +1,6 @@
-package io.catty.cluster.lbs;
+package io.catty.lbs;
 
 import io.catty.Invoker;
-import io.catty.cluster.LoadBalance;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 

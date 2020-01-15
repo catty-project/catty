@@ -1,4 +1,4 @@
-package io.catty.cluster;
+package io.catty.lbs;
 
 import io.catty.Invoker;
 import java.util.List;

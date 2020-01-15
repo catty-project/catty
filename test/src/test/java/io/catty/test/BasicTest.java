@@ -6,19 +6,16 @@ import io.catty.config.ClientConfig;
 import io.catty.config.ServerConfig;
 import io.catty.test.service.EchoService;
 import io.catty.test.service.EchoServiceImpl;
-import java.util.UUID;
-import org.testng.Assert;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 
-public class SyncTest {
+public abstract class BasicTest {
 
   private static final int TEST_PORT = 20550;
 
-  private Exporter exporter;
+  protected Exporter exporter;
 
-  private Reference<EchoService> reference;
+  protected Reference<EchoService> reference;
 
   @BeforeTest
   public void init() {
@@ -42,14 +39,6 @@ public class SyncTest {
   public void destroy() {
     reference.derefer();
     exporter.unexport();
-  }
-
-  @Test
-  public void returnTest() {
-    String echo = UUID.randomUUID().toString();
-    EchoService service = reference.refer();
-    String result = service.echo(echo);
-    Assert.assertEquals(echo, result);
   }
 
 }

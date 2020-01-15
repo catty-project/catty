@@ -4,6 +4,7 @@ import io.catty.Invoker;
 import io.catty.Request;
 import io.catty.Response;
 import io.catty.Invocation;
+import io.catty.lbs.LoadBalance;
 import io.catty.transport.Client;
 import io.catty.api.Registry;
 import io.catty.config.ClientConfig;

@@ -1,4 +1,4 @@
-package io.catty.benchmark.utils;
+package io.catty.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

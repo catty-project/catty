@@ -1,7 +1,7 @@
 package io.catty.benchmark.service;
 
 import io.catty.benchmark.generated.BenchmarkProtocol;
-import io.catty.benchmark.utils.MD5Utils;
+import io.catty.utils.MD5Utils;
 
 public class ProtobufServiceImpl implements ProtobufService {
 
