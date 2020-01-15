@@ -71,11 +71,13 @@ public class Reference<T> {
   }
 
   public void derefer() {
-    if(client != null) {
+    if(client != null && client.isOpen()) {
       client.close();
+      client = null;
     }
-    if(registry != null) {
+    if(registry != null && registry.isOpen()) {
       registry.close();
+      registry = null;
     }
     if(cluster != null) {
       cluster.close();

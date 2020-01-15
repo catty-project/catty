@@ -2,14 +2,14 @@ package io.catty;
 
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
-import io.catty.transport.Server;
 import io.catty.codec.CattySerialization;
 import io.catty.config.ServerConfig;
 import io.catty.meta.endpoint.EndpointMetaInfo;
 import io.catty.meta.endpoint.EndpointTypeEnum;
 import io.catty.meta.endpoint.MetaInfoEnum;
-import io.catty.transport.netty.NettyServer;
 import io.catty.router.ServerRouterInvoker;
+import io.catty.transport.Server;
+import io.catty.transport.netty.NettyServer;
 import io.catty.zk.ZookeeperRegistry;
 import java.util.HashMap;
 import java.util.Map;
@@ -88,13 +88,15 @@ public class Exporter {
     serviceRouterMap.remove(address);
     address = null;
     server.close();
-    serviceHandlers.forEach((s, invoker) -> {
-      EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
-      metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME.toString(), s);
-      metaInfo
-          .addMetaInfo(MetaInfoEnum.ADDRESS.toString(), serverConfig.getServerAddress().toString());
-      registry.unregister(metaInfo);
-    });
-    registry.close();
+    if (registry != null && registry.isOpen()) {
+      serviceHandlers.forEach((s, invoker) -> {
+        EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
+        metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME.toString(), s);
+        metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS.toString(),
+            serverConfig.getServerAddress().toString());
+        registry.unregister(metaInfo);
+      });
+      registry.close();
+    }
   }
 }
