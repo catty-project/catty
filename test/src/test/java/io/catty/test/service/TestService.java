@@ -8,4 +8,7 @@ public interface TestService {
 
   CompletableFuture<String> asyncEcho(String name);
 
+  String checkedException() throws Test1CheckedException;
+
+  String multiCheckedException() throws Test1CheckedException, Test2CheckedException;
 }

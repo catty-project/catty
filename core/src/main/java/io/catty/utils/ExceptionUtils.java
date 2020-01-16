@@ -34,7 +34,7 @@ public abstract class ExceptionUtils {
   }
 
   public static String[] parseExceptionString(String s) {
-    return new String[]{s.substring(0, s.indexOf("\n")), s.substring(s.indexOf("\n"))};
+    return new String[]{s.substring(0, s.indexOf("\n")), s.substring(s.indexOf("\n") + 1)};
   }
 
   public static Exception getInstance(Class<?> exceptionClass, String msg) {

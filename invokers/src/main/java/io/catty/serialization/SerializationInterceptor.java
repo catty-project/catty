@@ -55,7 +55,7 @@ public class SerializationInterceptor implements Serialization, InvokerIntercept
     Object returnValue = response.getValue();
     if(invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.CONSUMER) {
       if(response.getStatus() != ResponseStatus.OK) {
-        response.setValue(new String((byte[]) returnValue));
+        response.setValue(deserialize((byte[]) returnValue, String.class));
       } else {
         response.setValue(deserialize((byte[]) returnValue, methodMeta.getReturnType()));
       }

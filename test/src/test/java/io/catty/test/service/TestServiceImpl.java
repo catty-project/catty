@@ -28,4 +28,14 @@ public class TestServiceImpl implements TestService {
     });
     return future;
   }
+
+  @Override
+  public String checkedException() throws Test1CheckedException {
+    throw new Test1CheckedException("Test1CheckedException");
+  }
+
+  @Override
+  public String multiCheckedException() throws Test1CheckedException, Test2CheckedException {
+    throw new Test2CheckedException("Test2CheckedException");
+  }
 }

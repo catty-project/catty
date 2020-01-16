@@ -3,6 +3,7 @@ package io.catty;
 import io.catty.Response.ResponseStatus;
 import io.catty.meta.service.MethodMeta;
 import io.catty.utils.ExceptionUtils;
+import java.lang.reflect.InvocationTargetException;
 
 public class ProviderInvoker implements Invoker {
 
@@ -25,9 +26,16 @@ public class ProviderInvoker implements Invoker {
       response.setValue(value);
       response.setStatus(ResponseStatus.OK);
     } catch (Exception e) {
-      if(methodMeta.containsCheckedException(e.getClass())) {
-        response.setStatus(ResponseStatus.EXCEPTED_ERROR);
-        response.setValue(ExceptionUtils.toString(e));
+      if(e instanceof InvocationTargetException) {
+        // fixme: require jdk >= 1.4
+        Throwable targetException = e.getCause();
+        if(methodMeta.containsCheckedException(targetException.getClass())) {
+          response.setStatus(ResponseStatus.EXCEPTED_ERROR);
+          response.setValue(ExceptionUtils.toString(targetException));
+        } else {
+          response.setStatus(ResponseStatus.INNER_ERROR);
+          response.setValue(ExceptionUtils.toString(e));
+        }
       } else {
         response.setStatus(ResponseStatus.INNER_ERROR);
         response.setValue(ExceptionUtils.toString(e));

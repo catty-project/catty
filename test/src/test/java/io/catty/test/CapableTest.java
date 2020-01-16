@@ -1,5 +1,7 @@
 package io.catty.test;
 
+import io.catty.test.service.Test1CheckedException;
+import io.catty.test.service.Test2CheckedException;
 import io.catty.test.service.TestService;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -7,6 +9,13 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class CapableTest extends BasicTest {
+
+  @Test
+  public void multiRefer() {
+    TestService service1 = reference.refer();
+    TestService service2 = reference.refer();
+    Assert.assertSame(service1, service2);
+  }
 
   @Test
   public void syncTest() {
@@ -28,4 +37,15 @@ public class CapableTest extends BasicTest {
     }
   }
 
+  @Test(expectedExceptions = {Test1CheckedException.class, Test2CheckedException.class})
+  public void checkedExceptionTest() throws Test1CheckedException {
+    TestService service = reference.refer();
+    service.checkedException();
+  }
+
+  @Test(expectedExceptions = {Test1CheckedException.class, Test2CheckedException.class})
+  public void checkedMultiExceptionTest() throws Test1CheckedException, Test2CheckedException {
+    TestService service = reference.refer();
+    service.multiCheckedException();
+  }
 }
