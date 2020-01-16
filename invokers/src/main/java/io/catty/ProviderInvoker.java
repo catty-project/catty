@@ -2,16 +2,15 @@ package io.catty;
 
 import io.catty.Response.ResponseStatus;
 import io.catty.codec.Serialization;
+import io.catty.meta.service.MethodMeta;
 import io.catty.utils.ExceptionUtils;
 import io.catty.utils.ReflectUtils;
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -21,7 +20,6 @@ public class ProviderInvoker<T> implements Invoker {
   private Map<Method, Set<Class<?>>> methodExceptionsCache = new ConcurrentHashMap<>();
 
   private T ref;
-  private Serialization serialization;
 
   /**
    * cache all interface's methods
@@ -47,7 +45,6 @@ public class ProviderInvoker<T> implements Invoker {
         methodExceptionsCache.put(method, new HashSet<>(Arrays.asList(exceptionTypes)));
       }
     }
-    this.serialization = serialization;
   }
 
   @Override
@@ -63,18 +60,13 @@ public class ProviderInvoker<T> implements Invoker {
       return response;
     }
 
+    invocation.setInvokedMethod(new MethodMeta(method));
     Set<Class<?>> exceptionTypes = methodExceptionsCache.get(method);
 
     try {
-      Object[] argsValue = resolveArgsValue(request.getArgsValue(), method);
+      Object[] argsValue = request.getArgsValue();
       Object value = method.invoke(ref, argsValue);
-      if (value != null) {
-        if(value instanceof CompletableFuture) {
-          response.setValue(value);
-        } else {
-          response.setValue(serialization.serialize(value));
-        }
-      }
+      response.setValue(value);
       response.setStatus(ResponseStatus.OK);
     } catch (Exception e) {
       if(exceptionTypes.contains(e.getClass())) {
@@ -89,21 +81,6 @@ public class ProviderInvoker<T> implements Invoker {
       response.setValue(ExceptionUtils.toString("Unknown Error!", e));
     }
     return response;
-  }
-
-  @SuppressWarnings("unchecked")
-  private Object[] resolveArgsValue(Object[] args, Method method) throws IOException {
-    if (args == null) {
-      return null;
-    }
-    Object[] resolvedArgs = new Object[args.length];
-    Class<?>[] parameterTypes = method.getParameterTypes();
-    for (int i = 0; i < args.length; i++) {
-      if (args[i] instanceof byte[]) {
-        resolvedArgs[i] = serialization.deserialize((byte[]) args[i], parameterTypes[i]);
-      }
-    }
-    return resolvedArgs;
   }
 
 }

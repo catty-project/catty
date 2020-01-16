@@ -9,29 +9,62 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import io.catty.Invocation;
 import io.catty.Invocation.InvokerLinkTypeEnum;
-import io.catty.Invoker;
+import io.catty.InvokerInterceptor;
 import io.catty.Request;
 import io.catty.Response;
+import io.catty.Response.ResponseStatus;
 import io.catty.codec.Serialization;
+import io.catty.meta.service.MethodMeta;
 import java.lang.reflect.Method;
 
-public class SerializationInvoker implements Serialization, Invoker {
+public class SerializationInterceptor implements Serialization, InvokerInterceptor {
 
-  private Invoker invoker;
-
-  public SerializationInvoker(Invoker invoker) {
-    this.invoker = invoker;
+  @Override
+  public void beforeInvoke(Request request, Invocation invocation) {
+    if(invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.CONSUMER) {
+      Object[] args = request.getArgsValue();
+      if(args != null) {
+        Object[] afterSerialize = new Object[args.length];
+        for(int i = 0; i < args.length; i++) {
+          afterSerialize[i] = serialize(args[i]);
+        }
+        request.setArgsValue(afterSerialize);
+      }
+    } else if(invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.PROVIDER) {
+      Object[] args = request.getArgsValue();
+      if(args != null) {
+        MethodMeta methodMeta = invocation.getInvokedMethod();
+        Class<?>[] parameterTypes = methodMeta.getMethod().getParameterTypes();
+        Object[] afterDeserialize = new Object[args.length];
+        for(int i = 0;i < args.length; i++) {
+          if(args[i] instanceof byte[]) {
+            afterDeserialize[i] = deserialize((byte[]) args[i], parameterTypes[i]);
+          } else {
+            afterDeserialize[i] = args[i];
+          }
+        }
+        request.setArgsValue(afterDeserialize);
+      }
+    }
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
+  public void afterInvoke(Response response, Invocation invocation) {
+    MethodMeta methodMeta = invocation.getInvokedMethod();
+    Object returnValue = response.getValue();
     if(invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.CONSUMER) {
-
+      if(response.getStatus() != ResponseStatus.OK) {
+        response.setValue(new String((byte[]) returnValue));
+      } else {
+        response.setValue(deserialize((byte[]) returnValue, methodMeta.getReturnType()));
+      }
     } else if(invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.PROVIDER) {
-
+      if(returnValue instanceof String) {
+        response.setValue(((String) returnValue).getBytes());
+      } else {
+        response.setValue(serialize(returnValue));
+      }
     }
-
-    return null;
   }
 
   @Override

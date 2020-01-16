@@ -2,8 +2,14 @@ package io.catty;
 
 public interface InvokerInterceptor {
 
-  void beforeInvoke(Request request, Response response, Invocation invocation);
+  void beforeInvoke(Request request, Invocation invocation);
 
-  void afterInvoke(Request request, Response response, Invocation invocation);
+  void afterInvoke(Response response, Invocation invocation);
+
+  enum InterceptorType {
+    NORMAL,
+    SERIALIZATION,
+    ;
+  }
 
 }

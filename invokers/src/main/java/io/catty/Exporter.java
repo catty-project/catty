@@ -8,6 +8,7 @@ import io.catty.meta.endpoint.EndpointMetaInfo;
 import io.catty.meta.endpoint.EndpointTypeEnum;
 import io.catty.meta.endpoint.MetaInfoEnum;
 import io.catty.router.ServerRouterInvoker;
+import io.catty.serialization.SerializationInterceptor;
 import io.catty.transport.Server;
 import io.catty.transport.netty.NettyServer;
 import io.catty.zk.ZookeeperRegistry;
@@ -42,8 +43,11 @@ public class Exporter {
   }
 
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
-    serviceHandlers.put(interfaceClass.getName(),
+    InvokerChainBuilder chainBuilder = InvokerChainBuilder.getInstance();
+    chainBuilder.registerInterceptor(new SerializationInterceptor());
+    chainBuilder.setSourceInvoker(
         new ProviderInvoker<>(serviceObject, interfaceClass, new CattySerialization()));
+    serviceHandlers.put(interfaceClass.getName(), chainBuilder.buildInvoker());
   }
 
   public void export() {

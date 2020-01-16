@@ -44,20 +44,12 @@ public class ConsumerInvoker<T> implements InvocationHandler {
     request.setRequestId(RequestIdGenerator.next());
     request.setInterfaceName(method.getDeclaringClass().getName());
     request.setMethodName(method.getName());
-    if (args != null && args.length > 0) {
-      Object[] argBytes = new Object[args.length];
-      for (int i = 0; i < args.length; i++) {
-        argBytes[i] = serialization.serialize(args[i]);
-      }
-      request.setArgsValue(argBytes);
-    } else {
-      request.setArgsValue(null);
-    }
+    request.setArgsValue(args);
 
     Class<?> returnType = method.getReturnType();
 
     Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
-    invocation.setInvokedMethod(method);
+    invocation.setInvokedMethod(new MethodMeta(method));
     Response response = invoker.invoke(request, invocation);
 
     AsyncResponse asyncResponse = (AsyncResponse) response;
@@ -98,7 +90,7 @@ public class ConsumerInvoker<T> implements InvocationHandler {
       }
       throw new CattyException(exceptionInfo[1]);
     }
-    return resolveReturnValue(response.getValue(), returnType);
+    return response.getValue();
   }
 
   @SuppressWarnings("unchecked")

@@ -1,6 +1,6 @@
 package io.catty;
 
-import java.lang.reflect.Method;
+import io.catty.meta.service.MethodMeta;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -14,11 +14,11 @@ public class Invocation {
 
   private Map<String, Object> attribute = new ConcurrentHashMap<>();
 
-  private Method invokedMethod;
+  private MethodMeta invokedMethod;
 
   private InvokerLinkTypeEnum linkTypeEnum;
 
-  public Method getInvokedMethod() {
+  public MethodMeta getInvokedMethod() {
     return invokedMethod;
   }
 
@@ -26,7 +26,7 @@ public class Invocation {
     this.linkTypeEnum = linkTypeEnum;
   }
 
-  public void setInvokedMethod(Method invokedMethod) {
+  public void setInvokedMethod(MethodMeta invokedMethod) {
     this.invokedMethod = invokedMethod;
   }
 

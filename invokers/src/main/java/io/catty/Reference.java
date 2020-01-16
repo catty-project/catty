@@ -1,5 +1,6 @@
 package io.catty;
 
+import io.catty.serialization.SerializationInterceptor;
 import io.catty.transport.Client;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
@@ -53,7 +54,10 @@ public class Reference<T> {
           if (registryConfig == null) {
             client = new NettyClient(clientConfig);
             client.open();
-            ref = new ProxyFactory<T>().getProxy(interfaceClass, client);
+            InvokerChainBuilder chainBuilder = InvokerChainBuilder.getInstance();
+            chainBuilder.setSourceInvoker(client);
+            chainBuilder.registerInterceptor(new SerializationInterceptor());
+            ref = new ProxyFactory<T>().getProxy(interfaceClass, chainBuilder.buildInvoker());
           } else {
             registry = new ZookeeperRegistry(registryConfig);
             registry.open();
