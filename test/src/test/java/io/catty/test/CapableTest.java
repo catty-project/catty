@@ -55,4 +55,5 @@ public class CapableTest extends BasicTest {
     TestService service = reference.refer();
     service.runtimeException();
   }
+
 }
