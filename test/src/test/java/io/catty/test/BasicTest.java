@@ -4,8 +4,8 @@ import io.catty.Exporter;
 import io.catty.Reference;
 import io.catty.config.ClientConfig;
 import io.catty.config.ServerConfig;
-import io.catty.test.service.EchoService;
-import io.catty.test.service.EchoServiceImpl;
+import io.catty.test.service.TestService;
+import io.catty.test.service.TestServiceImpl;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 
@@ -15,7 +15,7 @@ public abstract class BasicTest {
 
   protected Exporter exporter;
 
-  protected Reference<EchoService> reference;
+  protected Reference<TestService> reference;
 
   @BeforeTest
   public void init() {
@@ -23,7 +23,7 @@ public abstract class BasicTest {
         .port(TEST_PORT)
         .build();
     exporter = new Exporter(serverConfig);
-    exporter.registerService(EchoService.class, new EchoServiceImpl());
+    exporter.registerService(TestService.class, new TestServiceImpl());
     exporter.export();
 
     ClientConfig clientConfig = ClientConfig.builder()
@@ -32,7 +32,7 @@ public abstract class BasicTest {
 
     reference = new Reference<>();
     reference.setClientConfig(clientConfig);
-    reference.setInterfaceClass(EchoService.class);
+    reference.setInterfaceClass(TestService.class);
   }
 
   @AfterTest

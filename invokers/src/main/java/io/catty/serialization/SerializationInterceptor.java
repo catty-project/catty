@@ -16,6 +16,7 @@ import io.catty.Response.ResponseStatus;
 import io.catty.codec.Serialization;
 import io.catty.meta.service.MethodMeta;
 import java.lang.reflect.Method;
+import java.util.concurrent.CompletableFuture;
 
 public class SerializationInterceptor implements Serialization, InvokerInterceptor {
 
@@ -59,8 +60,10 @@ public class SerializationInterceptor implements Serialization, InvokerIntercept
         response.setValue(deserialize((byte[]) returnValue, methodMeta.getReturnType()));
       }
     } else if(invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.PROVIDER) {
-      if(returnValue instanceof String) {
-        response.setValue(((String) returnValue).getBytes());
+      // fixme : or invocation.getMethod.isAsync is better?
+      if(returnValue instanceof CompletableFuture) {
+        CompletableFuture originFuture = (CompletableFuture) returnValue;
+        response.setValue(originFuture.thenApply(this::serialize));
       } else {
         response.setValue(serialize(returnValue));
       }

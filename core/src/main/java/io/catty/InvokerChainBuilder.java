@@ -5,17 +5,6 @@ import java.util.List;
 
 public class InvokerChainBuilder {
 
-  private static class InstanceHolder {
-
-    private static InvokerChainBuilder instance = new InvokerChainBuilder();
-  }
-
-  public static InvokerChainBuilder getInstance() {
-    return InstanceHolder.instance;
-  }
-
-  private InvokerChainBuilder() {}
-
   private List<InvokerInterceptor> interceptors = new LinkedList<>();
 
   private Invoker sourceInvoker;

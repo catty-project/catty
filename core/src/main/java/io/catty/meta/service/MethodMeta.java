@@ -49,6 +49,10 @@ public class MethodMeta {
     return isAsync;
   }
 
+  public boolean containsCheckedException(Class<?> exceptionClass) {
+    return checkedExceptions.containsKey(exceptionClass.getName());
+  }
+
   public Class<?> getReturnType() {
     return returnType;
   }

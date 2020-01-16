@@ -2,7 +2,7 @@ package io.catty.test.service;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface EchoService {
+public interface TestService {
 
   String echo(String name);
 

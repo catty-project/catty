@@ -31,7 +31,7 @@ public class ServiceMeta {
 
     List<Method> methods = ReflectUtils.getPublicMethod(interfaceClass);
     for (Method method : methods) {
-      String methodSign = ReflectUtils.getMethodDesc(method);
+      String methodSign = ReflectUtils.getMethodSign(method);
       if(methodMap.containsKey(methodSign)) {
         throw new Error("Duplicated method sign: " + methodSign + "#" + method
             + ". Method's signature excepted unique.");
@@ -52,6 +52,15 @@ public class ServiceMeta {
 
   public MethodMeta getMethodMeta(Method method) {
     return methodMetaMap.get(method);
+  }
+
+  public MethodMeta getMethodMetaBySign(String methodSign) {
+    Method method = methodMap.get(methodSign);
+    if(method == null) {
+      return null;
+    } else {
+      return methodMetaMap.get(method);
+    }
   }
 
   public Method getMethodBySign(String methodSign) {

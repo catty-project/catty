@@ -70,7 +70,7 @@ public class ReflectUtils {
     return classTypes;
   }
 
-  public static String getMethodDesc(Method method) {
+  public static String getMethodSign(Method method) {
     StringBuilder sb = new StringBuilder();
     sb.append(method.getName()).append("(");
     if (method.getParameterCount() > 0) {
@@ -83,7 +83,7 @@ public class ReflectUtils {
     return sb.toString();
   }
 
-  public static String getMethodDesc(String methodName, String paramDesc) {
+  public static String getMethodSign(String methodName, String paramDesc) {
     if (paramDesc == null || "".equals(paramDesc)) {
       return methodName + "()";
     } else {

@@ -18,6 +18,16 @@ public class Invocation {
 
   private InvokerLinkTypeEnum linkTypeEnum;
 
+  private Object target;
+
+  public Object getTarget() {
+    return target;
+  }
+
+  public void setTarget(Object target) {
+    this.target = target;
+  }
+
   public MethodMeta getInvokedMethod() {
     return invokedMethod;
   }

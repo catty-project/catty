@@ -6,11 +6,10 @@ import io.catty.codec.Serialization;
 import io.catty.meta.service.MethodMeta;
 import io.catty.meta.service.ServiceMeta;
 import io.catty.utils.ExceptionUtils;
+import io.catty.utils.ReflectUtils;
 import io.catty.utils.RequestIdGenerator;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -43,13 +42,14 @@ public class ConsumerInvoker<T> implements InvocationHandler {
     Request request = new DefaultRequest();
     request.setRequestId(RequestIdGenerator.next());
     request.setInterfaceName(method.getDeclaringClass().getName());
-    request.setMethodName(method.getName());
+    request.setMethodName(ReflectUtils.getMethodSign(method));
     request.setArgsValue(args);
 
     Class<?> returnType = method.getReturnType();
 
     Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
     invocation.setInvokedMethod(new MethodMeta(method));
+    invocation.setTarget(proxy);
     Response response = invoker.invoke(request, invocation);
 
     AsyncResponse asyncResponse = (AsyncResponse) response;
@@ -58,7 +58,6 @@ public class ConsumerInvoker<T> implements InvocationHandler {
       return null;
     }
     // async-method
-    // todo : fix exception.
     if (methodMeta.isAsync()) {
       CompletableFuture future = new CompletableFuture();
       asyncResponse.whenComplete((v, t) -> {
@@ -66,11 +65,18 @@ public class ConsumerInvoker<T> implements InvocationHandler {
           future.completeExceptionally(t);
         } else {
           if (v.isError()) {
-            future.completeExceptionally((Exception) v.getValue());
+            String[] exceptionInfo = ExceptionUtils
+                .parseExceptionString((String) response.getValue());
+            if (response.getStatus() == ResponseStatus.EXCEPTED_ERROR) {
+              future.completeExceptionally(ExceptionUtils
+                  .getInstance(methodMeta.getCheckedExceptionByName(exceptionInfo[0]),
+                      exceptionInfo[1]));
+            } else {
+              future.completeExceptionally(new CattyException(exceptionInfo[1]));
+            }
           } else {
             try {
-              Type returnGenericType = method.getGenericReturnType();
-              future.complete(resolveReturnValue(v.getValue(), returnGenericType));
+              future.complete(v.getValue());
             } catch (Exception e) {
               future.completeExceptionally(e);
             }
@@ -93,30 +99,10 @@ public class ConsumerInvoker<T> implements InvocationHandler {
     return response.getValue();
   }
 
-  @SuppressWarnings("unchecked")
-  private Object resolveReturnValue(Object returnValue, Type resolvedReturnType) {
-    if (!(returnValue instanceof byte[])) {
-      return returnValue;
-    }
-    byte[] returnValueBytes = (byte[]) returnValue;
-    Class<?> returnType = null;
-    if (resolvedReturnType instanceof ParameterizedType) {
-      returnType = (Class<?>) ((ParameterizedType) resolvedReturnType)
-          .getActualTypeArguments()[0];
-    } else if (resolvedReturnType instanceof Class) {
-      returnType = (Class<?>) resolvedReturnType;
-    }
-    if (returnType == null) {
-      throw new IllegalArgumentException();
-    }
-    return serialization.deserialize(returnValueBytes, returnType);
-  }
-
   private boolean isLocalMethod(Method method) {
     if (method.getDeclaringClass().equals(Object.class)) {
       try {
-        interfaceClazz
-            .getDeclaredMethod(method.getName(), method.getParameterTypes());
+        interfaceClazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
         return false;
       } catch (NoSuchMethodException e) {
         return true;

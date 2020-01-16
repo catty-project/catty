@@ -54,7 +54,7 @@ public class Reference<T> {
           if (registryConfig == null) {
             client = new NettyClient(clientConfig);
             client.open();
-            InvokerChainBuilder chainBuilder = InvokerChainBuilder.getInstance();
+            InvokerChainBuilder chainBuilder = new InvokerChainBuilder();
             chainBuilder.setSourceInvoker(client);
             chainBuilder.registerInterceptor(new SerializationInterceptor());
             ref = new ProxyFactory<T>().getProxy(interfaceClass, chainBuilder.buildInvoker());
