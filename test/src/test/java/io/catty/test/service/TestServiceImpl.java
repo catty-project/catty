@@ -38,4 +38,9 @@ public class TestServiceImpl implements TestService {
   public String multiCheckedException() throws Test1CheckedException, Test2CheckedException {
     throw new Test2CheckedException("Test2CheckedException");
   }
+
+  @Override
+  public String runtimeException() {
+    throw new NullPointerException("NPE");
+  }
 }

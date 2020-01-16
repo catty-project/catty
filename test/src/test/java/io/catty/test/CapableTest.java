@@ -1,5 +1,6 @@
 package io.catty.test;
 
+import io.catty.CattyException;
 import io.catty.test.service.Test1CheckedException;
 import io.catty.test.service.Test2CheckedException;
 import io.catty.test.service.TestService;
@@ -47,5 +48,11 @@ public class CapableTest extends BasicTest {
   public void checkedMultiExceptionTest() throws Test1CheckedException, Test2CheckedException {
     TestService service = reference.refer();
     service.multiCheckedException();
+  }
+
+  @Test(expectedExceptions = {CattyException.class})
+  public void runtimeExceptionTest() {
+    TestService service = reference.refer();
+    service.runtimeException();
   }
 }

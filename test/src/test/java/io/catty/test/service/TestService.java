@@ -11,4 +11,9 @@ public interface TestService {
   String checkedException() throws Test1CheckedException;
 
   String multiCheckedException() throws Test1CheckedException, Test2CheckedException;
+
+  /**
+   * @throws NullPointerException
+   */
+  String runtimeException();
 }
