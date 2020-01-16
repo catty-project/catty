@@ -6,7 +6,6 @@ import io.catty.utils.ExceptionUtils;
 
 public class ProviderInvoker implements Invoker {
 
-
   @Override
   public Response invoke(Request request, Invocation invocation) {
     Response response = new DefaultResponse();
