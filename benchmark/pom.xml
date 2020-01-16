@@ -24,7 +24,7 @@
       <plugin>
         <groupId>com.github.os72</groupId>
         <artifactId>protoc-jar-maven-plugin</artifactId>
-        <version>3.7.0.1</version>
+        <version>3.6.0.1</version>
         <executions>
           <execution>
             <id>generate-sources</id>
@@ -33,7 +33,7 @@
               <goal>run</goal>
             </goals>
             <configuration>
-              <protocVersion>3.5.1</protocVersion>
+              <protocVersion>3.6.0</protocVersion>
               <addSources>none</addSources>
               <includeStdTypes>true</includeStdTypes>
               <outputDirectory>src/main/java</outputDirectory>
