@@ -7,9 +7,9 @@ import io.catty.Response;
 import io.catty.Invocation;
 import io.catty.codec.Codec;
 import io.catty.config.ServerConfig;
-import io.catty.worker.ConsistentHashLoopGroup;
-import io.catty.worker.HashableChooserFactory;
-import io.catty.worker.HashableExecutor;
+import io.catty.transport.worker.ConsistentHashLoopGroup;
+import io.catty.transport.worker.HashableChooserFactory;
+import io.catty.transport.worker.HashableExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
