@@ -177,7 +177,7 @@ public class ZookeeperRegistry implements Registry {
 
   private String buildPath(EndpointMetaInfo config) {
     String root = ROOT;
-    String path = config.getString(MetaInfoEnum.SERVER_NAME.toString());
+    String path = config.getString(MetaInfoEnum.SERVER_NAME);
     String serverOrClient;
     if(config.getEndpointTypeEnum() == EndpointTypeEnum.CLIENT) {
       serverOrClient = CONSUMERS;

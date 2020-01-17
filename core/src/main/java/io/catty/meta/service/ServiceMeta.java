@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Service meta info.
  *
- * Cache service's interface info to mark easy to entry.
+ * Cache service's interface info to mark an easy entry.
  */
 public class ServiceMeta {
 

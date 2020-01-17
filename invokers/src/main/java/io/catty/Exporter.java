@@ -76,9 +76,8 @@ public class Exporter {
       serverRouterInvoker.registerInvoker(s, invoker);
       if (registry != null) {
         EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
-        metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME.toString(), s);
-        metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS.toString(),
-            serverConfig.getServerAddress().toString());
+        metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME, s);
+        metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS, serverConfig.getServerAddress().toString());
         registry.register(metaInfo);
       }
     });
@@ -95,9 +94,8 @@ public class Exporter {
     if (registry != null && registry.isOpen()) {
       serviceHandlers.forEach((s, invoker) -> {
         EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
-        metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME.toString(), s);
-        metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS.toString(),
-            serverConfig.getServerAddress().toString());
+        metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME, s);
+        metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS, serverConfig.getServerAddress().toString());
         registry.unregister(metaInfo);
       });
       registry.close();

@@ -38,7 +38,7 @@ public class CapableTest extends BasicTest {
     }
   }
 
-  @Test(expectedExceptions = {Test1CheckedException.class, Test2CheckedException.class})
+  @Test(expectedExceptions = {Test1CheckedException.class})
   public void checkedExceptionTest() throws Test1CheckedException {
     TestService service = reference.refer();
     service.checkedException();

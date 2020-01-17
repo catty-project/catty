@@ -26,10 +26,12 @@ public class ProviderInvoker implements Invoker {
       response.setValue(value);
       response.setStatus(ResponseStatus.OK);
     } catch (Exception e) {
+      // todo: deal runtime exception.
       if(e instanceof InvocationTargetException) {
-        // fixme: require jdk >= 1.4
+        // fixme: require jdk >= 1.4.
         Throwable targetException = e.getCause();
         if(methodMeta.containsCheckedException(targetException.getClass())) {
+          // todo: EXCEPTED_ERROR => CHECKED_EXCEPTION.
           response.setStatus(ResponseStatus.EXCEPTED_ERROR);
           response.setValue(ExceptionUtils.toString(targetException));
         } else {

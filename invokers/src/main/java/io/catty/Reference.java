@@ -63,8 +63,8 @@ public class Reference<T> {
             registry.open();
             cluster = new Cluster(new RandomLoadBalance());
             EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
-            metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME.toString(), interfaceClass.getName());
-            metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS.toString(), clientConfig.getAddress());
+            metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME, interfaceClass.getName());
+            metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS, clientConfig.getAddress());
             registry.subscribe(metaInfo, cluster);
             ref = new ProxyFactory<T>().getProxy(interfaceClass, cluster);
           }

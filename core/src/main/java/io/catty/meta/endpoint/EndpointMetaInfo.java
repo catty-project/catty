@@ -23,7 +23,10 @@ public class EndpointMetaInfo {
     return endpointTypeEnum;
   }
 
-  // todo : need more robust
+  /**
+   * System setting style: setting1=a;setting2=b;setting3=c;
+   * todo : need more robust
+   */
   public static EndpointMetaInfo parse(String metaInfoStr, EndpointTypeEnum endpointTypeEnum) {
     Map<String, String> map = new HashMap<>();
     String[] metaInfoEntryArray = metaInfoStr.split(";");
@@ -45,81 +48,162 @@ public class EndpointMetaInfo {
     return sb.toString();
   }
 
-  public void addMetaInfo(String key, String value) {
+  public void addMetaInfo(MetaInfoEnum key, String value) {
+    info.put(key.toString(), value);
+  }
+
+  public byte getByte(MetaInfoEnum key) {
+    return Byte.valueOf(info.get(key.toString()));
+  }
+
+  public short getShort(MetaInfoEnum key) {
+    return Short.valueOf(info.get(key.toString()));
+  }
+
+  public int getInt(MetaInfoEnum key) {
+    return Integer.valueOf(info.get(key.toString()));
+  }
+
+  public long getLong(MetaInfoEnum key) {
+    return Long.valueOf(info.get(key.toString()));
+  }
+
+  public String getString(MetaInfoEnum key) {
+    return info.get(key.toString());
+  }
+
+  public boolean getBool(MetaInfoEnum key) {
+    return Boolean.valueOf(info.get(key.toString()));
+  }
+
+  public double getDouble(MetaInfoEnum key) {
+    return Double.valueOf(info.get(key.toString()));
+  }
+
+  public byte getByteDef(MetaInfoEnum key, byte def) {
+    if(info.containsKey(key.toString())) {
+      return Byte.valueOf(info.get(key.toString()));
+    }
+    return def;
+  }
+
+  public short getShortDef(MetaInfoEnum key, short def) {
+    if(info.containsKey(key.toString())) {
+      return Short.valueOf(info.get(key.toString()));
+    }
+    return def;
+  }
+
+  public int getIntDef(MetaInfoEnum key, int def) {
+    if(info.containsKey(key.toString())) {
+      return Integer.valueOf(info.get(key.toString()));
+    }
+    return def;
+  }
+
+  public long getLongDef(MetaInfoEnum key, long def) {
+    if(info.containsKey(key.toString())) {
+      return Long.valueOf(info.get(key.toString()));
+    }
+    return def;
+  }
+
+  public String getStringDef(MetaInfoEnum key, String def) {
+    if(info.containsKey(key.toString())) {
+      return info.get(key.toString());
+    }
+    return def;
+  }
+
+  public boolean getBoolDef(MetaInfoEnum key, boolean def) {
+    if(info.containsKey(key.toString())) {
+      return Boolean.valueOf(info.get(key.toString()));
+    }
+    return def;
+  }
+
+  public double getDoubleDef(MetaInfoEnum key, double def) {
+    if(info.containsKey(key.toString())) {
+      return Double.valueOf(info.get(key.toString()));
+    }
+    return def;
+  }
+
+  public void addCustomMetaInfo(String key, String value) {
     info.put(key, value);
   }
 
-  public byte getByte(String key) {
+  public byte getCustomByte(String key) {
     return Byte.valueOf(info.get(key));
   }
 
-  public short getShort(String key) {
+  public short getCustomShort(String key) {
     return Short.valueOf(info.get(key));
   }
 
-  public int getInt(String key) {
+  public int getCustomInt(String key) {
     return Integer.valueOf(info.get(key));
   }
 
-  public long getLong(String key) {
+  public long getCustomLong(String key) {
     return Long.valueOf(info.get(key));
   }
 
-  public String getString(String key) {
+  public String getCustomString(String key) {
     return info.get(key);
   }
 
-  public boolean getBool(String key) {
+  public boolean getCustomBool(String key) {
     return Boolean.valueOf(info.get(key));
   }
 
-  public double getDouble(String key) {
+  public double getCustomDouble(String key) {
     return Double.valueOf(info.get(key));
   }
 
-  public byte getByteDef(String key, byte def) {
+  public byte getCustomByteDef(String key, byte def) {
     if(info.containsKey(key)) {
       return Byte.valueOf(info.get(key));
     }
     return def;
   }
 
-  public short getShortDef(String key, short def) {
+  public short getCustomShortDef(String key, short def) {
     if(info.containsKey(key)) {
       return Short.valueOf(info.get(key));
     }
     return def;
   }
 
-  public int getIntDef(String key, int def) {
+  public int getCustomIntDef(String key, int def) {
     if(info.containsKey(key)) {
       return Integer.valueOf(info.get(key));
     }
     return def;
   }
 
-  public long getLongDef(String key, long def) {
+  public long getCustomLongDef(String key, long def) {
     if(info.containsKey(key)) {
       return Long.valueOf(info.get(key));
     }
     return def;
   }
 
-  public String getStringDef(String key, String def) {
+  public String getCustomStringDef(String key, String def) {
     if(info.containsKey(key)) {
       return info.get(key);
     }
     return def;
   }
 
-  public boolean getBoolDef(String key, boolean def) {
+  public boolean getCustomBoolDef(String key, boolean def) {
     if(info.containsKey(key)) {
       return Boolean.valueOf(info.get(key));
     }
     return def;
   }
 
-  public double getDoubleDef(String key, double def) {
+  public double getCustomDoubleDef(String key, double def) {
     if(info.containsKey(key)) {
       return Double.valueOf(info.get(key));
     }

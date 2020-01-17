@@ -2,9 +2,9 @@ package io.catty.benchmark;
 
 import io.catty.Exporter;
 import io.catty.Reference;
-import io.catty.benchmark.common.ProtobufWrkGateway;
-import io.catty.benchmark.service.ProtobufService;
-import io.catty.benchmark.service.ProtobufServiceImpl;
+import io.catty.benchmark.common.PojoWrkGateway;
+import io.catty.benchmark.service.PojoService;
+import io.catty.benchmark.service.PojoServiceImpl;
 import io.catty.config.ClientConfig;
 import io.catty.config.ServerConfig;
 
@@ -17,17 +17,17 @@ public class Benchmark {
         .build();
 
     Exporter exporter = new Exporter(serverConfig);
-    exporter.registerService(ProtobufService.class, new ProtobufServiceImpl());
+    exporter.registerService(PojoService.class, new PojoServiceImpl());
     exporter.export();
 
     ClientConfig clientConfig = ClientConfig.builder()
         .address("127.0.0.1:25500")
         .build();
 
-    Reference<ProtobufService> reference = new Reference<>();
+    Reference<PojoService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);
-    reference.setInterfaceClass(ProtobufService.class);
-    ProtobufWrkGateway gateway = new ProtobufWrkGateway();
+    reference.setInterfaceClass(PojoService.class);
+    PojoWrkGateway gateway = new PojoWrkGateway();
     gateway.start(reference.refer());
   }
 

@@ -81,7 +81,7 @@ public class Cluster implements Invoker, Registry.NotifyListener {
 
   private Client createClientFromMetaInfo(EndpointMetaInfo metaInfo) {
     ClientConfig clientConfig = ClientConfig.builder()
-        .address(metaInfo.getString(MetaInfoEnum.ADDRESS.toString()))
+        .address(metaInfo.getString(MetaInfoEnum.ADDRESS))
         .build();
     return new NettyClient(clientConfig);
   }
