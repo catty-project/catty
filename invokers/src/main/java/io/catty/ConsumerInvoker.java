@@ -2,7 +2,6 @@ package io.catty;
 
 import io.catty.Invocation.InvokerLinkTypeEnum;
 import io.catty.Response.ResponseStatus;
-import io.catty.codec.Serialization;
 import io.catty.meta.service.MethodMeta;
 import io.catty.meta.service.ServiceMeta;
 import io.catty.utils.ExceptionUtils;
@@ -18,12 +17,10 @@ public class ConsumerInvoker<T> implements InvocationHandler {
   private Invoker invoker;
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
-  private Serialization serialization;
 
-  public ConsumerInvoker(Class<T> clazz, Invoker invoker, Serialization serialization) {
+  public ConsumerInvoker(Class<T> clazz, Invoker invoker) {
     this.interfaceClazz = clazz;
     this.invoker = invoker;
-    this.serialization = serialization;
     this.serviceMeta = new ServiceMeta(clazz);
   }
 
