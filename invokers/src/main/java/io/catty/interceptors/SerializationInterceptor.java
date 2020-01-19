@@ -1,4 +1,4 @@
-package io.catty.serialization;
+package io.catty.interceptors;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.JSONSerializer;

@@ -21,6 +21,13 @@ public class MethodMeta {
 
   private Class<?> genericReturnType;
 
+  private long timeout;
+
+  public MethodMeta(Method method, long timeout) {
+    this(method);
+    this.timeout = timeout;
+  }
+
   public MethodMeta(Method method) {
     this.method = method;
     this.checkedExceptions = new HashMap<>();
@@ -84,4 +91,7 @@ public class MethodMeta {
     this.genericReturnType = (Class) genericReturnType;
   }
 
+  public long getTimeout() {
+    return timeout;
+  }
 }

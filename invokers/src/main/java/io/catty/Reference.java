@@ -1,6 +1,6 @@
 package io.catty;
 
-import io.catty.serialization.SerializationInterceptor;
+import io.catty.interceptors.SerializationInterceptor;
 import io.catty.transport.Client;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
