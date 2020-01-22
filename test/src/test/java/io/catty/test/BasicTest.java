@@ -1,7 +1,7 @@
 package io.catty.test;
 
-import io.catty.Exporter;
-import io.catty.Reference;
+import io.catty.config.Exporter;
+import io.catty.config.Reference;
 import io.catty.config.ClientConfig;
 import io.catty.config.ServerConfig;
 import io.catty.test.service.TestService;

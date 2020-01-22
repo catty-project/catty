@@ -1,4 +1,4 @@
-package io.catty;
+package io.catty.core;
 
 import io.catty.meta.service.MethodMeta;
 import java.util.Map;

@@ -1,7 +1,7 @@
 package io.catty.transport.netty;
 
-import io.catty.Invocation;
-import io.catty.Invocation.InvokerLinkTypeEnum;
+import io.catty.core.Invocation;
+import io.catty.core.Invocation.InvokerLinkTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
@@ -9,8 +9,8 @@ import io.netty.channel.ChannelHandlerContext;
 import java.util.concurrent.CompletableFuture;
 import io.catty.codec.Codec.DataTypeEnum;
 import io.catty.CattyException;
-import io.catty.Request;
-import io.catty.Response;
+import io.catty.core.Request;
+import io.catty.core.Response;
 
 public class ServerChannelHandler extends ChannelDuplexHandler {
 

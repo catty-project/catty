@@ -1,7 +1,11 @@
 package io.catty;
 
-import io.catty.Invocation.InvokerLinkTypeEnum;
-import io.catty.Response.ResponseStatus;
+import io.catty.core.Invocation;
+import io.catty.core.Invocation.InvokerLinkTypeEnum;
+import io.catty.core.Invoker;
+import io.catty.core.Request;
+import io.catty.core.Response;
+import io.catty.core.Response.ResponseStatus;
 import io.catty.meta.service.MethodMeta;
 import io.catty.meta.service.ServiceMeta;
 import io.catty.utils.ExceptionUtils;
@@ -9,19 +13,20 @@ import io.catty.utils.ReflectUtils;
 import io.catty.utils.RequestIdGenerator;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
 
 
-public class ConsumerInvoker<T> implements InvocationHandler {
+public class ConsumerInvocationHandler<T> implements InvocationHandler {
 
   private Invoker invoker;
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
 
-  public ConsumerInvoker(Class<T> clazz, Invoker invoker) {
+  public ConsumerInvocationHandler(Class<T> clazz, Invoker invoker) {
     this.interfaceClazz = clazz;
     this.invoker = invoker;
-    this.serviceMeta = new ServiceMeta(clazz);
+    this.serviceMeta = ServiceMeta.parse(clazz);
   }
 
   @Override
@@ -106,5 +111,11 @@ public class ConsumerInvoker<T> implements InvocationHandler {
       }
     }
     return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <E> E getProxy(Class<E> clazz, Invoker invoker) {
+    return (E) Proxy.newProxyInstance(
+        clazz.getClassLoader(), new Class[]{clazz}, new ConsumerInvocationHandler(clazz, invoker));
   }
 }

@@ -1,6 +1,6 @@
 package io.catty.lbs;
 
-import io.catty.Invoker;
+import io.catty.core.Invoker;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 

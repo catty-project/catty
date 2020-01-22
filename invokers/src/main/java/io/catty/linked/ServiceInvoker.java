@@ -1,26 +1,31 @@
-package io.catty;
+package io.catty.linked;
 
-import io.catty.Invocation.InvokerLinkTypeEnum;
+import io.catty.CattyException;
+import io.catty.core.Invocation;
+import io.catty.core.Invocation.InvokerLinkTypeEnum;
+import io.catty.core.Invoker;
+import io.catty.core.LinkedInvoker;
+import io.catty.core.Request;
+import io.catty.core.Response;
 import io.catty.meta.service.MethodMeta;
 import io.catty.meta.service.ServiceMeta;
 
 
-public class ServiceInvoker<T> implements Invoker {
+public class ServiceInvoker<T> extends LinkedInvoker {
 
   private T ref;
-  private Invoker invoker;
   private ServiceMeta serviceMeta;
 
   /**
    * cache all interface's methods
    */
   public ServiceInvoker(T ref, Class<T> interfaceClazz, Invoker invoker) {
+    super(invoker);
     if (!interfaceClazz.isInterface()) {
       throw new CattyException("ServiceInvoker: interfaceClazz is not a interface!");
     }
     this.ref = ref;
-    this.serviceMeta = new ServiceMeta(interfaceClazz);
-    this.invoker = invoker;
+    this.serviceMeta = ServiceMeta.parse(interfaceClazz);
   }
 
   @Override
@@ -31,7 +36,7 @@ public class ServiceInvoker<T> implements Invoker {
     invocation.setTarget(ref);
     MethodMeta methodMeta = serviceMeta.getMethodMetaBySign(request.getMethodName());
     invocation.setInvokedMethod(methodMeta);
-    return invoker.invoke(request, invocation);
+    return next.invoke(request, invocation);
   }
 
 }

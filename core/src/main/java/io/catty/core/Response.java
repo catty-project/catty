@@ -1,4 +1,4 @@
-package io.catty;
+package io.catty.core;
 
 public interface Response {
 

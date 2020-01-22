@@ -3,14 +3,15 @@ package io.catty.transport.netty;
 import io.catty.CattyException;
 import io.catty.DefaultAsyncResponse;
 import io.catty.GlobalConstants;
-import io.catty.Invocation;
-import io.catty.Request;
-import io.catty.Response;
-import io.catty.Response.ResponseStatus;
 import io.catty.TransportException;
 import io.catty.codec.CattyCodec;
 import io.catty.codec.Codec.DataTypeEnum;
-import io.catty.config.ClientConfig;
+import io.catty.core.Invocation;
+import io.catty.core.Request;
+import io.catty.core.Response;
+import io.catty.core.Response.ResponseStatus;
+import io.catty.meta.endpoint.EndpointMetaInfo;
+import io.catty.meta.endpoint.MetaInfoEnum;
 import io.catty.transport.AbstractClient;
 import io.catty.utils.ExceptionUtils;
 import io.netty.bootstrap.Bootstrap;
@@ -31,16 +32,16 @@ public class NettyClient extends AbstractClient {
   private io.netty.channel.Channel clientChannel;
   private NioEventLoopGroup nioEventLoopGroup;
 
-  public NettyClient(ClientConfig clientConfig) {
-    super(clientConfig, new CattyCodec());
+  public NettyClient(EndpointMetaInfo metaInfo) {
+    super(metaInfo, new CattyCodec());
     nioEventLoopGroup = new NioEventLoopGroup(GlobalConstants.THREAD_NUMBER + 1);
   }
 
   @Override
   protected void doOpen() {
     Bootstrap bootstrap = new Bootstrap();
-    int connectTimeoutMillis = getConfig().getTimeout() > 0 ? getConfig().getTimeout()
-        : GlobalConstants.DEFAULT_CLIENT_TIMEOUT;
+    int connectTimeoutMillis = getConfig()
+        .getIntDef(MetaInfoEnum.TIMEOUT, GlobalConstants.DEFAULT_CLIENT_TIMEOUT);
     bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMillis);
     bootstrap.option(ChannelOption.TCP_NODELAY, true);
     bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
@@ -58,9 +59,11 @@ public class NettyClient extends AbstractClient {
         });
     ChannelFuture future;
     try {
-      future = bootstrap.connect(getConfig().getServerIp(), getConfig().getServerPort()).sync();
+      future = bootstrap
+          .connect(getConfig().getString(MetaInfoEnum.IP), getConfig().getInt(MetaInfoEnum.PORT))
+          .sync();
     } catch (InterruptedException i) {
-      close();
+      destroy();
       throw new TransportException("NettyClient: connect().sync() interrupted", i);
     }
 
@@ -69,7 +72,7 @@ public class NettyClient extends AbstractClient {
 
   @Override
   protected void doClose() {
-    if (!isOpen()) {
+    if (!isAvailable()) {
       return;
     }
     if (clientChannel != null) {

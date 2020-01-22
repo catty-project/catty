@@ -1,6 +1,6 @@
 package io.catty;
 
-import io.catty.Request;
+import io.catty.core.Request;
 
 public class DefaultRequest implements Request {
 

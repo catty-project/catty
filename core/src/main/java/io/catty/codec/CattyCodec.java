@@ -1,9 +1,9 @@
 package io.catty.codec;
 
 import com.google.protobuf.ByteString;
-import io.catty.Request;
-import io.catty.Response;
-import io.catty.Response.ResponseStatus;
+import io.catty.core.Request;
+import io.catty.core.Response;
+import io.catty.core.Response.ResponseStatus;
 import io.catty.DefaultRequest;
 import io.catty.DefaultResponse;
 import io.catty.codec.generated.CattyProtocol;

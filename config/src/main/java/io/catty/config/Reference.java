@@ -1,12 +1,11 @@
-package io.catty;
+package io.catty.config;
 
-import io.catty.interceptors.SerializationInterceptor;
-import io.catty.transport.Client;
+import io.catty.ConsumerInvocationHandler;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
-import io.catty.cluster.Cluster;
+import io.catty.listable.Cluster;
+import io.catty.linked.SerializationInvoker;
 import io.catty.lbs.RandomLoadBalance;
-import io.catty.config.ClientConfig;
 import io.catty.meta.endpoint.EndpointMetaInfo;
 import io.catty.meta.endpoint.EndpointTypeEnum;
 import io.catty.meta.endpoint.MetaInfoEnum;
@@ -53,11 +52,11 @@ public class Reference<T> {
           }
           if (registryConfig == null) {
             client = new NettyClient(clientConfig);
-            client.open();
+            client.init();
             InvokerChainBuilder chainBuilder = new InvokerChainBuilder();
             chainBuilder.setSourceInvoker(client);
-            chainBuilder.registerInterceptor(new SerializationInterceptor());
-            ref = new ProxyFactory<T>().getProxy(interfaceClass, chainBuilder.buildInvoker());
+            chainBuilder.registerInterceptor(new SerializationInvoker());
+            ref = ConsumerInvocationHandler.getProxy(interfaceClass, chainBuilder.buildInvoker());
           } else {
             registry = new ZookeeperRegistry(registryConfig);
             registry.open();
@@ -66,7 +65,7 @@ public class Reference<T> {
             metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME, interfaceClass.getName());
             metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS, clientConfig.getAddress());
             registry.subscribe(metaInfo, cluster);
-            ref = new ProxyFactory<T>().getProxy(interfaceClass, cluster);
+            ref = ConsumerInvocationHandler.getProxy(interfaceClass, cluster);
           }
         }
       }
@@ -75,8 +74,8 @@ public class Reference<T> {
   }
 
   public void derefer() {
-    if(client != null && client.isOpen()) {
-      client.close();
+    if(client != null && client.isAvailable()) {
+      client.destroy();
       client = null;
     }
     if(registry != null && registry.isOpen()) {
@@ -84,7 +83,7 @@ public class Reference<T> {
       registry = null;
     }
     if(cluster != null) {
-      cluster.close();
+      cluster.destroy();
     }
   }
 
