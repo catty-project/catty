@@ -1,6 +1,6 @@
 package io.catty.transport.netty;
 
-import io.catty.Invoker;
+import io.catty.core.Invoker;
 import io.catty.codec.CattyCodec;
 import io.catty.config.ServerConfig;
 import io.catty.transport.AbstractServer;

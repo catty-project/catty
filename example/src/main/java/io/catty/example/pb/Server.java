@@ -1,6 +1,6 @@
 package io.catty.example.pb;
 
-import io.catty.Exporter;
+import io.catty.config.Exporter;
 import io.catty.config.ServerConfig;
 
 public class Server {

@@ -1,5 +1,7 @@
-package io.catty;
+package io.catty.core;
 
+
+import io.catty.CattyException;
 
 /**
  * The most important interface which represent an rpc invocation. Every struct in catty which in
@@ -22,6 +24,12 @@ package io.catty;
  * Invocation contains the whole information of the current invocation.
  */
 public interface Invoker {
+
+  default void init() {}
+
+  default void destroy() {}
+
+  default boolean isAvailable() {return true;}
 
   /**
    *

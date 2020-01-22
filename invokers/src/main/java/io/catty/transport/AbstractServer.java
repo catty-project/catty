@@ -1,19 +1,21 @@
 package io.catty.transport;
 
 import io.catty.GlobalConstants;
-import io.catty.Invoker;
-import io.catty.Request;
-import io.catty.Response;
-import io.catty.Invocation;
 import io.catty.codec.Codec;
-import io.catty.config.ServerConfig;
+import io.catty.core.Invocation;
+import io.catty.core.Invoker;
+import io.catty.core.LinkedInvoker;
+import io.catty.core.Request;
+import io.catty.core.Response;
+import io.catty.meta.endpoint.EndpointMetaInfo;
+import io.catty.meta.endpoint.MetaInfoEnum;
 import io.catty.transport.worker.ConsistentHashLoopGroup;
 import io.catty.transport.worker.HashableChooserFactory;
 import io.catty.transport.worker.HashableExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractServer implements Server {
+public abstract class AbstractServer extends LinkedInvoker implements Endpoint {
 
   private static Logger logger = LoggerFactory.getLogger(AbstractServer.class);
 
@@ -21,10 +23,9 @@ public abstract class AbstractServer implements Server {
   private static final int CONNECTED = 1;
   private static final int DISCONNECTED = 2;
 
-  private ServerConfig serverConfig;
+  private EndpointMetaInfo metaInfo;
   private volatile int status = NEW;
   private Codec codec;
-  private Invoker invoker;
 
   /**
    * HashableExecutor is needed, because if a request just be submitted randomly to a generic
@@ -43,16 +44,16 @@ public abstract class AbstractServer implements Server {
    */
   private HashableExecutor executor;
 
-  public AbstractServer(ServerConfig serverConfig, Codec codec, Invoker invoker) {
-    this.serverConfig = serverConfig;
+  public AbstractServer(EndpointMetaInfo metaInfo, Codec codec, Invoker invoker) {
+    super(invoker);
+    this.metaInfo = metaInfo;
     this.codec = codec;
-    this.invoker = invoker;
     createExecutor();
   }
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    return invoker.invoke(request, invocation);
+    return next.invoke(request, invocation);
   }
 
   @Override
@@ -66,22 +67,24 @@ public abstract class AbstractServer implements Server {
   }
 
   @Override
-  public ServerConfig getConfig() {
-    return serverConfig;
+  public EndpointMetaInfo getConfig() {
+    return metaInfo;
   }
 
   @Override
-  public boolean isOpen() {
+  public boolean isAvailable() {
     return status == CONNECTED;
   }
 
   @Override
-  public void open() {
+  public void init() {
+    super.init();
     doOpen();
   }
 
   @Override
-  public void close() {
+  public void destroy() {
+    super.destroy();
     doClose();
     executor.shutdownGracefully();
   }
@@ -91,8 +94,8 @@ public abstract class AbstractServer implements Server {
   protected abstract void doClose();
 
   private void createExecutor() {
-    int workerNum = serverConfig.getWorkerThreadNum() > 0 ? serverConfig.getWorkerThreadNum()
-        : GlobalConstants.THREAD_NUMBER * 2;
+    int workerNum = metaInfo
+        .getIntDef(MetaInfoEnum.WORKER_NUMBER, GlobalConstants.THREAD_NUMBER * 2);
     executor = new ConsistentHashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
   }
 

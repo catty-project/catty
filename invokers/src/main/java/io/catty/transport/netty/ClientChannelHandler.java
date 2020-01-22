@@ -1,6 +1,6 @@
 package io.catty.transport.netty;
 
-import io.catty.Response;
+import io.catty.core.Response;
 import io.catty.codec.Codec.DataTypeEnum;
 import io.catty.CattyException;
 import io.netty.buffer.ByteBuf;

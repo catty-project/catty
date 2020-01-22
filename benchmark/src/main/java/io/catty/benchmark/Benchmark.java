@@ -1,7 +1,7 @@
 package io.catty.benchmark;
 
-import io.catty.Exporter;
-import io.catty.Reference;
+import io.catty.config.Exporter;
+import io.catty.config.Reference;
 import io.catty.benchmark.common.PojoWrkGateway;
 import io.catty.benchmark.service.PojoService;
 import io.catty.benchmark.service.PojoServiceImpl;

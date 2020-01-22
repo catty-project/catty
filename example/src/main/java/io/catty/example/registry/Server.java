@@ -1,6 +1,6 @@
 package io.catty.example.registry;
 
-import io.catty.Exporter;
+import io.catty.config.Exporter;
 import io.catty.api.RegistryConfig;
 import io.catty.config.ServerConfig;
 

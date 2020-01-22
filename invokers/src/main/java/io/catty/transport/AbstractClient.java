@@ -1,14 +1,15 @@
 package io.catty.transport;
 
-import io.catty.Response;
 import io.catty.codec.Codec;
-import io.catty.config.ClientConfig;
+import io.catty.core.Response;
+import io.catty.meta.endpoint.EndpointMetaInfo;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractClient implements Client {
+public abstract class AbstractClient implements Endpoint {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -16,14 +17,14 @@ public abstract class AbstractClient implements Client {
   private static final int CONNECTED = 1;
   private static final int DISCONNECTED = 2;
 
-  private ClientConfig clientConfig;
+  private EndpointMetaInfo metaInfo;
   private volatile int status = NEW;
   private Codec codec;
 
   private Map<Long, Response> currentTask = new ConcurrentHashMap<>();
 
-  public AbstractClient(ClientConfig clientConfig, Codec codec) {
-    this.clientConfig = clientConfig;
+  public AbstractClient(EndpointMetaInfo metaInfo, Codec codec) {
+    this.metaInfo = metaInfo;
     this.codec = codec;
   }
 
@@ -41,25 +42,30 @@ public abstract class AbstractClient implements Client {
   }
 
   @Override
-  public ClientConfig getConfig() {
-    return clientConfig;
+  public EndpointMetaInfo getConfig() {
+    return metaInfo;
   }
 
   @Override
-  public boolean isOpen() {
+  public boolean isAvailable() {
     return status == CONNECTED;
   }
 
   @Override
-  public void open() {
+  public void init() {
     status = CONNECTED;
     doOpen();
   }
 
   @Override
-  public void close() {
+  public void destroy() {
     doClose();
     status = DISCONNECTED;
+  }
+
+  @Override
+  public Executor getExecutor() {
+    return null;
   }
 
   protected abstract void doOpen();

@@ -18,6 +18,7 @@
     <module>test</module>
     <module>benchmark</module>
     <module>all</module>
+    <module>config</module>
   </modules>
 
   <properties>

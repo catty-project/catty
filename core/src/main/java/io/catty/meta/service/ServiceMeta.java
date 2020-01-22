@@ -23,7 +23,11 @@ public class ServiceMeta {
 
   private Map<Method, MethodMeta> methodMetaMap;
 
-  public ServiceMeta(Class<?> interfaceClass) {
+  public static ServiceMeta parse(Class<?> interfaceClass) {
+    return new ServiceMeta(interfaceClass);
+  }
+
+  private ServiceMeta(Class<?> interfaceClass) {
     this.interfaceClass = interfaceClass;
     methodMap = new HashMap<>();
     validMethod = new HashSet<>();

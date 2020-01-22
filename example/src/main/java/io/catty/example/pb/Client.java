@@ -1,6 +1,6 @@
 package io.catty.example.pb;
 
-import io.catty.Reference;
+import io.catty.config.Reference;
 import io.catty.config.ClientConfig;
 import io.catty.example.pb.generated.EchoProtocol;
 import io.catty.example.pb.generated.EchoProtocol.Request;

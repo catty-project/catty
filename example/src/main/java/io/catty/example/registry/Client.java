@@ -1,6 +1,6 @@
 package io.catty.example.registry;
 
-import io.catty.Reference;
+import io.catty.config.Reference;
 import io.catty.config.ClientConfig;
 import io.catty.api.RegistryConfig;
 

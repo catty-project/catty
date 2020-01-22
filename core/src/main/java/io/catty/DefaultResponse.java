@@ -1,5 +1,7 @@
 package io.catty;
 
+import io.catty.core.Response;
+
 public class DefaultResponse implements Response {
 
   private long requestId;

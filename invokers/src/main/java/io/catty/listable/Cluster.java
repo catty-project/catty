@@ -1,14 +1,14 @@
-package io.catty.cluster;
+package io.catty.listable;
 
-import io.catty.Invoker;
-import io.catty.Request;
-import io.catty.Response;
-import io.catty.Invocation;
-import io.catty.lbs.LoadBalance;
-import io.catty.transport.Client;
+import io.catty.core.Invocation;
+import io.catty.core.Invoker;
+import io.catty.core.ListableInvoker;
+import io.catty.core.Request;
+import io.catty.core.Response;
 import io.catty.api.Registry;
-import io.catty.config.ClientConfig;
 import io.catty.api.RegistryConfig;
+import io.catty.config.ClientConfig;
+import io.catty.lbs.LoadBalance;
 import io.catty.meta.endpoint.EndpointMetaInfo;
 import io.catty.meta.endpoint.MetaInfoEnum;
 import io.catty.transport.netty.NettyClient;
@@ -20,38 +20,40 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class Cluster implements Invoker, Registry.NotifyListener {
+public class Cluster extends ListableInvoker implements Registry.NotifyListener {
 
   private LoadBalance loadBalance;
 
-  private Map<EndpointMetaInfo, Client> invokersMap;
-
-  private List<Client> invokers;
+  private Map<EndpointMetaInfo, Invoker> invokersMap;
 
   public Cluster(LoadBalance loadBalance) {
+    this(new ArrayList<>(), loadBalance);
+  }
+
+  public Cluster(List<Invoker> invokerList, LoadBalance loadBalance) {
+    super(invokerList);
     this.loadBalance = loadBalance;
     invokersMap = new HashMap<>();
-    invokers = new ArrayList<>();
   }
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    Client client = loadBalance.select(invokers);
-    if(!client.isOpen()) {
-      client.open();
+    Invoker invoker = loadBalance.select(invokerList);
+    if(!invoker.isAvailable()) {
+      invoker.init();
     }
-    return client.invoke(request, invocation);
+    return invoker.invoke(request, invocation);
   }
 
-  public void close() {
-    invokers.forEach(Client::close);
+  public void destroy() {
+    invokerList.forEach(Invoker::destroy);
   }
 
   @Override
   public synchronized void notify(RegistryConfig registryConfig,
       List<EndpointMetaInfo> metaInfoCollection) {
-    Map<EndpointMetaInfo, Client> newInvokerMap = new HashMap<>();
-    List<Client> newInvokerList = new ArrayList<>();
+    Map<EndpointMetaInfo, Invoker> newInvokerMap = new HashMap<>();
+    List<Invoker> newInvokerList = new ArrayList<>();
 
     List<EndpointMetaInfo> newList = new ArrayList<>();
     for (EndpointMetaInfo metaInfo : metaInfoCollection) {
@@ -61,25 +63,25 @@ public class Cluster implements Invoker, Registry.NotifyListener {
       newList.add(metaInfo);
     }
     for (EndpointMetaInfo metaInfo : newList) {
-      Client client = createClientFromMetaInfo(metaInfo);
-      newInvokerMap.put(metaInfo, client);
-      newInvokerList.add(client);
+      Invoker invoker = createClientFromMetaInfo(metaInfo);
+      newInvokerMap.put(metaInfo, invoker);
+      newInvokerList.add(invoker);
     }
 
     Set<EndpointMetaInfo> metaInfoSet = new HashSet<>(metaInfoCollection);
-    for (Entry<EndpointMetaInfo, Client> entry : invokersMap.entrySet()) {
+    for (Entry<EndpointMetaInfo, Invoker> entry : invokersMap.entrySet()) {
       if (metaInfoSet.contains(entry.getKey())) {
         newInvokerList.add(entry.getValue());
         newInvokerMap.put(entry.getKey(), entry.getValue());
       } else {
-        entry.getValue().close();
+        entry.getValue().destroy();
       }
     }
-    invokers = newInvokerList;
+    setInvokerList(newInvokerList);
     invokersMap = newInvokerMap;
   }
 
-  private Client createClientFromMetaInfo(EndpointMetaInfo metaInfo) {
+  private Invoker createClientFromMetaInfo(EndpointMetaInfo metaInfo) {
     ClientConfig clientConfig = ClientConfig.builder()
         .address(metaInfo.getString(MetaInfoEnum.ADDRESS))
         .build();

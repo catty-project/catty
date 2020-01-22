@@ -1,14 +1,16 @@
-package io.catty;
+package io.catty.config;
 
+import io.catty.core.Invoker;
+import io.catty.ProviderInvoker;
+import io.catty.ServerAddress;
+import io.catty.linked.ServiceInvoker;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
-import io.catty.config.ServerConfig;
+import io.catty.linked.SerializationInvoker;
 import io.catty.meta.endpoint.EndpointMetaInfo;
 import io.catty.meta.endpoint.EndpointTypeEnum;
 import io.catty.meta.endpoint.MetaInfoEnum;
-import io.catty.router.ServerRouterInvoker;
-import io.catty.interceptors.SerializationInterceptor;
-import io.catty.transport.Server;
+import io.catty.mapped.ServerRouterInvoker;
 import io.catty.transport.netty.NettyServer;
 import io.catty.zk.ZookeeperRegistry;
 import java.util.HashMap;
@@ -43,7 +45,7 @@ public class Exporter {
 
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
     InvokerChainBuilder chainBuilder = new InvokerChainBuilder();
-    chainBuilder.registerInterceptor(new SerializationInterceptor());
+    chainBuilder.registerInterceptor(new SerializationInvoker());
     chainBuilder.setSourceInvoker(new ProviderInvoker());
     ServiceInvoker<T> invoker = new ServiceInvoker<>(serviceObject, interfaceClass,
         chainBuilder.buildInvoker());
@@ -82,15 +84,15 @@ public class Exporter {
       }
     });
 
-    if (!server.isOpen()) {
-      server.open();
+    if (!server.isAvailable()) {
+      server.init();
     }
   }
 
   public void unexport() {
     serviceRouterMap.remove(address);
     address = null;
-    server.close();
+    server.destroy();
     if (registry != null && registry.isOpen()) {
       serviceHandlers.forEach((s, invoker) -> {
         EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
