@@ -7,15 +7,15 @@ import io.catty.core.Invoker;
 import io.catty.core.LinkedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
-import io.catty.meta.endpoint.EndpointMetaInfo;
-import io.catty.meta.endpoint.MetaInfoEnum;
+import io.catty.core.Server;
+import io.catty.config.ServerConfig;
 import io.catty.transport.worker.ConsistentHashLoopGroup;
 import io.catty.transport.worker.HashableChooserFactory;
 import io.catty.transport.worker.HashableExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractServer extends LinkedInvoker implements Endpoint {
+public abstract class AbstractServer extends LinkedInvoker implements Server {
 
   private static Logger logger = LoggerFactory.getLogger(AbstractServer.class);
 
@@ -23,7 +23,7 @@ public abstract class AbstractServer extends LinkedInvoker implements Endpoint {
   private static final int CONNECTED = 1;
   private static final int DISCONNECTED = 2;
 
-  private EndpointMetaInfo metaInfo;
+  private ServerConfig config;
   private volatile int status = NEW;
   private Codec codec;
 
@@ -44,9 +44,9 @@ public abstract class AbstractServer extends LinkedInvoker implements Endpoint {
    */
   private HashableExecutor executor;
 
-  public AbstractServer(EndpointMetaInfo metaInfo, Codec codec, Invoker invoker) {
+  public AbstractServer(ServerConfig config, Codec codec, Invoker invoker) {
     super(invoker);
-    this.metaInfo = metaInfo;
+    this.config = config;
     this.codec = codec;
     createExecutor();
   }
@@ -67,8 +67,8 @@ public abstract class AbstractServer extends LinkedInvoker implements Endpoint {
   }
 
   @Override
-  public EndpointMetaInfo getConfig() {
-    return metaInfo;
+  public ServerConfig getConfig() {
+    return config;
   }
 
   @Override
@@ -94,8 +94,8 @@ public abstract class AbstractServer extends LinkedInvoker implements Endpoint {
   protected abstract void doClose();
 
   private void createExecutor() {
-    int workerNum = metaInfo
-        .getIntDef(MetaInfoEnum.WORKER_NUMBER, GlobalConstants.THREAD_NUMBER * 2);
+    int workerNum = config.getWorkerThreadNum() > 0 ? config.getWorkerThreadNum() :
+        GlobalConstants.THREAD_NUMBER * 2;
     executor = new ConsistentHashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
   }
 

@@ -1,20 +1,20 @@
-package io.catty.meta.endpoint;
+package io.catty.meta;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class EndpointMetaInfo {
+public class MetaInfo {
 
   private Map<String, String> info = new HashMap<>();
 
   private EndpointTypeEnum endpointTypeEnum;
 
-  public EndpointMetaInfo(EndpointTypeEnum endpointTypeEnum) {
+  public MetaInfo(EndpointTypeEnum endpointTypeEnum) {
     this.endpointTypeEnum = endpointTypeEnum;
   }
 
-  public EndpointMetaInfo(Map<String, String> info, EndpointTypeEnum endpointTypeEnum) {
+  public MetaInfo(Map<String, String> info, EndpointTypeEnum endpointTypeEnum) {
     this.info = info;
     this.endpointTypeEnum = endpointTypeEnum;
   }
@@ -27,7 +27,7 @@ public class EndpointMetaInfo {
    * System setting style: setting1=a;setting2=b;setting3=c;
    * todo : need more robust
    */
-  public static EndpointMetaInfo parse(String metaInfoStr, EndpointTypeEnum endpointTypeEnum) {
+  public static MetaInfo parse(String metaInfoStr, EndpointTypeEnum endpointTypeEnum) {
     Map<String, String> map = new HashMap<>();
     String[] metaInfoEntryArray = metaInfoStr.split(";");
     for(String entry : metaInfoEntryArray) {
@@ -36,7 +36,7 @@ public class EndpointMetaInfo {
       }
       map.put(entry.substring(0, entry.indexOf("=")), entry.substring(entry.indexOf("=") + 1));
     }
-    return new EndpointMetaInfo(map, endpointTypeEnum);
+    return new MetaInfo(map, endpointTypeEnum);
   }
 
   @Override
@@ -50,6 +50,10 @@ public class EndpointMetaInfo {
 
   public void addMetaInfo(MetaInfoEnum key, String value) {
     info.put(key.toString(), value);
+  }
+
+  public void addMetaInfo(MetaInfoEnum key, Object value) {
+    info.put(key.toString(), String.valueOf(value));
   }
 
   public byte getByte(MetaInfoEnum key) {
@@ -217,10 +221,10 @@ public class EndpointMetaInfo {
 
   @Override
   public boolean equals(Object o) {
-    if(!(o instanceof EndpointMetaInfo)) {
+    if(!(o instanceof MetaInfo)) {
       return false;
     }
-    return info.equals(((EndpointMetaInfo) o).info);
+    return info.equals(((MetaInfo) o).info);
   }
 
 }

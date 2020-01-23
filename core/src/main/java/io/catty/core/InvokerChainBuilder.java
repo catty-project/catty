@@ -1,29 +1,11 @@
 package io.catty.core;
 
-public final class InvokerChainBuilder {
+import io.catty.meta.MetaInfo;
 
-  public class MapInvokerChainBuilder {
+public interface InvokerChainBuilder {
 
-  }
+  Invoker buildConsumerInvoker(MetaInfo metaInfo, Client client);
 
-  public class ListInvokerChainBuilder {
-
-  }
-
-  public class LinkInvokerChainBuilder {
-
-  }
-
-  public InvokerChainBuilder map() {
-    return this;
-  }
-
-  public InvokerChainBuilder list() {
-    return this;
-  }
-
-  public InvokerChainBuilder next() {
-    return this;
-  }
+  Invoker buildProviderInvoker(MetaInfo metaInfo);
 
 }

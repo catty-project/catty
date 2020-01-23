@@ -4,6 +4,7 @@ import io.catty.utils.NetUtils;
 import io.catty.ServerAddress;
 import lombok.Builder;
 
+// todo : remove lombok.
 @Builder
 public class ServerConfig {
 

@@ -9,8 +9,8 @@ import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
 import io.catty.config.ClientConfig;
 import io.catty.lbs.LoadBalance;
-import io.catty.meta.endpoint.EndpointMetaInfo;
-import io.catty.meta.endpoint.MetaInfoEnum;
+import io.catty.meta.MetaInfo;
+import io.catty.meta.MetaInfoEnum;
 import io.catty.transport.netty.NettyClient;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
 
   private LoadBalance loadBalance;
 
-  private Map<EndpointMetaInfo, Invoker> invokersMap;
+  private Map<MetaInfo, Invoker> invokersMap;
 
   public Cluster(LoadBalance loadBalance) {
     this(new ArrayList<>(), loadBalance);
@@ -51,25 +51,25 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
 
   @Override
   public synchronized void notify(RegistryConfig registryConfig,
-      List<EndpointMetaInfo> metaInfoCollection) {
-    Map<EndpointMetaInfo, Invoker> newInvokerMap = new HashMap<>();
+      List<MetaInfo> metaInfoCollection) {
+    Map<MetaInfo, Invoker> newInvokerMap = new HashMap<>();
     List<Invoker> newInvokerList = new ArrayList<>();
 
-    List<EndpointMetaInfo> newList = new ArrayList<>();
-    for (EndpointMetaInfo metaInfo : metaInfoCollection) {
+    List<MetaInfo> newList = new ArrayList<>();
+    for (MetaInfo metaInfo : metaInfoCollection) {
       if (invokersMap.containsKey(metaInfo)) {
         continue;
       }
       newList.add(metaInfo);
     }
-    for (EndpointMetaInfo metaInfo : newList) {
+    for (MetaInfo metaInfo : newList) {
       Invoker invoker = createClientFromMetaInfo(metaInfo);
       newInvokerMap.put(metaInfo, invoker);
       newInvokerList.add(invoker);
     }
 
-    Set<EndpointMetaInfo> metaInfoSet = new HashSet<>(metaInfoCollection);
-    for (Entry<EndpointMetaInfo, Invoker> entry : invokersMap.entrySet()) {
+    Set<MetaInfo> metaInfoSet = new HashSet<>(metaInfoCollection);
+    for (Entry<MetaInfo, Invoker> entry : invokersMap.entrySet()) {
       if (metaInfoSet.contains(entry.getKey())) {
         newInvokerList.add(entry.getValue());
         newInvokerMap.put(entry.getKey(), entry.getValue());
@@ -81,7 +81,7 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
     invokersMap = newInvokerMap;
   }
 
-  private Invoker createClientFromMetaInfo(EndpointMetaInfo metaInfo) {
+  private Invoker createClientFromMetaInfo(MetaInfo metaInfo) {
     ClientConfig clientConfig = ClientConfig.builder()
         .address(metaInfo.getString(MetaInfoEnum.ADDRESS))
         .build();

@@ -1,4 +1,4 @@
-package io.catty.meta.service;
+package io.catty.service;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;

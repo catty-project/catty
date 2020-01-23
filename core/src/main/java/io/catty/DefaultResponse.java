@@ -13,6 +13,10 @@ public class DefaultResponse implements Response {
   public DefaultResponse() {
   }
 
+  public DefaultResponse(long requestId) {
+    this.requestId = requestId;
+  }
+
   public DefaultResponse(long requestId, ResponseStatus status, Object value) {
     this.requestId = requestId;
     this.status = status;

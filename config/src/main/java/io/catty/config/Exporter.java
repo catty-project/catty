@@ -1,16 +1,19 @@
 package io.catty.config;
 
-import io.catty.core.Invoker;
-import io.catty.ProviderInvoker;
 import io.catty.ServerAddress;
-import io.catty.linked.ServiceInvoker;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
-import io.catty.linked.SerializationInvoker;
-import io.catty.meta.endpoint.EndpointMetaInfo;
-import io.catty.meta.endpoint.EndpointTypeEnum;
-import io.catty.meta.endpoint.MetaInfoEnum;
+import io.catty.core.InvokerChainBuilder;
+import io.catty.core.InvokerHolder;
+import io.catty.core.Server;
+import io.catty.extension.ExtensionFactory;
+import io.catty.extension.ExtensionFactory.InvokerBuilderType;
+import io.catty.extension.ExtensionFactory.SerializationType;
 import io.catty.mapped.ServerRouterInvoker;
+import io.catty.meta.EndpointTypeEnum;
+import io.catty.meta.MetaInfo;
+import io.catty.meta.MetaInfoEnum;
+import io.catty.service.ServiceMeta;
 import io.catty.transport.netty.NettyServer;
 import io.catty.zk.ZookeeperRegistry;
 import java.util.HashMap;
@@ -23,7 +26,7 @@ public class Exporter {
 
   private static Map<ServerAddress, Server> serverMap = new HashMap<>();
 
-  private Map<String, Invoker> serviceHandlers = new HashMap<>();
+  private Map<String, InvokerHolder> serviceHandlers = new HashMap<>();
 
   private ServerConfig serverConfig;
 
@@ -35,21 +38,44 @@ public class Exporter {
 
   private ServerAddress address;
 
+  private String serializationType = SerializationType.PROTOBUF_FASTJSON.toString();
+
   public Exporter(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
+    this.address = serverConfig.getServerAddress();
   }
 
   public void setRegistryConfig(RegistryConfig registryConfig) {
     this.registryConfig = registryConfig;
   }
 
+  public void setSerializationType(SerializationType serializationType) {
+    this.serializationType = serializationType.toString();
+  }
+
+  public void setSerializationType(String serializationType) {
+    this.serializationType = serializationType;
+  }
+
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
-    InvokerChainBuilder chainBuilder = new InvokerChainBuilder();
-    chainBuilder.registerInterceptor(new SerializationInvoker());
-    chainBuilder.setSourceInvoker(new ProviderInvoker());
-    ServiceInvoker<T> invoker = new ServiceInvoker<>(serviceObject, interfaceClass,
-        chainBuilder.buildInvoker());
-    serviceHandlers.put(interfaceClass.getName(), invoker);
+    ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
+    serviceMeta.setTarget(serviceObject);
+
+    MetaInfo metaInfo = new MetaInfo(EndpointTypeEnum.SERVER);
+    metaInfo.addMetaInfo(MetaInfoEnum.PORT, address.getPort());
+    metaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());
+    metaInfo.addMetaInfo(MetaInfoEnum.GROUP, serviceMeta.getGroup());
+    metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
+    metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
+    metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
+    metaInfo.addMetaInfo(MetaInfoEnum.WORKER_NUMBER, serverConfig.getWorkerThreadNum());
+
+    // todo: make InvokerChainBuilder configurable
+    InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
+        .getExtension(InvokerBuilderType.DIRECT);
+    InvokerHolder invokerHolder = InvokerHolder
+        .Of(metaInfo, serviceMeta, chainBuilder.buildProviderInvoker(metaInfo));
+    serviceHandlers.put(interfaceClass.getName(), invokerHolder);
   }
 
   public void export() {
@@ -57,8 +83,6 @@ public class Exporter {
       registry = new ZookeeperRegistry(registryConfig);
       registry.open();
     }
-
-    address = serverConfig.getServerAddress();
 
     ServerRouterInvoker serverRouterInvoker;
     if (serviceRouterMap.containsKey(address)) {
@@ -74,13 +98,10 @@ public class Exporter {
       serverMap.put(address, server);
     }
 
-    serviceHandlers.forEach((s, invoker) -> {
-      serverRouterInvoker.registerInvoker(s, invoker);
+    serviceHandlers.forEach((s, invokerHolder) -> {
+      serverRouterInvoker.registerInvoker(s, invokerHolder);
       if (registry != null) {
-        EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
-        metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME, s);
-        metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS, serverConfig.getServerAddress().toString());
-        registry.register(metaInfo);
+        registry.register(invokerHolder.getMetaInfo());
       }
     });
 
@@ -94,13 +115,10 @@ public class Exporter {
     address = null;
     server.destroy();
     if (registry != null && registry.isOpen()) {
-      serviceHandlers.forEach((s, invoker) -> {
-        EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
-        metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME, s);
-        metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS, serverConfig.getServerAddress().toString());
-        registry.unregister(metaInfo);
-      });
+      serviceHandlers
+          .forEach((s, invokerHolder) -> registry.unregister(invokerHolder.getMetaInfo()));
       registry.close();
     }
   }
+
 }
