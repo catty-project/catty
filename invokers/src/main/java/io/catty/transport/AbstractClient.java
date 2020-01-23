@@ -1,15 +1,16 @@
 package io.catty.transport;
 
 import io.catty.codec.Codec;
+import io.catty.core.Client;
 import io.catty.core.Response;
-import io.catty.meta.endpoint.EndpointMetaInfo;
+import io.catty.config.ClientConfig;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractClient implements Endpoint {
+public abstract class AbstractClient implements Client {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -17,14 +18,14 @@ public abstract class AbstractClient implements Endpoint {
   private static final int CONNECTED = 1;
   private static final int DISCONNECTED = 2;
 
-  private EndpointMetaInfo metaInfo;
+  private ClientConfig config;
   private volatile int status = NEW;
   private Codec codec;
 
   private Map<Long, Response> currentTask = new ConcurrentHashMap<>();
 
-  public AbstractClient(EndpointMetaInfo metaInfo, Codec codec) {
-    this.metaInfo = metaInfo;
+  public AbstractClient(ClientConfig config, Codec codec) {
+    this.config = config;
     this.codec = codec;
   }
 
@@ -42,8 +43,8 @@ public abstract class AbstractClient implements Endpoint {
   }
 
   @Override
-  public EndpointMetaInfo getConfig() {
-    return metaInfo;
+  public ClientConfig getConfig() {
+    return config;
   }
 
   @Override

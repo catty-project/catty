@@ -1,4 +1,4 @@
-package io.catty.meta.endpoint;
+package io.catty.meta;
 
 public enum  EndpointTypeEnum {
 

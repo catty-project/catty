@@ -1,9 +1,9 @@
 package io.catty.transport.netty;
 
-import io.catty.core.Invoker;
 import io.catty.codec.CattyCodec;
-import io.catty.config.ServerConfig;
+import io.catty.core.Invoker;
 import io.catty.transport.AbstractServer;
+import io.catty.config.ServerConfig;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;

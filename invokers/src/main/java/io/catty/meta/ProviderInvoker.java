@@ -1,11 +1,13 @@
-package io.catty;
+package io.catty.meta;
 
+import io.catty.CattyException;
+import io.catty.DefaultResponse;
 import io.catty.core.Invocation;
 import io.catty.core.Invoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Response.ResponseStatus;
-import io.catty.meta.service.MethodMeta;
+import io.catty.service.MethodMeta;
 import io.catty.utils.ExceptionUtils;
 import java.lang.reflect.InvocationTargetException;
 
@@ -13,7 +15,7 @@ public class ProviderInvoker implements Invoker {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    Response response = new DefaultResponse();
+    Response response = new DefaultResponse(request.getRequestId());
     String methodName = request.getMethodName();
     MethodMeta methodMeta = invocation.getInvokedMethod();
 
@@ -27,8 +29,8 @@ public class ProviderInvoker implements Invoker {
     try {
       Object[] argsValue = request.getArgsValue();
       Object value = methodMeta.getMethod().invoke(invocation.getTarget(), argsValue);
-      response.setValue(value);
       response.setStatus(ResponseStatus.OK);
+      response.setValue(value);
     } catch (Exception e) {
       // todo: deal runtime exception.
       if(e instanceof InvocationTargetException) {

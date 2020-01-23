@@ -1,13 +1,17 @@
-package io.catty;
+package io.catty.linked;
 
+import io.catty.AsyncResponse;
+import io.catty.CattyException;
+import io.catty.DefaultRequest;
 import io.catty.core.Invocation;
 import io.catty.core.Invocation.InvokerLinkTypeEnum;
-import io.catty.core.Invoker;
+import io.catty.core.InvokerHolder;
+import io.catty.core.LinkedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Response.ResponseStatus;
-import io.catty.meta.service.MethodMeta;
-import io.catty.meta.service.ServiceMeta;
+import io.catty.service.MethodMeta;
+import io.catty.service.ServiceMeta;
 import io.catty.utils.ExceptionUtils;
 import io.catty.utils.ReflectUtils;
 import io.catty.utils.RequestIdGenerator;
@@ -17,16 +21,20 @@ import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
 
 
-public class ConsumerInvocationHandler<T> implements InvocationHandler {
+public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandler {
 
-  private Invoker invoker;
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
 
-  public ConsumerInvocationHandler(Class<T> clazz, Invoker invoker) {
+  public ConsumerInvoker(Class<T> clazz, InvokerHolder invokerHolder) {
+    super(invokerHolder.getInvoker());
     this.interfaceClazz = clazz;
-    this.invoker = invoker;
-    this.serviceMeta = ServiceMeta.parse(clazz);
+    this.serviceMeta = invokerHolder.getServiceMeta();
+  }
+
+  @Override
+  public Response invoke(Request request, Invocation invocation) {
+    return next.invoke(request, invocation);
   }
 
   @Override
@@ -52,7 +60,7 @@ public class ConsumerInvocationHandler<T> implements InvocationHandler {
     Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
     invocation.setInvokedMethod(new MethodMeta(method));
     invocation.setTarget(proxy);
-    Response response = invoker.invoke(request, invocation);
+    Response response = invoke(request, invocation);
 
     AsyncResponse asyncResponse = (AsyncResponse) response;
 
@@ -114,8 +122,8 @@ public class ConsumerInvocationHandler<T> implements InvocationHandler {
   }
 
   @SuppressWarnings("unchecked")
-  public static <E> E getProxy(Class<E> clazz, Invoker invoker) {
+  public static <E> E getProxy(Class<E> clazz, InvokerHolder invokerHolder) {
     return (E) Proxy.newProxyInstance(
-        clazz.getClassLoader(), new Class[]{clazz}, new ConsumerInvocationHandler(clazz, invoker));
+        clazz.getClassLoader(), new Class[]{clazz}, new ConsumerInvoker(clazz, invokerHolder));
   }
 }

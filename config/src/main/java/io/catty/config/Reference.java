@@ -1,14 +1,21 @@
 package io.catty.config;
 
-import io.catty.ConsumerInvocationHandler;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
+import io.catty.core.Client;
+import io.catty.core.InvokerChainBuilder;
+import io.catty.core.InvokerHolder;
+import io.catty.extension.ExtensionFactory;
+import io.catty.extension.ExtensionFactory.InvokerBuilderType;
+import io.catty.extension.ExtensionFactory.LoadBalanceType;
+import io.catty.extension.ExtensionFactory.SerializationType;
+import io.catty.lbs.LoadBalance;
+import io.catty.linked.ConsumerInvoker;
 import io.catty.listable.Cluster;
-import io.catty.linked.SerializationInvoker;
-import io.catty.lbs.RandomLoadBalance;
-import io.catty.meta.endpoint.EndpointMetaInfo;
-import io.catty.meta.endpoint.EndpointTypeEnum;
-import io.catty.meta.endpoint.MetaInfoEnum;
+import io.catty.meta.EndpointTypeEnum;
+import io.catty.meta.MetaInfo;
+import io.catty.meta.MetaInfoEnum;
+import io.catty.service.ServiceMeta;
 import io.catty.transport.netty.NettyClient;
 import io.catty.zk.ZookeeperRegistry;
 
@@ -28,6 +35,10 @@ public class Reference<T> {
 
   private T ref;
 
+  private String serializationType = SerializationType.PROTOBUF_FASTJSON.toString();
+
+  private String loadbalanceType = LoadBalanceType.RANDOM.toString();
+
   public Reference() {
   }
 
@@ -43,6 +54,22 @@ public class Reference<T> {
     this.interfaceClass = interfaceClass;
   }
 
+  public void setSerializationType(SerializationType serializationType) {
+    this.serializationType = serializationType.toString();
+  }
+
+  public void setSerializationType(String serializationType) {
+    this.serializationType = serializationType;
+  }
+
+  public void setLoadbalanceType(String loadbalanceType) {
+    this.loadbalanceType = loadbalanceType;
+  }
+
+  public void setLoadbalanceType(LoadBalanceType loadbalanceType) {
+    this.loadbalanceType = loadbalanceType.toString();
+  }
+
   public T refer() {
     if (ref == null) {
       synchronized (this) {
@@ -50,23 +77,41 @@ public class Reference<T> {
           if (clientConfig == null) {
             throw new NullPointerException("ClientConfig can't be both null");
           }
+
+          ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
+
+          MetaInfo metaInfo = new MetaInfo(EndpointTypeEnum.CLIENT);
+          metaInfo.addMetaInfo(MetaInfoEnum.GROUP, serviceMeta.getGroup());
+          metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
+          metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
+          metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
+
+          // todo :
           if (registryConfig == null) {
             client = new NettyClient(clientConfig);
             client.init();
-            InvokerChainBuilder chainBuilder = new InvokerChainBuilder();
-            chainBuilder.setSourceInvoker(client);
-            chainBuilder.registerInterceptor(new SerializationInvoker());
-            ref = ConsumerInvocationHandler.getProxy(interfaceClass, chainBuilder.buildInvoker());
+
+            metaInfo.addMetaInfo(MetaInfoEnum.PORT, clientConfig.getServerPort());
+            metaInfo.addMetaInfo(MetaInfoEnum.IP, clientConfig.getServerIp());
+
+            // todo: make InvokerChainBuilder configurable
+            InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
+                .getExtension(InvokerBuilderType.DIRECT);
+            InvokerHolder invokerHolder = InvokerHolder
+                .Of(metaInfo, serviceMeta, chainBuilder.buildConsumerInvoker(metaInfo, client));
+            ref = ConsumerInvoker.getProxy(interfaceClass, invokerHolder);
           } else {
             registry = new ZookeeperRegistry(registryConfig);
             registry.open();
-            cluster = new Cluster(new RandomLoadBalance());
-            EndpointMetaInfo metaInfo = new EndpointMetaInfo(EndpointTypeEnum.SERVER);
-            metaInfo.addMetaInfo(MetaInfoEnum.SERVER_NAME, interfaceClass.getName());
-            metaInfo.addMetaInfo(MetaInfoEnum.ADDRESS, clientConfig.getAddress());
+
+            LoadBalance loadBalance = ExtensionFactory.getLoadbalance()
+                .getExtension(loadbalanceType);
+            cluster = new Cluster(loadBalance);
             registry.subscribe(metaInfo, cluster);
-            ref = ConsumerInvocationHandler.getProxy(interfaceClass, cluster);
+            ref = ConsumerInvoker
+                .getProxy(interfaceClass, InvokerHolder.Of(metaInfo, serviceMeta, cluster));
           }
+          serviceMeta.setTarget(ref);
         }
       }
     }
@@ -74,15 +119,15 @@ public class Reference<T> {
   }
 
   public void derefer() {
-    if(client != null && client.isAvailable()) {
+    if (client != null && client.isAvailable()) {
       client.destroy();
       client = null;
     }
-    if(registry != null && registry.isOpen()) {
+    if (registry != null && registry.isOpen()) {
       registry.close();
       registry = null;
     }
-    if(cluster != null) {
+    if (cluster != null) {
       cluster.destroy();
     }
   }

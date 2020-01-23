@@ -1,6 +1,6 @@
 package io.catty.core;
 
-import io.catty.meta.service.MethodMeta;
+import io.catty.service.MethodMeta;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

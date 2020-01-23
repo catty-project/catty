@@ -1,11 +1,11 @@
 package io.catty.zk;
 
 import io.catty.api.Registry;
-import io.catty.meta.endpoint.EndpointMetaInfo;
+import io.catty.meta.MetaInfo;
 import io.catty.api.RegistryConfig;
 import io.catty.RegistryException;
-import io.catty.meta.endpoint.EndpointTypeEnum;
-import io.catty.meta.endpoint.MetaInfoEnum;
+import io.catty.meta.EndpointTypeEnum;
+import io.catty.meta.MetaInfoEnum;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -69,7 +69,7 @@ public class ZookeeperRegistry implements Registry {
   }
 
   @Override
-  public void register(EndpointMetaInfo metaInfo) {
+  public void register(MetaInfo metaInfo) {
     checkClientStatus();
     String path = buildPath(metaInfo);
     if (!exist(path)) {
@@ -80,21 +80,21 @@ public class ZookeeperRegistry implements Registry {
   }
 
   @Override
-  public void unregister(EndpointMetaInfo metaInfo) {
+  public void unregister(MetaInfo metaInfo) {
     checkClientStatus();
     String path = buildPath(metaInfo) + PATH_SEP + metaInfo.toString();
     delete(path);
   }
 
   @Override
-  public void subscribe(EndpointMetaInfo metaInfo, NotifyListener listener) {
+  public void subscribe(MetaInfo metaInfo, NotifyListener listener) {
     checkClientStatus();
 
     String path = buildPath(metaInfo);
     try {
       List<String> metaInfos = client.getChildren().forPath(path);
       listener.notify(registryConfig, metaInfos.stream()
-          .map(s -> EndpointMetaInfo.parse(s, metaInfo.getEndpointTypeEnum()))
+          .map(s -> MetaInfo.parse(s, metaInfo.getEndpointTypeEnum()))
           .collect(Collectors.toList()));
     } catch (Exception e) {
       throw new RegistryException("ZookeeperRegistry: getChildren error", e);
@@ -105,7 +105,7 @@ public class ZookeeperRegistry implements Registry {
         if (event.getPath() != null && event.getPath().startsWith(path)) {
           List<String> metaInfos = event.getChildren();
           listener.notify(registryConfig, metaInfos.stream()
-              .map(s -> EndpointMetaInfo.parse(s, metaInfo.getEndpointTypeEnum()))
+              .map(s -> MetaInfo.parse(s, metaInfo.getEndpointTypeEnum()))
               .collect(Collectors.toList()));
         }
       }
@@ -114,7 +114,7 @@ public class ZookeeperRegistry implements Registry {
   }
 
   @Override
-  public void unsubscribe(EndpointMetaInfo metaInfo, NotifyListener listener) {
+  public void unsubscribe(MetaInfo metaInfo, NotifyListener listener) {
 
   }
 
@@ -175,9 +175,9 @@ public class ZookeeperRegistry implements Registry {
     }
   }
 
-  private String buildPath(EndpointMetaInfo config) {
+  private String buildPath(MetaInfo config) {
     String root = ROOT;
-    String path = config.getString(MetaInfoEnum.SERVER_NAME);
+    String path = config.getString(MetaInfoEnum.SERVICE_NAME);
     String serverOrClient;
     if(config.getEndpointTypeEnum() == EndpointTypeEnum.CLIENT) {
       serverOrClient = CONSUMERS;

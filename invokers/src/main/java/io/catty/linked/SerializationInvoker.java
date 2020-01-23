@@ -8,7 +8,7 @@ import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Response.ResponseStatus;
 import io.catty.codec.Serialization;
-import io.catty.meta.service.MethodMeta;
+import io.catty.service.MethodMeta;
 import java.util.concurrent.CompletionStage;
 
 public class SerializationInvoker extends LinkedInvoker {

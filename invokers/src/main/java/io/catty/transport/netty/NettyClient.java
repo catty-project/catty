@@ -10,9 +10,8 @@ import io.catty.core.Invocation;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Response.ResponseStatus;
-import io.catty.meta.endpoint.EndpointMetaInfo;
-import io.catty.meta.endpoint.MetaInfoEnum;
 import io.catty.transport.AbstractClient;
+import io.catty.config.ClientConfig;
 import io.catty.utils.ExceptionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -32,16 +31,16 @@ public class NettyClient extends AbstractClient {
   private io.netty.channel.Channel clientChannel;
   private NioEventLoopGroup nioEventLoopGroup;
 
-  public NettyClient(EndpointMetaInfo metaInfo) {
-    super(metaInfo, new CattyCodec());
+  public NettyClient(ClientConfig clientConfig) {
+    super(clientConfig, new CattyCodec());
     nioEventLoopGroup = new NioEventLoopGroup(GlobalConstants.THREAD_NUMBER + 1);
   }
 
   @Override
   protected void doOpen() {
     Bootstrap bootstrap = new Bootstrap();
-    int connectTimeoutMillis = getConfig()
-        .getIntDef(MetaInfoEnum.TIMEOUT, GlobalConstants.DEFAULT_CLIENT_TIMEOUT);
+    int connectTimeoutMillis = getConfig().getTimeout() > 0 ? getConfig().getTimeout()
+        : GlobalConstants.DEFAULT_CLIENT_TIMEOUT;
     bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMillis);
     bootstrap.option(ChannelOption.TCP_NODELAY, true);
     bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
@@ -60,7 +59,7 @@ public class NettyClient extends AbstractClient {
     ChannelFuture future;
     try {
       future = bootstrap
-          .connect(getConfig().getString(MetaInfoEnum.IP), getConfig().getInt(MetaInfoEnum.PORT))
+          .connect(getConfig().getServerIp(), getConfig().getServerPort())
           .sync();
     } catch (InterruptedException i) {
       destroy();
