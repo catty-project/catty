@@ -1,16 +1,21 @@
 package io.catty.listable;
 
-import io.catty.core.Invocation;
-import io.catty.core.Invoker;
-import io.catty.core.ListableInvoker;
-import io.catty.core.Request;
-import io.catty.core.Response;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
 import io.catty.config.ClientConfig;
+import io.catty.core.Client;
+import io.catty.core.Invocation;
+import io.catty.core.Invoker;
+import io.catty.core.InvokerChainBuilder;
+import io.catty.core.ListableInvoker;
+import io.catty.core.Request;
+import io.catty.core.Response;
+import io.catty.extension.ExtensionFactory;
+import io.catty.extension.ExtensionFactory.InvokerBuilderType;
 import io.catty.lbs.LoadBalance;
 import io.catty.meta.MetaInfo;
 import io.catty.meta.MetaInfoEnum;
+import io.catty.service.ServiceMeta;
 import io.catty.transport.netty.NettyClient;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,25 +31,33 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
 
   private Map<MetaInfo, Invoker> invokersMap;
 
-  public Cluster(LoadBalance loadBalance) {
-    this(new ArrayList<>(), loadBalance);
+  private ServiceMeta serviceMeta;
+
+  private MetaInfo metaInfo;
+
+  public Cluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
+    this(metaInfo, serviceMeta, new ArrayList<>());
   }
 
-  public Cluster(List<Invoker> invokerList, LoadBalance loadBalance) {
+  public Cluster(MetaInfo metaInfo, ServiceMeta serviceMeta, List<Invoker> invokerList) {
     super(invokerList);
-    this.loadBalance = loadBalance;
+    this.metaInfo = metaInfo;
+    this.serviceMeta = serviceMeta;
+    this.loadBalance = ExtensionFactory.getLoadbalance()
+        .getExtension(metaInfo.getString(MetaInfoEnum.LOAD_BALANCE));
     invokersMap = new HashMap<>();
   }
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
     Invoker invoker = loadBalance.select(invokerList);
-    if(!invoker.isAvailable()) {
+    if (!invoker.isAvailable()) {
       invoker.init();
     }
     return invoker.invoke(request, invocation);
   }
 
+  @Override
   public void destroy() {
     invokerList.forEach(Invoker::destroy);
   }
@@ -82,9 +95,16 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
   }
 
   private Invoker createClientFromMetaInfo(MetaInfo metaInfo) {
+    InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
+        .getExtension(InvokerBuilderType.DIRECT);
     ClientConfig clientConfig = ClientConfig.builder()
-        .address(metaInfo.getString(MetaInfoEnum.ADDRESS))
+        .address(buildAddress(metaInfo))
         .build();
-    return new NettyClient(clientConfig);
+    Client client = new NettyClient(clientConfig);
+    return chainBuilder.buildConsumerInvoker(metaInfo, client);
+  }
+
+  private String buildAddress(MetaInfo metaInfo) {
+    return metaInfo.getString(MetaInfoEnum.IP) + ":" + metaInfo.getString(MetaInfoEnum.PORT);
   }
 }

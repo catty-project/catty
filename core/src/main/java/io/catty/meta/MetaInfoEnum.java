@@ -6,7 +6,6 @@ public enum MetaInfoEnum {
   PORT,
   SERVICE_NAME,
   WORKER_NUMBER,
-  ADDRESS,
   TIMEOUT,
   GROUP,
   VERSION,

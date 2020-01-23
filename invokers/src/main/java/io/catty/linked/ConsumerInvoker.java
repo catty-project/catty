@@ -58,7 +58,7 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     Class<?> returnType = method.getReturnType();
 
     Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
-    invocation.setInvokedMethod(new MethodMeta(method));
+    invocation.setInvokedMethod(methodMeta);
     invocation.setTarget(proxy);
     Response response = invoke(request, invocation);
 

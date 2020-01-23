@@ -71,7 +71,7 @@ public class ZookeeperRegistry implements Registry {
   @Override
   public void register(MetaInfo metaInfo) {
     checkClientStatus();
-    String path = buildPath(metaInfo);
+    String path = buildPath(metaInfo, false);
     if (!exist(path)) {
       buildPath(path);
     }
@@ -82,7 +82,7 @@ public class ZookeeperRegistry implements Registry {
   @Override
   public void unregister(MetaInfo metaInfo) {
     checkClientStatus();
-    String path = buildPath(metaInfo) + PATH_SEP + metaInfo.toString();
+    String path = buildPath(metaInfo, false) + PATH_SEP + metaInfo.toString();
     delete(path);
   }
 
@@ -90,7 +90,7 @@ public class ZookeeperRegistry implements Registry {
   public void subscribe(MetaInfo metaInfo, NotifyListener listener) {
     checkClientStatus();
 
-    String path = buildPath(metaInfo);
+    String path = buildPath(metaInfo, true);
     try {
       List<String> metaInfos = client.getChildren().forPath(path);
       listener.notify(registryConfig, metaInfos.stream()
@@ -175,16 +175,20 @@ public class ZookeeperRegistry implements Registry {
     }
   }
 
-  private String buildPath(MetaInfo config) {
+  private String buildPath(MetaInfo config, boolean isSubscribe) {
     String root = ROOT;
     String path = config.getString(MetaInfoEnum.SERVICE_NAME);
     String serverOrClient;
-    if(config.getEndpointTypeEnum() == EndpointTypeEnum.CLIENT) {
-      serverOrClient = CONSUMERS;
-    } else if(config.getEndpointTypeEnum() == EndpointTypeEnum.SERVER) {
+    if(isSubscribe) {
       serverOrClient = PROVIDERS;
     } else {
-      throw new IllegalArgumentException();
+      if(config.getEndpointTypeEnum() == EndpointTypeEnum.CLIENT) {
+        serverOrClient = CONSUMERS;
+      } else if(config.getEndpointTypeEnum() == EndpointTypeEnum.SERVER) {
+        serverOrClient = PROVIDERS;
+      } else {
+        throw new IllegalArgumentException();
+      }
     }
     return root
         + PATH_SEP + path

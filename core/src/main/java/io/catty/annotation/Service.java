@@ -32,6 +32,6 @@ public @interface Service {
   /**
    * The group of this service.
    */
-  String group() default "";
+  String group() default "default";
 
 }

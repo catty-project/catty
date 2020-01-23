@@ -60,6 +60,9 @@ public class ServiceMeta {
       this.group = serviceInfo.group();
       this.serviceName = serviceInfo.name();
     }
+    if("".equals(serviceName)) {
+      serviceName = interfaceClass.getName();
+    }
   }
 
   public Class<?> getInterfaceClass() {

@@ -9,7 +9,6 @@ import io.catty.extension.ExtensionFactory;
 import io.catty.extension.ExtensionFactory.InvokerBuilderType;
 import io.catty.extension.ExtensionFactory.LoadBalanceType;
 import io.catty.extension.ExtensionFactory.SerializationType;
-import io.catty.lbs.LoadBalance;
 import io.catty.linked.ConsumerInvoker;
 import io.catty.listable.Cluster;
 import io.catty.meta.EndpointTypeEnum;
@@ -104,9 +103,8 @@ public class Reference<T> {
             registry = new ZookeeperRegistry(registryConfig);
             registry.open();
 
-            LoadBalance loadBalance = ExtensionFactory.getLoadbalance()
-                .getExtension(loadbalanceType);
-            cluster = new Cluster(loadBalance);
+            metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadbalanceType);
+            cluster = new Cluster(metaInfo, serviceMeta);
             registry.subscribe(metaInfo, cluster);
             ref = ConsumerInvoker
                 .getProxy(interfaceClass, InvokerHolder.Of(metaInfo, serviceMeta, cluster));

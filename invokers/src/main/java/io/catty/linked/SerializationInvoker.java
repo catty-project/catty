@@ -50,6 +50,7 @@ public class SerializationInvoker extends LinkedInvoker {
         request.setArgsValue(afterDeserialize);
       }
     }
+
     Response response = next.invoke(request, invocation);
 
     MethodMeta methodMeta = invocation.getInvokedMethod();
