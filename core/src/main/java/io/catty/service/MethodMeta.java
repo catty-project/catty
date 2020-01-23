@@ -1,5 +1,6 @@
 package io.catty.service;
 
+import io.catty.annotation.Function;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -21,7 +22,7 @@ public class MethodMeta {
 
   private Class<?> genericReturnType;
 
-  private long timeout;
+  private long timeout = -1; /* -1 means no timeout */
 
   public MethodMeta(Method method, long timeout) {
     this(method);
@@ -42,6 +43,11 @@ public class MethodMeta {
      */
     isAsync = CompletionStage.class.isAssignableFrom(returnType);
     resolveReturnTypes(method);
+
+    if (method.isAnnotationPresent(Function.class)) {
+      Function function = method.getDeclaredAnnotation(Function.class);
+      this.timeout = function.timeout();
+    }
   }
 
   public Class<?> getCheckedExceptionByName(String className) {
