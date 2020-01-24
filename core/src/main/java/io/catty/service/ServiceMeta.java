@@ -58,11 +58,13 @@ public class ServiceMeta {
       Service serviceInfo = interfaceClass.getAnnotation(Service.class);
       this.version = serviceInfo.version();
       this.group = serviceInfo.group();
-      this.serviceName = serviceInfo.name();
+      if("".equals(serviceInfo.name())) {
+        serviceName = interfaceClass.getName();
+      } else {
+        this.serviceName = serviceInfo.name();
+      }
     }
-    if("".equals(serviceName)) {
-      serviceName = interfaceClass.getName();
-    }
+
   }
 
   public Class<?> getInterfaceClass() {
