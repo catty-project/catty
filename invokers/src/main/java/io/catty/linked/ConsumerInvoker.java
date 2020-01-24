@@ -40,12 +40,14 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
+    // todo: need better performance.
     if (isLocalMethod(method)) {
       throw new CattyException("Can not invoke local method: " + method.getName());
     }
 
     MethodMeta methodMeta = serviceMeta.getMethodMeta(method);
     if (methodMeta == null) {
+      // todo: exception need be more accurate.
       throw new CattyException("Method is invalid, method: " + method.getName());
     }
 
@@ -64,6 +66,7 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
 
     AsyncResponse asyncResponse = (AsyncResponse) response;
 
+    // todo: If void return will wait a response of TCP need be configurable.
     if (returnType == Void.TYPE) {
       return null;
     }
