@@ -2,7 +2,7 @@ package io.catty.utils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RequestIdGenerator {
+public abstract class RequestIdGenerator {
 
   private static final AtomicInteger curId = new AtomicInteger();
   private static final int MAX_PER_ROUND = 1 << 24;

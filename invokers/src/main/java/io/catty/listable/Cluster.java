@@ -17,6 +17,7 @@ import io.catty.meta.MetaInfo;
 import io.catty.meta.MetaInfoEnum;
 import io.catty.service.ServiceMeta;
 import io.catty.transport.netty.NettyClient;
+import io.catty.utils.MetaInfoUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,6 +66,8 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
   @Override
   public synchronized void notify(RegistryConfig registryConfig,
       List<MetaInfo> metaInfoCollection) {
+    metaInfoCollection = satisfy(metaInfoCollection);
+
     Map<MetaInfo, Invoker> newInvokerMap = new HashMap<>();
     List<Invoker> newInvokerList = new ArrayList<>();
 
@@ -94,6 +97,25 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
     invokersMap = newInvokerMap;
   }
 
+  // fixme: Just remove on metaInfoCollection directly might get better performance?
+  private List<MetaInfo> satisfy(List<MetaInfo> metaInfoCollection) {
+    List<MetaInfo> newMetaInfo = new ArrayList<>();
+    String referenceGroup = metaInfo.getStringDef(MetaInfoEnum.GROUP, "");
+    String referenceVersion = metaInfo.getStringDef(MetaInfoEnum.VERSION, "0.0.0");
+    for(MetaInfo info : metaInfoCollection) {
+      String group = info.getString(MetaInfoEnum.GROUP);
+      if(group != null && !group.equals(referenceGroup)) {
+        continue;
+      }
+      String version = info.getString(MetaInfoEnum.VERSION);
+      if(!MetaInfoUtils.compareVersion(referenceVersion, version)) {
+        continue;
+      }
+      newMetaInfo.add(info);
+    }
+    return newMetaInfo;
+  }
+
   private Invoker createClientFromMetaInfo(MetaInfo metaInfo) {
     InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
         .getExtension(InvokerBuilderType.DIRECT);
@@ -107,4 +129,5 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
   private String buildAddress(MetaInfo metaInfo) {
     return metaInfo.getString(MetaInfoEnum.IP) + ":" + metaInfo.getString(MetaInfoEnum.PORT);
   }
+
 }

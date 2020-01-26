@@ -3,7 +3,7 @@ package io.catty.utils;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class MD5Utils {
+public abstract class MD5Utils {
 
   public static String md5(String input) {
     char[] hexDigits = {

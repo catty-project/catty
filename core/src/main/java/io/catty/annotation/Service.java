@@ -31,7 +31,8 @@ public @interface Service {
 
   /**
    * The group of this service.
+   * If group is empty, every group would match.
    */
-  String group() default "default";
+  String group() default "";
 
 }

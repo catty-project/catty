@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NetUtils {
+public abstract class NetUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(NetUtils.class);
 

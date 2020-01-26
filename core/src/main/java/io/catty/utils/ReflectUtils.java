@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-public class ReflectUtils {
+public abstract class ReflectUtils {
 
   private static final ConcurrentMap<String, Class<?>> nameToClassCache = new ConcurrentHashMap<>();
   private static final ConcurrentMap<String, Method> nameToMethodCache = new ConcurrentHashMap<>();
