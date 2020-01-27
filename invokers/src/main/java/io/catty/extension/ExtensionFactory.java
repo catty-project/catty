@@ -6,6 +6,10 @@ import io.catty.codec.CattySerialization;
 import io.catty.codec.Codec;
 import io.catty.codec.Serialization;
 import io.catty.core.InvokerChainBuilder;
+import io.catty.extension.ExtensionType.CodecType;
+import io.catty.extension.ExtensionType.InvokerBuilderType;
+import io.catty.extension.ExtensionType.LoadBalanceType;
+import io.catty.extension.ExtensionType.SerializationType;
 import io.catty.lbs.LoadBalance;
 import io.catty.lbs.RandomLoadBalance;
 import java.util.HashMap;
@@ -32,29 +36,6 @@ public final class ExtensionFactory<T> {
     LOAD_BALANCE.register(LoadBalanceType.RANDOM, new RandomLoadBalance());
     CODEC.register(CodecType.CATTY, new CattyCodec());
     INVOKER_BUILDER.register(InvokerBuilderType.DIRECT, new CattyInvokerBuilder());
-  }
-
-  public enum SerializationType {
-    PROTOBUF,
-    FASTJSON,
-    PROTOBUF_FASTJSON,
-    ;
-  }
-
-  public enum LoadBalanceType {
-    RANDOM,
-    ;
-  }
-
-  public enum CodecType {
-    CATTY,
-    ;
-  }
-
-  public enum InvokerBuilderType {
-    DIRECT,
-    REGISTRY,
-    ;
   }
 
   public static ExtensionFactory<Serialization> getSerialization() {

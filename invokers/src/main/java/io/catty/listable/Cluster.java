@@ -11,7 +11,7 @@ import io.catty.core.ListableInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.extension.ExtensionFactory;
-import io.catty.extension.ExtensionFactory.InvokerBuilderType;
+import io.catty.extension.ExtensionType.InvokerBuilderType;
 import io.catty.lbs.LoadBalance;
 import io.catty.meta.MetaInfo;
 import io.catty.meta.MetaInfoEnum;
