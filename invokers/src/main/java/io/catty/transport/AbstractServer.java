@@ -28,7 +28,7 @@ public abstract class AbstractServer extends LinkedInvoker implements Server {
   private Codec codec;
 
   /**
-   * HashableExecutor is needed, because if a request just be submitted randomly to a generic
+   * HashableExecutor is needed because if every requests just be submitted randomly to a generic
    * executor such as ThreadPollExecutor, then the a series of requests can't be able to be executed
    * by the origin order even if they are transformed by the same TCP link. And in some cases, this
    * will cause severe problem.
