@@ -6,16 +6,17 @@ import io.catty.GlobalConstants;
 import io.catty.TransportException;
 import io.catty.codec.CattyCodec;
 import io.catty.codec.Codec.DataTypeEnum;
+import io.catty.config.ClientConfig;
 import io.catty.core.Invocation;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Response.ResponseStatus;
 import io.catty.transport.AbstractClient;
-import io.catty.config.ClientConfig;
 import io.catty.utils.ExceptionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -28,7 +29,7 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 
 public class NettyClient extends AbstractClient {
 
-  private io.netty.channel.Channel clientChannel;
+  private Channel clientChannel;
   private NioEventLoopGroup nioEventLoopGroup;
 
   public NettyClient(ClientConfig clientConfig) {
@@ -84,6 +85,10 @@ public class NettyClient extends AbstractClient {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
+    // fixme: need thread-safe.
+    if(!isAvailable()) {
+      init();
+    }
     Response response = new DefaultAsyncResponse(request.getRequestId());
     addCurrentTask(request.getRequestId(), response);
     try {

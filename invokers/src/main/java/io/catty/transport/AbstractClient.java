@@ -1,9 +1,9 @@
 package io.catty.transport;
 
 import io.catty.codec.Codec;
+import io.catty.config.ClientConfig;
 import io.catty.core.Client;
 import io.catty.core.Response;
-import io.catty.config.ClientConfig;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;

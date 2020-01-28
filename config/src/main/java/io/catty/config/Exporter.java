@@ -72,7 +72,7 @@ public class Exporter {
 
     // todo: make InvokerChainBuilder configurable
     InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
-        .getExtension(InvokerBuilderType.DIRECT);
+        .getExtensionSingleton(InvokerBuilderType.DIRECT);
     InvokerHolder invokerHolder = InvokerHolder
         .Of(metaInfo, serviceMeta, chainBuilder.buildProviderInvoker(metaInfo));
     serviceHandlers.put(interfaceClass.getName(), invokerHolder);

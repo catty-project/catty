@@ -12,18 +12,4 @@ abstract public class LinkedInvoker implements Invoker {
     this.next = next;
   }
 
-  @Override
-  public void init() {
-    next.init();
-  }
-
-  @Override
-  public void destroy() {
-    next.destroy();
-  }
-
-  @Override
-  public boolean isAvailable() {
-    return next.isAvailable();
-  }
 }

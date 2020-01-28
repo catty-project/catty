@@ -11,17 +11,12 @@ import io.catty.core.Response;
 import io.catty.core.Response.ResponseStatus;
 import io.catty.service.MethodMeta;
 import io.catty.utils.ExceptionUtils;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerRouterInvoker extends MappedInvoker {
 
   public ServerRouterInvoker() {
-    this(new ConcurrentHashMap<>());
-  }
-
-  public ServerRouterInvoker(Map<Object, InvokerHolder> invokerMap) {
-    super(invokerMap);
+    super(new ConcurrentHashMap<>());
   }
 
   @Override

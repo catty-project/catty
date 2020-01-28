@@ -2,12 +2,11 @@ package io.catty.listable;
 
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
-import io.catty.config.ClientConfig;
-import io.catty.core.Client;
 import io.catty.core.Invocation;
 import io.catty.core.Invoker;
 import io.catty.core.InvokerChainBuilder;
-import io.catty.core.ListableInvoker;
+import io.catty.core.InvokerHolder;
+import io.catty.core.MappedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.extension.ExtensionFactory;
@@ -16,7 +15,7 @@ import io.catty.lbs.LoadBalance;
 import io.catty.meta.MetaInfo;
 import io.catty.meta.MetaInfoEnum;
 import io.catty.service.ServiceMeta;
-import io.catty.transport.netty.NettyClient;
+import io.catty.utils.EndpointUtils;
 import io.catty.utils.MetaInfoUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,89 +25,84 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class Cluster extends ListableInvoker implements Registry.NotifyListener {
+public class Cluster extends MappedInvoker implements Registry.NotifyListener {
 
   private LoadBalance loadBalance;
-
-  private Map<MetaInfo, Invoker> invokersMap;
 
   private ServiceMeta serviceMeta;
 
   private MetaInfo metaInfo;
 
-  public Cluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
-    this(metaInfo, serviceMeta, new ArrayList<>());
-  }
+  private List<Invoker> invokerList;
 
-  public Cluster(MetaInfo metaInfo, ServiceMeta serviceMeta, List<Invoker> invokerList) {
-    super(invokerList);
+  public Cluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
     this.metaInfo = metaInfo;
     this.serviceMeta = serviceMeta;
-    this.loadBalance = ExtensionFactory.getLoadbalance()
-        .getExtension(metaInfo.getString(MetaInfoEnum.LOAD_BALANCE));
-    invokersMap = new HashMap<>();
+    this.loadBalance = ExtensionFactory.getLoadBalance()
+        .getExtensionProtoType(metaInfo.getString(MetaInfoEnum.LOAD_BALANCE));
   }
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
     Invoker invoker = loadBalance.select(invokerList);
-    if (!invoker.isAvailable()) {
-      invoker.init();
-    }
     return invoker.invoke(request, invocation);
   }
 
-  @Override
   public void destroy() {
-    invokerList.forEach(Invoker::destroy);
+    invokerList.forEach(EndpointUtils::destroyInvoker);
   }
 
   @Override
   public synchronized void notify(RegistryConfig registryConfig,
       List<MetaInfo> metaInfoCollection) {
-    metaInfoCollection = satisfy(metaInfoCollection);
+    metaInfoCollection = findCandidate(metaInfoCollection);
 
-    Map<MetaInfo, Invoker> newInvokerMap = new HashMap<>();
     List<Invoker> newInvokerList = new ArrayList<>();
+    Map<String, InvokerHolder> newInvokerMap = new HashMap<>();
 
+    // find new server.
     List<MetaInfo> newList = new ArrayList<>();
     for (MetaInfo metaInfo : metaInfoCollection) {
-      if (invokersMap.containsKey(metaInfo)) {
-        continue;
+      if (!invokerMap.containsKey(metaInfo.toString())) {
+        newList.add(metaInfo);
       }
-      newList.add(metaInfo);
     }
     for (MetaInfo metaInfo : newList) {
       Invoker invoker = createClientFromMetaInfo(metaInfo);
-      newInvokerMap.put(metaInfo, invoker);
       newInvokerList.add(invoker);
+      newInvokerMap.put(metaInfo.toString(), InvokerHolder.Of(metaInfo, serviceMeta, invoker));
     }
 
-    Set<MetaInfo> metaInfoSet = new HashSet<>(metaInfoCollection);
-    for (Entry<MetaInfo, Invoker> entry : invokersMap.entrySet()) {
+    // find invalid server.
+    Set<String> metaInfoSet = new HashSet<>();
+    for (MetaInfo info : metaInfoCollection) {
+      metaInfoSet.add(info.toString());
+    }
+    for (Entry<String, InvokerHolder> entry : invokerMap.entrySet()) {
       if (metaInfoSet.contains(entry.getKey())) {
-        newInvokerList.add(entry.getValue());
+        newInvokerList.add(entry.getValue().getInvoker());
         newInvokerMap.put(entry.getKey(), entry.getValue());
       } else {
-        entry.getValue().destroy();
+        EndpointUtils.destroyInvoker(entry.getValue().getInvoker());
       }
     }
-    setInvokerList(newInvokerList);
-    invokersMap = newInvokerMap;
+
+    this.invokerList = newInvokerList;
+    super.invokerMap = newInvokerMap;
   }
 
   // fixme: Just remove on metaInfoCollection directly might get better performance?
-  private List<MetaInfo> satisfy(List<MetaInfo> metaInfoCollection) {
+  private List<MetaInfo> findCandidate(List<MetaInfo> metaInfoCollection) {
     List<MetaInfo> newMetaInfo = new ArrayList<>();
     String referenceGroup = metaInfo.getStringDef(MetaInfoEnum.GROUP, "");
     String referenceVersion = metaInfo.getStringDef(MetaInfoEnum.VERSION, "0.0.0");
-    for(MetaInfo info : metaInfoCollection) {
+    for (MetaInfo info : metaInfoCollection) {
       String group = info.getString(MetaInfoEnum.GROUP);
-      if(group != null && !group.equals(referenceGroup)) {
+      if (group != null && !group.equals(referenceGroup)) {
         continue;
       }
       String version = info.getString(MetaInfoEnum.VERSION);
-      if(!MetaInfoUtils.compareVersion(referenceVersion, version)) {
+      if (!MetaInfoUtils.compareVersion(referenceVersion, version)) {
         continue;
       }
       newMetaInfo.add(info);
@@ -118,16 +112,8 @@ public class Cluster extends ListableInvoker implements Registry.NotifyListener 
 
   private Invoker createClientFromMetaInfo(MetaInfo metaInfo) {
     InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
-        .getExtension(InvokerBuilderType.DIRECT);
-    ClientConfig clientConfig = ClientConfig.builder()
-        .address(buildAddress(metaInfo))
-        .build();
-    Client client = new NettyClient(clientConfig);
-    return chainBuilder.buildConsumerInvoker(metaInfo, client);
-  }
-
-  private String buildAddress(MetaInfo metaInfo) {
-    return metaInfo.getString(MetaInfoEnum.IP) + ":" + metaInfo.getString(MetaInfoEnum.PORT);
+        .getExtensionSingleton(InvokerBuilderType.DIRECT);
+    return chainBuilder.buildConsumerInvoker(metaInfo);
   }
 
 }

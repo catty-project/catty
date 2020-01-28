@@ -10,6 +10,11 @@ public class MetaInfo {
 
   private EndpointTypeEnum endpointTypeEnum;
 
+  /**
+   * Cache this.toString() result.
+   */
+  private String toString;
+
   public MetaInfo(EndpointTypeEnum endpointTypeEnum) {
     this.endpointTypeEnum = endpointTypeEnum;
   }
@@ -17,6 +22,7 @@ public class MetaInfo {
   public MetaInfo(Map<String, String> info, EndpointTypeEnum endpointTypeEnum) {
     this.info = info;
     this.endpointTypeEnum = endpointTypeEnum;
+    toString();
   }
 
   public EndpointTypeEnum getEndpointTypeEnum() {
@@ -41,11 +47,14 @@ public class MetaInfo {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for(Entry<String, String> entry : info.entrySet()) {
-      sb.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
+    if(this.toString == null) {
+      StringBuilder sb = new StringBuilder();
+      for(Entry<String, String> entry : info.entrySet()) {
+        sb.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
+      }
+      this.toString = sb.toString();
     }
-    return sb.toString();
+    return toString;
   }
 
   public void addMetaInfo(MetaInfoEnum key, String value) {

@@ -18,7 +18,6 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class NettyServer extends AbstractServer {
 
   private static Logger logger = LoggerFactory.getLogger(NettyServer.class);
@@ -26,7 +25,6 @@ public class NettyServer extends AbstractServer {
   private io.netty.channel.Channel serverChannel;
   private NioEventLoopGroup bossGroup;
   private NioEventLoopGroup workerGroup;
-
 
   public NettyServer(ServerConfig serverConfig, Invoker invoker) {
     super(serverConfig, new CattyCodec(), invoker);

@@ -25,12 +25,6 @@ import io.catty.CattyException;
  */
 public interface Invoker {
 
-  default void init() {}
-
-  default void destroy() {}
-
-  default boolean isAvailable() {return true;}
-
   /**
    *
    * @param request rpc request

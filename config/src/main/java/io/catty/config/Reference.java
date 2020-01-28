@@ -15,7 +15,6 @@ import io.catty.meta.EndpointTypeEnum;
 import io.catty.meta.MetaInfo;
 import io.catty.meta.MetaInfoEnum;
 import io.catty.service.ServiceMeta;
-import io.catty.transport.netty.NettyClient;
 import io.catty.zk.ZookeeperRegistry;
 
 public class Reference<T> {
@@ -87,17 +86,14 @@ public class Reference<T> {
 
           // todo :
           if (registryConfig == null) {
-            client = new NettyClient(clientConfig);
-            client.init();
-
             metaInfo.addMetaInfo(MetaInfoEnum.PORT, clientConfig.getServerPort());
             metaInfo.addMetaInfo(MetaInfoEnum.IP, clientConfig.getServerIp());
 
             // todo: make InvokerChainBuilder configurable
             InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
-                .getExtension(InvokerBuilderType.DIRECT);
+                .getExtensionSingleton(InvokerBuilderType.DIRECT);
             InvokerHolder invokerHolder = InvokerHolder
-                .Of(metaInfo, serviceMeta, chainBuilder.buildConsumerInvoker(metaInfo, client));
+                .Of(metaInfo, serviceMeta, chainBuilder.buildConsumerInvoker(metaInfo));
             ref = ConsumerInvoker.getProxy(interfaceClass, invokerHolder);
           } else {
             registry = new ZookeeperRegistry(registryConfig);

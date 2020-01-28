@@ -78,13 +78,11 @@ public abstract class AbstractServer extends LinkedInvoker implements Server {
 
   @Override
   public void init() {
-    super.init();
     doOpen();
   }
 
   @Override
   public void destroy() {
-    super.destroy();
     doClose();
     executor.shutdownGracefully();
   }
