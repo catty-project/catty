@@ -13,12 +13,12 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 /**
- * ConsistentHashLoopGroup guarantees that the task from the same hash number will be dispatched to
+ * HashLoopGroup guarantees that the task from the same hash number will be dispatched to
  * the same thread.
  *
- * If you need to execute some task by order, you could use ConsistentHashLoopGroup.
+ * If you need to execute some task by order, you could use HashLoopGroup.
  */
-public final class ConsistentHashLoopGroup
+public final class HashLoopGroup
     extends MultithreadEventExecutorGroup
     implements HashableExecutor {
 
@@ -29,7 +29,7 @@ public final class ConsistentHashLoopGroup
   // todo: add a classicExecutor.
   private ExecutorService classicExecutor;
 
-  public ConsistentHashLoopGroup(int threadNum, HashableChooserFactory chooserFactory) {
+  public HashLoopGroup(int threadNum, HashableChooserFactory chooserFactory) {
     this(threadNum, null, chooserFactory, DEFAULT_MAX_PENDING_EXECUTOR_TASKS,
         RejectedExecutionHandlers.reject());
     EventExecutorChooser chooser = chooserFactory
@@ -37,7 +37,7 @@ public final class ConsistentHashLoopGroup
     this.chooser = (HashableChooser) chooser;
   }
 
-  private ConsistentHashLoopGroup(int threadNum, Executor executor,
+  private HashLoopGroup(int threadNum, Executor executor,
       EventExecutorChooserFactory chooserFactory, Object... args) {
     super(threadNum, executor, chooserFactory, args);
   }

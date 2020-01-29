@@ -9,7 +9,7 @@ import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Server;
 import io.catty.config.ServerConfig;
-import io.catty.transport.worker.ConsistentHashLoopGroup;
+import io.catty.transport.worker.HashLoopGroup;
 import io.catty.transport.worker.HashableChooserFactory;
 import io.catty.transport.worker.HashableExecutor;
 import org.slf4j.Logger;
@@ -94,7 +94,7 @@ public abstract class AbstractServer extends LinkedInvoker implements Server {
   private void createExecutor() {
     int workerNum = config.getWorkerThreadNum() > 0 ? config.getWorkerThreadNum() :
         GlobalConstants.THREAD_NUMBER * 2;
-    executor = new ConsistentHashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
+    executor = new HashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
   }
 
 }

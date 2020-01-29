@@ -10,7 +10,7 @@ import io.catty.extension.ExtensionType.InvokerBuilderType;
 import io.catty.extension.ExtensionType.LoadBalanceType;
 import io.catty.extension.ExtensionType.SerializationType;
 import io.catty.linked.ConsumerInvoker;
-import io.catty.listable.Cluster;
+import io.catty.mapped.ClusterInvoker;
 import io.catty.meta.EndpointTypeEnum;
 import io.catty.meta.MetaInfo;
 import io.catty.meta.MetaInfoEnum;
@@ -27,7 +27,7 @@ public class Reference<T> {
 
   private Client client;
 
-  private Cluster cluster;
+  private ClusterInvoker clusterInvoker;
 
   private Registry registry;
 
@@ -100,10 +100,10 @@ public class Reference<T> {
             registry.open();
 
             metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadbalanceType);
-            cluster = new Cluster(metaInfo, serviceMeta);
-            registry.subscribe(metaInfo, cluster);
+            clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
+            registry.subscribe(metaInfo, clusterInvoker);
             ref = ConsumerInvoker
-                .getProxy(interfaceClass, InvokerHolder.Of(metaInfo, serviceMeta, cluster));
+                .getProxy(interfaceClass, InvokerHolder.Of(metaInfo, serviceMeta, clusterInvoker));
           }
           serviceMeta.setTarget(ref);
         }
@@ -121,8 +121,8 @@ public class Reference<T> {
       registry.close();
       registry = null;
     }
-    if (cluster != null) {
-      cluster.destroy();
+    if (clusterInvoker != null) {
+      clusterInvoker.destroy();
     }
   }
 

@@ -9,7 +9,7 @@ import io.netty.util.concurrent.EventExecutorGroup;
  * extended EventExecutorGroup.
  *
  * @see io.netty.util.concurrent.MultithreadEventExecutorGroup
- * @see ConsistentHashLoopGroup
+ * @see HashLoopGroup
  */
 public interface HashableExecutor extends EventExecutorGroup {
 

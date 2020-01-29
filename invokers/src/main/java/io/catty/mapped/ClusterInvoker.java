@@ -1,4 +1,4 @@
-package io.catty.listable;
+package io.catty.mapped;
 
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class Cluster extends MappedInvoker implements Registry.NotifyListener {
+public class ClusterInvoker extends MappedInvoker implements Registry.NotifyListener {
 
   private LoadBalance loadBalance;
 
@@ -35,7 +35,7 @@ public class Cluster extends MappedInvoker implements Registry.NotifyListener {
 
   private List<InvokerHolder> invokerList;
 
-  public Cluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
+  public ClusterInvoker(MetaInfo metaInfo, ServiceMeta serviceMeta) {
     this.metaInfo = metaInfo;
     this.serviceMeta = serviceMeta;
     this.loadBalance = ExtensionFactory.getLoadBalance()
