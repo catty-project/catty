@@ -1,10 +1,10 @@
 package io.catty.lbs;
 
-import io.catty.core.Invoker;
+import io.catty.core.InvokerHolder;
 import java.util.List;
 
 public interface LoadBalance {
 
-  <T extends Invoker> T select(List<T> invokers);
+  InvokerHolder select(List<InvokerHolder> invokers);
 
 }

@@ -12,6 +12,7 @@ public enum MetaInfoEnum {
   SERIALIZATION,
   LOAD_BALANCE,
   CODEC,
+  WEIGHT,
   ;
 
 }

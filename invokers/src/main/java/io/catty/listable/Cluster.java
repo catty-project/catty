@@ -33,7 +33,7 @@ public class Cluster extends MappedInvoker implements Registry.NotifyListener {
 
   private MetaInfo metaInfo;
 
-  private List<Invoker> invokerList;
+  private List<InvokerHolder> invokerList;
 
   public Cluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
     this.metaInfo = metaInfo;
@@ -44,12 +44,12 @@ public class Cluster extends MappedInvoker implements Registry.NotifyListener {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    Invoker invoker = loadBalance.select(invokerList);
+    Invoker invoker = loadBalance.select(invokerList).getInvoker();
     return invoker.invoke(request, invocation);
   }
 
   public void destroy() {
-    invokerList.forEach(EndpointUtils::destroyInvoker);
+    invokerList.forEach(invokerHolder -> EndpointUtils.destroyInvoker(invokerHolder.getInvoker()));
   }
 
   @Override
@@ -57,7 +57,7 @@ public class Cluster extends MappedInvoker implements Registry.NotifyListener {
       List<MetaInfo> metaInfoCollection) {
     metaInfoCollection = findCandidate(metaInfoCollection);
 
-    List<Invoker> newInvokerList = new ArrayList<>();
+    List<InvokerHolder> newInvokerList = new ArrayList<>();
     Map<String, InvokerHolder> newInvokerMap = new HashMap<>();
 
     // find new server.
@@ -69,8 +69,9 @@ public class Cluster extends MappedInvoker implements Registry.NotifyListener {
     }
     for (MetaInfo metaInfo : newList) {
       Invoker invoker = createClientFromMetaInfo(metaInfo);
-      newInvokerList.add(invoker);
-      newInvokerMap.put(metaInfo.toString(), InvokerHolder.Of(metaInfo, serviceMeta, invoker));
+      InvokerHolder invokerHolder = InvokerHolder.Of(metaInfo, serviceMeta, invoker);
+      newInvokerList.add(invokerHolder);
+      newInvokerMap.put(metaInfo.toString(), invokerHolder);
     }
 
     // find invalid server.
@@ -80,7 +81,7 @@ public class Cluster extends MappedInvoker implements Registry.NotifyListener {
     }
     for (Entry<String, InvokerHolder> entry : invokerMap.entrySet()) {
       if (metaInfoSet.contains(entry.getKey())) {
-        newInvokerList.add(entry.getValue().getInvoker());
+        newInvokerList.add(entry.getValue());
         newInvokerMap.put(entry.getKey(), entry.getValue());
       } else {
         EndpointUtils.destroyInvoker(entry.getValue().getInvoker());
