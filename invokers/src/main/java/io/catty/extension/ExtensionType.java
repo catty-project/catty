@@ -1,6 +1,6 @@
 package io.catty.extension;
 
-public class ExtensionType {
+public final class ExtensionType {
 
   public enum SerializationType {
     PROTOBUF,
