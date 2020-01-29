@@ -39,6 +39,8 @@ public class ServerRouterInvoker extends MappedInvoker {
     MethodMeta methodMeta = invokerHolder.getServiceMeta()
         .getMethodMetaBySign(request.getMethodName());
     invocation.setInvokedMethod(methodMeta);
+    invocation.setServiceMeta(invokerHolder.getServiceMeta());
+    invocation.setMetaInfo(invokerHolder.getMetaInfo());
     return invokerHolder.getInvoker().invoke(request, invocation);
   }
 

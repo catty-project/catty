@@ -22,9 +22,9 @@ public class MethodMeta {
 
   private Class<?> genericReturnType;
 
-  private long timeout = -1; /* -1 means no timeout */
+  private int timeout = -1; /* -1 means no timeout */
 
-  public MethodMeta(Method method, long timeout) {
+  public MethodMeta(Method method, int timeout) {
     this(method);
     this.timeout = timeout;
   }
@@ -97,7 +97,7 @@ public class MethodMeta {
     this.genericReturnType = (Class) genericReturnType;
   }
 
-  public long getTimeout() {
+  public int getTimeout() {
     return timeout;
   }
 }

@@ -63,4 +63,12 @@ public class DefaultRequest implements Request {
     this.args = argsValue;
   }
 
+  @Override
+  public String toString() {
+    return "DefaultRequest{" +
+        "requestId=" + requestId +
+        ", interfaceName='" + interfaceName + '\'' +
+        ", methodName='" + methodName + '\'' +
+        '}';
+  }
 }

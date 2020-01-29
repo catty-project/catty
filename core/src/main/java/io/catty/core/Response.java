@@ -22,6 +22,7 @@ public interface Response {
     OUTER_ERROR,
     UNKNOWN_ERROR,
     EXCEPTED_ERROR,
+    TIMEOUT_ERROR,
     ;
   }
 

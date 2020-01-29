@@ -44,8 +44,10 @@ public class Cluster extends MappedInvoker implements Registry.NotifyListener {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    Invoker invoker = loadBalance.select(invokerList).getInvoker();
-    return invoker.invoke(request, invocation);
+    InvokerHolder invokerHolder = loadBalance.select(invokerList);
+    invocation.setMetaInfo(invokerHolder.getMetaInfo());
+    invocation.setServiceMeta(invokerHolder.getServiceMeta());
+    return invokerHolder.getInvoker().invoke(request, invocation);
   }
 
   public void destroy() {
