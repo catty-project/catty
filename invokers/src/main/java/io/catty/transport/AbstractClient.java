@@ -1,6 +1,6 @@
 package io.catty.transport;
 
-import io.catty.core.extension.Codec;
+import io.catty.core.extension.api.Codec;
 import io.catty.core.config.ClientConfig;
 import io.catty.core.Client;
 import io.catty.core.Response;

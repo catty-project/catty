@@ -2,7 +2,7 @@ package io.catty.extension.lbs;
 
 import io.catty.core.InvokerHolder;
 import io.catty.core.extension.Extension;
-import io.catty.core.extension.LoadBalance;
+import io.catty.core.extension.api.LoadBalance;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 

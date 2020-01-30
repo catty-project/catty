@@ -8,7 +8,7 @@ import io.catty.core.DefaultRequest;
 import io.catty.core.DefaultResponse;
 import io.catty.core.codec.generated.CattyProtocol;
 import io.catty.core.CodecException;
-import io.catty.core.extension.Codec;
+import io.catty.core.extension.api.Codec;
 import io.catty.core.extension.Extension;
 import java.util.ArrayList;
 

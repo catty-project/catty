@@ -2,7 +2,7 @@ package io.catty.transport.netty;
 
 import io.catty.core.config.ServerConfig;
 import io.catty.core.Invoker;
-import io.catty.core.extension.Codec;
+import io.catty.core.extension.api.Codec;
 import io.catty.transport.AbstractServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;

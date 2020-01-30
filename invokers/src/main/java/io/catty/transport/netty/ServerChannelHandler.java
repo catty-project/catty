@@ -7,7 +7,7 @@ import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.concurrent.CompletableFuture;
-import io.catty.core.extension.Codec.DataTypeEnum;
+import io.catty.core.extension.api.Codec.DataTypeEnum;
 import io.catty.core.CattyException;
 import io.catty.core.Request;
 import io.catty.core.Response;

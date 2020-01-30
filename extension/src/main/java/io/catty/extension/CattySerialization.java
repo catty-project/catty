@@ -8,7 +8,7 @@ import com.google.protobuf.GeneratedMessageV3.Builder;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import io.catty.core.extension.Extension;
-import io.catty.core.extension.Serialization;
+import io.catty.core.extension.api.Serialization;
 import java.lang.reflect.Method;
 
 @Extension("PROTOBUF_FASTJSON")

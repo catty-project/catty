@@ -1,4 +1,4 @@
-package io.catty.core.extension;
+package io.catty.core.extension.api;
 
 import io.catty.core.InvokerHolder;
 import java.util.List;

@@ -1,4 +1,4 @@
-package io.catty.core.extension;
+package io.catty.core.extension.api;
 
 public interface Serialization {
 
