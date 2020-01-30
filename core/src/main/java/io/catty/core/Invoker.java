@@ -1,8 +1,6 @@
 package io.catty.core;
 
 
-import io.catty.CattyException;
-
 /**
  * The most important interface which represent an rpc invocation. Every struct in catty which in
  * the invoke-link is an Invoker.

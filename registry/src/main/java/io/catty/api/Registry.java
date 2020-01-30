@@ -1,6 +1,6 @@
 package io.catty.api;
 
-import io.catty.meta.MetaInfo;
+import io.catty.core.meta.MetaInfo;
 import java.util.List;
 
 public interface Registry {

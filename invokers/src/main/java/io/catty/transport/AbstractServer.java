@@ -1,14 +1,14 @@
 package io.catty.transport;
 
-import io.catty.GlobalConstants;
-import io.catty.codec.Codec;
+import io.catty.core.GlobalConstants;
+import io.catty.core.extension.Codec;
 import io.catty.core.Invocation;
 import io.catty.core.Invoker;
 import io.catty.core.LinkedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Server;
-import io.catty.config.ServerConfig;
+import io.catty.core.config.ServerConfig;
 import io.catty.transport.worker.HashLoopGroup;
 import io.catty.transport.worker.HashableChooserFactory;
 import io.catty.transport.worker.HashableExecutor;

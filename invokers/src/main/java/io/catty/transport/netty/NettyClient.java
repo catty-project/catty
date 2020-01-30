@@ -1,18 +1,18 @@
 package io.catty.transport.netty;
 
-import io.catty.CattyException;
-import io.catty.DefaultAsyncResponse;
-import io.catty.GlobalConstants;
-import io.catty.TransportException;
-import io.catty.codec.CattyCodec;
-import io.catty.codec.Codec.DataTypeEnum;
-import io.catty.config.ClientConfig;
+import io.catty.core.CattyException;
+import io.catty.core.DefaultAsyncResponse;
+import io.catty.core.GlobalConstants;
+import io.catty.core.TransportException;
+import io.catty.core.config.ClientConfig;
 import io.catty.core.Invocation;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Response.ResponseStatus;
+import io.catty.core.extension.Codec;
+import io.catty.core.extension.Codec.DataTypeEnum;
 import io.catty.transport.AbstractClient;
-import io.catty.utils.ExceptionUtils;
+import io.catty.core.utils.ExceptionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -32,8 +32,8 @@ public class NettyClient extends AbstractClient {
   private Channel clientChannel;
   private NioEventLoopGroup nioEventLoopGroup;
 
-  public NettyClient(ClientConfig clientConfig) {
-    super(clientConfig, new CattyCodec());
+  public NettyClient(ClientConfig clientConfig, Codec codec) {
+    super(clientConfig, codec);
     nioEventLoopGroup = new NioEventLoopGroup(GlobalConstants.THREAD_NUMBER + 1);
   }
 

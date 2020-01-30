@@ -1,6 +1,6 @@
 package io.catty.benchmark.service;
 
-import io.catty.utils.MD5Utils;
+import io.catty.core.utils.MD5Utils;
 
 public class PojoServiceImpl implements PojoService {
 

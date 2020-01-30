@@ -1,19 +1,22 @@
 package io.catty.config;
 
-import io.catty.ServerAddress;
+import io.catty.core.ServerAddress;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
-import io.catty.core.InvokerChainBuilder;
+import io.catty.core.config.ServerConfig;
 import io.catty.core.InvokerHolder;
 import io.catty.core.Server;
-import io.catty.extension.ExtensionFactory;
-import io.catty.extension.ExtensionType.InvokerBuilderType;
-import io.catty.extension.ExtensionType.SerializationType;
+import io.catty.core.extension.Codec;
+import io.catty.core.extension.ExtensionFactory;
+import io.catty.core.extension.ExtensionType.CodecType;
+import io.catty.core.extension.ExtensionType.InvokerBuilderType;
+import io.catty.core.extension.ExtensionType.SerializationType;
+import io.catty.core.extension.InvokerChainBuilder;
 import io.catty.mapped.ServerRouterInvoker;
-import io.catty.meta.EndpointTypeEnum;
-import io.catty.meta.MetaInfo;
-import io.catty.meta.MetaInfoEnum;
-import io.catty.service.ServiceMeta;
+import io.catty.core.meta.EndpointTypeEnum;
+import io.catty.core.meta.MetaInfo;
+import io.catty.core.meta.MetaInfoEnum;
+import io.catty.core.service.ServiceMeta;
 import io.catty.transport.netty.NettyServer;
 import io.catty.zk.ZookeeperRegistry;
 import java.util.HashMap;
@@ -40,6 +43,8 @@ public class Exporter {
 
   private String serializationType = SerializationType.PROTOBUF_FASTJSON.toString();
 
+  private String codecType = CodecType.CATTY.toString();
+
   public Exporter(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
     this.address = serverConfig.getServerAddress();
@@ -57,6 +62,14 @@ public class Exporter {
     this.serializationType = serializationType;
   }
 
+  public void setCodecType(CodecType codecType) {
+    this.codecType = codecType.toString();
+  }
+
+  public void setCodecType(String codecType) {
+    this.codecType = codecType;
+  }
+
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
     ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
     serviceMeta.setTarget(serviceObject);
@@ -68,6 +81,7 @@ public class Exporter {
     metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
     metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
     metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
+    metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
     metaInfo.addMetaInfo(MetaInfoEnum.WORKER_NUMBER, serverConfig.getWorkerThreadNum());
 
     // todo: make InvokerChainBuilder configurable
@@ -93,7 +107,8 @@ public class Exporter {
       serverRouterInvoker = serviceRouterMap.get(address);
     } else {
       serverRouterInvoker = new ServerRouterInvoker();
-      server = new NettyServer(serverConfig, serverRouterInvoker);
+      Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(codecType);
+      server = new NettyServer(serverConfig, codec, serverRouterInvoker);
       serviceRouterMap.put(address, serverRouterInvoker);
       serverMap.put(address, server);
     }

@@ -1,6 +1,6 @@
 package io.catty.test;
 
-import io.catty.CattyException;
+import io.catty.core.CattyException;
 import io.catty.test.service.Test1CheckedException;
 import io.catty.test.service.Test2CheckedException;
 import io.catty.test.service.TestService;

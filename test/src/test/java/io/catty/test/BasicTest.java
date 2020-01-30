@@ -2,8 +2,8 @@ package io.catty.test;
 
 import io.catty.config.Exporter;
 import io.catty.config.Reference;
-import io.catty.config.ClientConfig;
-import io.catty.config.ServerConfig;
+import io.catty.core.config.ClientConfig;
+import io.catty.core.config.ServerConfig;
 import io.catty.test.service.TestService;
 import io.catty.test.service.TestServiceImpl;
 import org.testng.annotations.AfterTest;

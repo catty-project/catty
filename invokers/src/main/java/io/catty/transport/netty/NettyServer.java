@@ -1,9 +1,9 @@
 package io.catty.transport.netty;
 
-import io.catty.codec.CattyCodec;
+import io.catty.core.config.ServerConfig;
 import io.catty.core.Invoker;
+import io.catty.core.extension.Codec;
 import io.catty.transport.AbstractServer;
-import io.catty.config.ServerConfig;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -26,8 +26,8 @@ public class NettyServer extends AbstractServer {
   private NioEventLoopGroup bossGroup;
   private NioEventLoopGroup workerGroup;
 
-  public NettyServer(ServerConfig serverConfig, Invoker invoker) {
-    super(serverConfig, new CattyCodec(), invoker);
+  public NettyServer(ServerConfig serverConfig, Codec codec, Invoker invoker) {
+    super(serverConfig, codec, invoker);
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
   }

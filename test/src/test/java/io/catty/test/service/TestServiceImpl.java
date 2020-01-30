@@ -1,6 +1,6 @@
 package io.catty.test.service;
 
-import io.catty.utils.MD5Utils;
+import io.catty.core.utils.MD5Utils;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

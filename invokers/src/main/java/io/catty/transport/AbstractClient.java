@@ -1,7 +1,7 @@
 package io.catty.transport;
 
-import io.catty.codec.Codec;
-import io.catty.config.ClientConfig;
+import io.catty.core.extension.Codec;
+import io.catty.core.config.ClientConfig;
 import io.catty.core.Client;
 import io.catty.core.Response;
 import java.util.Map;

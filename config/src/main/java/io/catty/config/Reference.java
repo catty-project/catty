@@ -2,19 +2,21 @@ package io.catty.config;
 
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
+import io.catty.core.config.ClientConfig;
 import io.catty.core.Client;
-import io.catty.core.InvokerChainBuilder;
+import io.catty.core.extension.ExtensionType.CodecType;
+import io.catty.core.extension.InvokerChainBuilder;
 import io.catty.core.InvokerHolder;
-import io.catty.extension.ExtensionFactory;
-import io.catty.extension.ExtensionType.InvokerBuilderType;
-import io.catty.extension.ExtensionType.LoadBalanceType;
-import io.catty.extension.ExtensionType.SerializationType;
+import io.catty.core.extension.ExtensionFactory;
+import io.catty.core.extension.ExtensionType.InvokerBuilderType;
+import io.catty.core.extension.ExtensionType.LoadBalanceType;
+import io.catty.core.extension.ExtensionType.SerializationType;
 import io.catty.linked.ConsumerInvoker;
 import io.catty.mapped.ClusterInvoker;
-import io.catty.meta.EndpointTypeEnum;
-import io.catty.meta.MetaInfo;
-import io.catty.meta.MetaInfoEnum;
-import io.catty.service.ServiceMeta;
+import io.catty.core.meta.EndpointTypeEnum;
+import io.catty.core.meta.MetaInfo;
+import io.catty.core.meta.MetaInfoEnum;
+import io.catty.core.service.ServiceMeta;
 import io.catty.zk.ZookeeperRegistry;
 
 public class Reference<T> {
@@ -36,6 +38,8 @@ public class Reference<T> {
   private String serializationType = SerializationType.PROTOBUF_FASTJSON.toString();
 
   private String loadbalanceType = LoadBalanceType.RANDOM.toString();
+
+  private String codecType = CodecType.CATTY.toString();
 
   public Reference() {
   }
@@ -68,6 +72,14 @@ public class Reference<T> {
     this.loadbalanceType = loadbalanceType.toString();
   }
 
+  public void setCodecType(CodecType codecType) {
+    this.codecType = codecType.toString();
+  }
+
+  public void setCodecType(String codecType) {
+    this.codecType = codecType;
+  }
+
   public T refer() {
     if (ref == null) {
       synchronized (this) {
@@ -83,6 +95,7 @@ public class Reference<T> {
           metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
           metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
           metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
+          metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
 
           // todo :
           if (registryConfig == null) {

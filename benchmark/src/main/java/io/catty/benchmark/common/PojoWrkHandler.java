@@ -6,7 +6,7 @@ import static io.netty.handler.codec.rtsp.RtspResponseStatuses.INTERNAL_SERVER_E
 
 import io.catty.benchmark.service.PojoService;
 import io.catty.benchmark.utils.BenchmarkConstans;
-import io.catty.utils.MD5Utils;
+import io.catty.core.utils.MD5Utils;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;

@@ -1,7 +1,7 @@
 package io.catty.test.timeout;
 
-import io.catty.timer.HashedWheelTimer;
-import io.catty.timer.Timer;
+import io.catty.core.timer.HashedWheelTimer;
+import io.catty.core.timer.Timer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.testng.Assert;

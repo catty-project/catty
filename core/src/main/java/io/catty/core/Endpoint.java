@@ -1,6 +1,6 @@
 package io.catty.core;
 
-import io.catty.codec.Codec;
+import io.catty.core.extension.Codec;
 import java.util.concurrent.Executor;
 
 public interface Endpoint extends Invoker {

@@ -1,6 +1,6 @@
 package io.catty.core;
 
-import io.catty.config.ClientConfig;
+import io.catty.core.config.ClientConfig;
 
 public interface Client extends Endpoint {
 

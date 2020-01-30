@@ -1,8 +1,8 @@
 package io.catty.core;
 
-import io.catty.meta.MetaInfo;
-import io.catty.service.MethodMeta;
-import io.catty.service.ServiceMeta;
+import io.catty.core.meta.MetaInfo;
+import io.catty.core.service.MethodMeta;
+import io.catty.core.service.ServiceMeta;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

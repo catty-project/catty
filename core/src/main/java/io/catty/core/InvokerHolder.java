@@ -1,7 +1,7 @@
 package io.catty.core;
 
-import io.catty.meta.MetaInfo;
-import io.catty.service.ServiceMeta;
+import io.catty.core.meta.MetaInfo;
+import io.catty.core.service.ServiceMeta;
 
 public final class InvokerHolder {
 

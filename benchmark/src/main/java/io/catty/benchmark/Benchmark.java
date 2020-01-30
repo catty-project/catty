@@ -5,8 +5,8 @@ import io.catty.config.Reference;
 import io.catty.benchmark.common.PojoWrkGateway;
 import io.catty.benchmark.service.PojoService;
 import io.catty.benchmark.service.PojoServiceImpl;
-import io.catty.config.ClientConfig;
-import io.catty.config.ServerConfig;
+import io.catty.core.config.ClientConfig;
+import io.catty.core.config.ServerConfig;
 
 public class Benchmark {
 
