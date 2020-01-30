@@ -19,6 +19,7 @@
     <module>benchmark</module>
     <module>all</module>
     <module>config</module>
+    <module>extension</module>
   </modules>
 
   <properties>

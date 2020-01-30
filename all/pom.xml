@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>all</artifactId>
+  <artifactId>catty-all</artifactId>
 
   <dependencies>
     <dependency>
@@ -20,6 +20,21 @@
     <dependency>
       <groupId>io.catty</groupId>
       <artifactId>catty-invokers</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.catty</groupId>
+      <artifactId>catty-registry</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.catty</groupId>
+      <artifactId>catty-config</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.catty</groupId>
+      <artifactId>catty-extension</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>

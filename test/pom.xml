@@ -20,7 +20,7 @@
     </dependency>
     <dependency>
       <groupId>io.catty</groupId>
-      <artifactId>catty-config</artifactId>
+      <artifactId>catty-all</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
