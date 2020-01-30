@@ -31,15 +31,17 @@ public class ServiceMeta {
 
   private String serviceName = "";
 
+  // todo: support service's timeout
+
   public static ServiceMeta parse(Class<?> interfaceClass) {
     return new ServiceMeta(interfaceClass);
   }
 
   private ServiceMeta(Class<?> interfaceClass) {
     this.interfaceClass = interfaceClass;
-    methodMap = new HashMap<>();
-    validMethod = new HashSet<>();
-    methodMetaMap = new HashMap<>();
+    this.methodMap = new HashMap<>();
+    this.validMethod = new HashSet<>();
+    this.methodMetaMap = new HashMap<>();
 
     List<Method> methods = ReflectUtils.getPublicMethod(interfaceClass);
     for (Method method : methods) {
@@ -58,12 +60,11 @@ public class ServiceMeta {
       this.version = serviceInfo.version();
       this.group = serviceInfo.group();
       if("".equals(serviceInfo.name())) {
-        serviceName = interfaceClass.getName();
+        this.serviceName = interfaceClass.getName();
       } else {
         this.serviceName = serviceInfo.name();
       }
     }
-
   }
 
   public Class<?> getInterfaceClass() {
