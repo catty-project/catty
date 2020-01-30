@@ -85,4 +85,6 @@ public class Client {
 ```
 
 # Project Status
-The project is developing (means unstable), and has not a release version yet, but it will be coming soon!
+The project is developing (means unstable), and has not a release version yet, but it will come soon!
+
+#*Welcome to join me!*
