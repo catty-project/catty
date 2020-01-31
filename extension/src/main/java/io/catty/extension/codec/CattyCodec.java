@@ -1,15 +1,16 @@
-package io.catty.extension;
+package io.catty.extension.codec;
 
 import com.google.protobuf.ByteString;
-import io.catty.core.Request;
-import io.catty.core.Response;
-import io.catty.core.Response.ResponseStatus;
+import io.catty.core.CodecException;
 import io.catty.core.DefaultRequest;
 import io.catty.core.DefaultResponse;
+import io.catty.core.Request;
+import io.catty.core.Response;
+import io.catty.core.Response.ResponseEntity;
+import io.catty.core.Response.ResponseStatus;
 import io.catty.core.codec.generated.CattyProtocol;
-import io.catty.core.CodecException;
-import io.catty.core.extension.api.Codec;
 import io.catty.core.extension.Extension;
+import io.catty.core.extension.api.Codec;
 import java.util.ArrayList;
 
 @Extension("CATTY")
@@ -66,8 +67,10 @@ public class CattyCodec implements Codec {
       }
       if (DataTypeEnum.RESPONSE == dataTypeEnum) {
         CattyProtocol.Response response = CattyProtocol.Response.parseFrom(data);
-        return new DefaultResponse(response.getRequestId(),
-            ResponseStatus.valueOf(response.getStatus()), response.getReturnValue().toByteArray());
+        Response response0 = new DefaultResponse(response.getRequestId());
+        response0.setResponseEntity(ResponseEntity.Of(ResponseStatus.valueOf(response.getStatus()),
+            response.getReturnValue().toByteArray()));
+        return response0;
       }
       throw new CodecException("Illegal DataTypeEnum: " + dataTypeEnum);
     } catch (Exception e) {

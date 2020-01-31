@@ -1,16 +1,15 @@
 package io.catty.transport.netty;
 
+import io.catty.core.CattyException;
 import io.catty.core.Invocation;
 import io.catty.core.Invocation.InvokerLinkTypeEnum;
+import io.catty.core.Request;
+import io.catty.core.Response;
+import io.catty.core.extension.api.Codec.DataTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
-import java.util.concurrent.CompletableFuture;
-import io.catty.core.extension.api.Codec.DataTypeEnum;
-import io.catty.core.CattyException;
-import io.catty.core.Request;
-import io.catty.core.Response;
 
 public class ServerChannelHandler extends ChannelDuplexHandler {
 
@@ -44,24 +43,17 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
 
   private void processRequest(ChannelHandlerContext ctx, Request request) {
     Response response = nettyServer.invoke(request, new Invocation(InvokerLinkTypeEnum.PROVIDER));
-    response.setRequestId(request.getRequestId());
-    Object value = response.getValue();
-    if (value == null || value instanceof Void) {
-      return;
-    }
-    if (value instanceof CompletableFuture) {
-      CompletableFuture future = (CompletableFuture) value;
-      future.whenComplete((r, t) -> {
-        if (t != null) {
-          response.setValue(t);
-        } else {
-          response.setValue(r);
-        }
-        sendResponse(ctx, response);
-      });
-    } else {
+    response.whenComplete((v, t) -> {
+      if (v.getValue() == null || v.getValue() instanceof Void) {
+        return;
+      }
+      if (t == null) {
+        response.setResponseEntity(v);
+      } else {
+        // todo:
+      }
       sendResponse(ctx, response);
-    }
+    });
   }
 
   private ChannelFuture sendResponse(ChannelHandlerContext ctx, Response response) {

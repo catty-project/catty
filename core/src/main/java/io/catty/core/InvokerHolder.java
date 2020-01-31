@@ -3,6 +3,9 @@ package io.catty.core;
 import io.catty.core.meta.MetaInfo;
 import io.catty.core.service.ServiceMeta;
 
+/**
+ * This class holds meta-info for the invoker.
+ */
 public final class InvokerHolder {
 
   private ServiceMeta serviceMeta;

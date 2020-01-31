@@ -1,24 +1,19 @@
 package io.catty.core;
 
-public class DefaultResponse implements Response {
+import io.catty.core.Response.ResponseEntity;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+
+public class DefaultResponse extends CompletableFuture<ResponseEntity> implements Response {
 
   private long requestId;
-
-  private ResponseStatus status;
-
-  private Object value;
-
-  public DefaultResponse() {
-  }
+  private ResponseEntity entity;
 
   public DefaultResponse(long requestId) {
     this.requestId = requestId;
-  }
-
-  public DefaultResponse(long requestId, ResponseStatus status, Object value) {
-    this.requestId = requestId;
-    this.status = status;
-    this.value = value;
   }
 
   @Override
@@ -27,32 +22,46 @@ public class DefaultResponse implements Response {
   }
 
   @Override
-  public void setRequestId(long requestId) {
-    this.requestId = requestId;
-  }
-
-  @Override
   public Object getValue() {
-    return value;
-  }
-
-  @Override
-  public void setValue(Object value) {
-    this.value = value;
+    return entity.getValue();
   }
 
   @Override
   public ResponseStatus getStatus() {
-    return status;
+    return entity.getStatus();
   }
 
   @Override
-  public void setStatus(ResponseStatus status) {
-    this.status = status;
+  public ResponseEntity getResponseEntity() {
+    return entity;
+  }
+
+  @Override
+  public void setResponseEntity(ResponseEntity entity) {
+    try {
+      if (!isDone()) {
+        super.complete(entity);
+      }
+      this.entity = entity;
+    } catch (Exception e) {
+      // This should not happen
+      throw new CattyException(e);
+    }
+  }
+
+  @Override
+  public void await() throws InterruptedException, ExecutionException {
+    get();
+  }
+
+  @Override
+  public void await(long timeout, TimeUnit unit)
+      throws InterruptedException, ExecutionException, TimeoutException {
+    get(timeout, unit);
   }
 
   @Override
   public boolean isError() {
-    return ResponseStatus.OK != status;
+    return ResponseStatus.OK != entity.getStatus();
   }
 }

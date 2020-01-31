@@ -1,8 +1,8 @@
 package io.catty.transport.netty;
 
+import io.catty.core.CattyException;
 import io.catty.core.Response;
 import io.catty.core.extension.api.Codec.DataTypeEnum;
-import io.catty.core.CattyException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,8 +32,7 @@ public class ClientChannelHandler extends ChannelDuplexHandler {
 
   private void processResponse(Response response) {
     Response future = nettyClient.getResponseFuture(response.getRequestId());
-    future.setStatus(response.getStatus());
-    future.setValue(response.getValue());
+    future.setResponseEntity(response.getResponseEntity());
   }
 
 }

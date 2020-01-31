@@ -1,18 +1,19 @@
 package io.catty.transport.netty;
 
 import io.catty.core.CattyException;
-import io.catty.core.DefaultAsyncResponse;
+import io.catty.core.DefaultResponse;
 import io.catty.core.GlobalConstants;
-import io.catty.core.TransportException;
-import io.catty.core.config.ClientConfig;
 import io.catty.core.Invocation;
 import io.catty.core.Request;
 import io.catty.core.Response;
+import io.catty.core.Response.ResponseEntity;
 import io.catty.core.Response.ResponseStatus;
+import io.catty.core.TransportException;
+import io.catty.core.config.ClientConfig;
 import io.catty.core.extension.api.Codec;
 import io.catty.core.extension.api.Codec.DataTypeEnum;
-import io.catty.transport.AbstractClient;
 import io.catty.core.utils.ExceptionUtils;
+import io.catty.transport.AbstractClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -86,10 +87,10 @@ public class NettyClient extends AbstractClient {
   @Override
   public Response invoke(Request request, Invocation invocation) {
     // fixme: need thread-safe.
-    if(!isAvailable()) {
+    if (!isAvailable()) {
       init();
     }
-    Response response = new DefaultAsyncResponse(request.getRequestId());
+    Response response = new DefaultResponse(request.getRequestId());
     addCurrentTask(request.getRequestId(), response);
     try {
       byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
@@ -102,8 +103,8 @@ public class NettyClient extends AbstractClient {
       }
       return response;
     } catch (Exception e) {
-      response.setStatus(ResponseStatus.INNER_ERROR);
-      response.setValue(ExceptionUtils.toString(e));
+      response.setResponseEntity(
+          ResponseEntity.Of(ResponseStatus.INNER_ERROR, ExceptionUtils.toString(e)));
       return response;
     }
   }

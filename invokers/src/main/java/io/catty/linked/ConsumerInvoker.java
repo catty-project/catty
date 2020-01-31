@@ -1,6 +1,5 @@
 package io.catty.linked;
 
-import io.catty.core.AsyncResponse;
 import io.catty.core.CattyException;
 import io.catty.core.DefaultRequest;
 import io.catty.core.Invocation;
@@ -62,9 +61,8 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
     invocation.setInvokedMethod(methodMeta);
     invocation.setTarget(proxy);
-    Response response = invoke(request, invocation);
 
-    AsyncResponse asyncResponse = (AsyncResponse) response;
+    Response response = invoke(request, invocation);
 
     // todo: If void return will wait a response of TCP need be configurable.
     if (returnType == Void.TYPE) {
@@ -73,14 +71,14 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     // async-method
     if (methodMeta.isAsync()) {
       CompletableFuture future = new CompletableFuture();
-      asyncResponse.whenComplete((v, t) -> {
+      response.whenComplete((v, t) -> {
         if (t != null) {
           future.completeExceptionally(t);
         } else {
-          if (v.isError()) {
+          if (v.getStatus() != ResponseStatus.OK) {
             String[] exceptionInfo = ExceptionUtils
-                .parseExceptionString((String) response.getValue());
-            if (response.getStatus() == ResponseStatus.EXCEPTED_ERROR) {
+                .parseExceptionString((String) v.getValue());
+            if (v.getStatus() == ResponseStatus.EXCEPTED_ERROR) {
               future.completeExceptionally(ExceptionUtils
                   .getInstance(methodMeta.getCheckedExceptionByName(exceptionInfo[0]),
                       exceptionInfo[1]));
@@ -100,7 +98,7 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     }
 
     // sync-method
-    asyncResponse.await();
+    response.await();
     if (response.isError()) {
       String[] exceptionInfo = ExceptionUtils.parseExceptionString((String) response.getValue());
       if (response.getStatus() == ResponseStatus.EXCEPTED_ERROR) {

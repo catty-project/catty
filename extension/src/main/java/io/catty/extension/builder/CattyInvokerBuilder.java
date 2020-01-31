@@ -4,14 +4,15 @@ import io.catty.core.Client;
 import io.catty.core.Invoker;
 import io.catty.core.LinkedInvoker;
 import io.catty.core.config.ClientConfig;
-import io.catty.core.extension.api.Codec;
 import io.catty.core.extension.Extension;
 import io.catty.core.extension.ExtensionFactory;
+import io.catty.core.extension.api.Codec;
 import io.catty.core.extension.api.InvokerChainBuilder;
 import io.catty.core.extension.api.Serialization;
 import io.catty.core.meta.MetaInfo;
 import io.catty.core.meta.MetaInfoEnum;
-import io.catty.linked.SerializationInvoker;
+import io.catty.linked.ConsumerSerializationInvoker;
+import io.catty.linked.ProviderSerializationInvoker;
 import io.catty.meta.ProviderInvoker;
 import io.catty.transport.netty.NettyClient;
 
@@ -28,7 +29,7 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
     Client client = new NettyClient(clientConfig, codec);
     Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
-    LinkedInvoker serializationInvoker = new SerializationInvoker(client, serialization);
+    LinkedInvoker serializationInvoker = new ConsumerSerializationInvoker(client, serialization);
     return serializationInvoker;
   }
 
@@ -37,7 +38,7 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
     Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
     ProviderInvoker providerInvoker = new ProviderInvoker();
-    LinkedInvoker serializationInvoker = new SerializationInvoker(providerInvoker, serialization);
+    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(providerInvoker, serialization);
     return serializationInvoker;
   }
 
