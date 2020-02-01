@@ -13,6 +13,7 @@ import io.catty.core.meta.MetaInfo;
 import io.catty.core.meta.MetaInfoEnum;
 import io.catty.linked.ConsumerSerializationInvoker;
 import io.catty.linked.ProviderSerializationInvoker;
+import io.catty.linked.TimeoutInvoker;
 import io.catty.meta.ProviderInvoker;
 import io.catty.transport.netty.NettyClient;
 
@@ -37,8 +38,10 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
   public Invoker buildProviderInvoker(MetaInfo metaInfo) {
     Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
+
     ProviderInvoker providerInvoker = new ProviderInvoker();
-    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(providerInvoker, serialization);
+    LinkedInvoker timeoutInvoker = new TimeoutInvoker(providerInvoker);
+    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(timeoutInvoker, serialization);
     return serializationInvoker;
   }
 

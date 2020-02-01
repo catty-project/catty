@@ -1,4 +1,4 @@
-package io.catty.linked;
+package io.catty.core;
 
 public class RpcTimeoutException extends RuntimeException {
 

@@ -31,6 +31,8 @@ public class ServiceMeta {
 
   private String serviceName = "";
 
+  private int timeout = -1;
+
   // todo: support service's timeout
 
   public static ServiceMeta parse(Class<?> interfaceClass) {
@@ -64,6 +66,7 @@ public class ServiceMeta {
       } else {
         this.serviceName = serviceInfo.name();
       }
+      this.timeout = serviceInfo.timeout();
     }
   }
 
@@ -97,6 +100,10 @@ public class ServiceMeta {
 
   public String getServiceName() {
     return serviceName;
+  }
+
+  public int getTimeout() {
+    return timeout;
   }
 
   public MethodMeta getMethodMetaBySign(String methodSign) {

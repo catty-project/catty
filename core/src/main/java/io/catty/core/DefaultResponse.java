@@ -1,6 +1,5 @@
 package io.catty.core;
 
-import io.catty.core.service.MethodMeta;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -11,7 +10,6 @@ public class DefaultResponse extends CompletableFuture<Object> implements Respon
 
   private long requestId;
   private Object value;
-  private MethodMeta methodMeta;
 
   public DefaultResponse(long requestId) {
     this.requestId = requestId;
@@ -27,27 +25,15 @@ public class DefaultResponse extends CompletableFuture<Object> implements Respon
     return value;
   }
 
+  /**
+   * The first time invoking setValue() will complete the future.
+   */
   @Override
   public void setValue(Object value) {
-    try {
-      if (!isDone()) {
-        super.complete(value);
-      }
-      this.value = value;
-    } catch (Exception e) {
-      // This should not happen
-      throw new CattyException(e);
+    this.value = value;
+    if (!isDone()) {
+      super.complete(value);
     }
-  }
-
-  @Override
-  public MethodMeta getMethodMeta() {
-    return methodMeta;
-  }
-
-  @Override
-  public void setMethodMeta(MethodMeta methodMeta) {
-    this.methodMeta = methodMeta;
   }
 
   @Override

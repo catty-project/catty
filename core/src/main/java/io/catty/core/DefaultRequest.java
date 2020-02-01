@@ -1,14 +1,11 @@
 package io.catty.core;
 
-import io.catty.core.service.MethodMeta;
-
 public class DefaultRequest implements Request {
 
   private long requestId;
   private String interfaceName;
   private String methodName;
   private Object[] args;
-  private MethodMeta methodMeta;
 
   public DefaultRequest() {
   }
@@ -59,15 +56,6 @@ public class DefaultRequest implements Request {
   @Override
   public void setArgsValue(Object[] argsValue) {
     this.args = argsValue;
-  }
-
-  @Override
-  public MethodMeta getMethodMeta() {
-    return methodMeta;
-  }
-
-  public void setMethodMeta(MethodMeta methodMeta) {
-    this.methodMeta = methodMeta;
   }
 
   @Override

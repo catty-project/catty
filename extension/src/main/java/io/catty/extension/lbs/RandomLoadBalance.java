@@ -6,6 +6,9 @@ import io.catty.core.extension.api.LoadBalance;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Simple random load balance.
+ */
 @Extension("RANDOM")
 public class RandomLoadBalance implements LoadBalance {
 

@@ -35,4 +35,11 @@ public @interface Service {
    */
   String group() default "";
 
+  /**
+   * Each method in this service will has this timeout limit.
+   * Each method could be set it's own timeout.
+   * @see Function
+   */
+  int timeout() default -1;
+
 }

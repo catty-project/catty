@@ -4,6 +4,9 @@ abstract public class LinkedInvoker implements Invoker {
 
   protected Invoker next;
 
+  public LinkedInvoker() {
+  }
+
   public LinkedInvoker(Invoker next) {
     this.next = next;
   }
