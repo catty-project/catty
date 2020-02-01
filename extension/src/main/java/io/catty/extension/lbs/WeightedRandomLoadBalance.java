@@ -19,6 +19,9 @@ public class WeightedRandomLoadBalance implements LoadBalance {
 
   @Override
   public InvokerHolder select(List<InvokerHolder> invokers) {
+    if(invokers.size() == 1) {
+      return invokers.get(0);
+    }
     int invokerSize = invokers.size();
     int totalWeight = 0;
     int[] weights = new int[invokerSize];

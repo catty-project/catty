@@ -32,7 +32,7 @@ public class ClientChannelHandler extends ChannelDuplexHandler {
 
   private void processResponse(Response response) {
     Response future = nettyClient.getResponseFuture(response.getRequestId());
-    future.setResponseEntity(response.getResponseEntity());
+    future.setValue(response.getValue());
   }
 
 }

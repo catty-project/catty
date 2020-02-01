@@ -65,6 +65,10 @@ public class MethodMeta {
     return checkedExceptions.containsKey(exceptionClass.getName());
   }
 
+  public boolean containsCheckedException(String exceptionClassName) {
+    return checkedExceptions.containsKey(exceptionClassName);
+  }
+
   public Class<?> getReturnType() {
     return returnType;
   }

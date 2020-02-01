@@ -1,16 +1,17 @@
 package io.catty.core;
 
-import io.catty.core.Response.ResponseEntity;
+import io.catty.core.service.MethodMeta;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 
-public class DefaultResponse extends CompletableFuture<ResponseEntity> implements Response {
+public class DefaultResponse extends CompletableFuture<Object> implements Response {
 
   private long requestId;
-  private ResponseEntity entity;
+  private Object value;
+  private MethodMeta methodMeta;
 
   public DefaultResponse(long requestId) {
     this.requestId = requestId;
@@ -23,30 +24,30 @@ public class DefaultResponse extends CompletableFuture<ResponseEntity> implement
 
   @Override
   public Object getValue() {
-    return entity.getValue();
+    return value;
   }
 
   @Override
-  public ResponseStatus getStatus() {
-    return entity.getStatus();
-  }
-
-  @Override
-  public ResponseEntity getResponseEntity() {
-    return entity;
-  }
-
-  @Override
-  public void setResponseEntity(ResponseEntity entity) {
+  public void setValue(Object value) {
     try {
       if (!isDone()) {
-        super.complete(entity);
+        super.complete(value);
       }
-      this.entity = entity;
+      this.value = value;
     } catch (Exception e) {
       // This should not happen
       throw new CattyException(e);
     }
+  }
+
+  @Override
+  public MethodMeta getMethodMeta() {
+    return methodMeta;
+  }
+
+  @Override
+  public void setMethodMeta(MethodMeta methodMeta) {
+    this.methodMeta = methodMeta;
   }
 
   @Override
@@ -60,8 +61,4 @@ public class DefaultResponse extends CompletableFuture<ResponseEntity> implement
     get(timeout, unit);
   }
 
-  @Override
-  public boolean isError() {
-    return ResponseStatus.OK != entity.getStatus();
-  }
 }

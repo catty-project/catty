@@ -6,13 +6,10 @@ import io.catty.core.GlobalConstants;
 import io.catty.core.Invocation;
 import io.catty.core.Request;
 import io.catty.core.Response;
-import io.catty.core.Response.ResponseEntity;
-import io.catty.core.Response.ResponseStatus;
 import io.catty.core.TransportException;
 import io.catty.core.config.ClientConfig;
 import io.catty.core.extension.api.Codec;
 import io.catty.core.extension.api.Codec.DataTypeEnum;
-import io.catty.core.utils.ExceptionUtils;
 import io.catty.transport.AbstractClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -103,8 +100,7 @@ public class NettyClient extends AbstractClient {
       }
       return response;
     } catch (Exception e) {
-      response.setResponseEntity(
-          ResponseEntity.Of(ResponseStatus.INNER_ERROR, ExceptionUtils.toString(e)));
+      response.setValue(e);
       return response;
     }
   }

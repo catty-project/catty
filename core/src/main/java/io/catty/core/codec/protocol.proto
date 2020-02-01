@@ -14,6 +14,5 @@ message Request {
 
 message Response {
   int64 requestId = 1;
-  string status = 2;
   bytes returnValue = 3;
 };

@@ -8,10 +8,8 @@ import io.catty.core.InvokerHolder;
 import io.catty.core.LinkedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
-import io.catty.core.Response.ResponseStatus;
 import io.catty.core.service.MethodMeta;
 import io.catty.core.service.ServiceMeta;
-import io.catty.core.utils.ExceptionUtils;
 import io.catty.core.utils.ReflectUtils;
 import io.catty.core.utils.RequestIdGenerator;
 import java.lang.reflect.InvocationHandler;
@@ -36,6 +34,7 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     return next.invoke(request, invocation);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
@@ -75,37 +74,17 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
         if (t != null) {
           future.completeExceptionally(t);
         } else {
-          if (v.getStatus() != ResponseStatus.OK) {
-            String[] exceptionInfo = ExceptionUtils
-                .parseExceptionString((String) v.getValue());
-            if (v.getStatus() == ResponseStatus.EXCEPTED_ERROR) {
-              future.completeExceptionally(ExceptionUtils
-                  .getInstance(methodMeta.getCheckedExceptionByName(exceptionInfo[0]),
-                      exceptionInfo[1]));
-            } else {
-              future.completeExceptionally(new CattyException(exceptionInfo[1]));
-            }
-          } else {
-            try {
-              future.complete(v.getValue());
-            } catch (Exception e) {
-              future.completeExceptionally(e);
-            }
-          }
+          future.complete(v);
         }
       });
       return future;
     }
 
     // sync-method
-    response.await();
-    if (response.isError()) {
-      String[] exceptionInfo = ExceptionUtils.parseExceptionString((String) response.getValue());
-      if (response.getStatus() == ResponseStatus.EXCEPTED_ERROR) {
-        throw ExceptionUtils
-            .getInstance(methodMeta.getCheckedExceptionByName(exceptionInfo[0]), exceptionInfo[1]);
-      }
-      throw new CattyException(exceptionInfo[1]);
+    response.await(); // wait for method return.
+    Object returnValue = response.getValue();
+    if(returnValue instanceof Throwable) {
+      throw (Throwable) returnValue;
     }
     return response.getValue();
   }

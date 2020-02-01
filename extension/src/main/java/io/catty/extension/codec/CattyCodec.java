@@ -6,8 +6,6 @@ import io.catty.core.DefaultRequest;
 import io.catty.core.DefaultResponse;
 import io.catty.core.Request;
 import io.catty.core.Response;
-import io.catty.core.Response.ResponseEntity;
-import io.catty.core.Response.ResponseStatus;
 import io.catty.core.codec.generated.CattyProtocol;
 import io.catty.core.extension.Extension;
 import io.catty.core.extension.api.Codec;
@@ -45,7 +43,6 @@ public class CattyCodec implements Codec {
       Response response = (Response) message;
       return CattyProtocol.Response.newBuilder()
           .setRequestId(response.getRequestId())
-          .setStatus(response.getStatus().toString())
           .setReturnValue(ByteString.copyFrom((byte[]) response.getValue()))
           .build()
           .toByteArray();
@@ -68,8 +65,7 @@ public class CattyCodec implements Codec {
       if (DataTypeEnum.RESPONSE == dataTypeEnum) {
         CattyProtocol.Response response = CattyProtocol.Response.parseFrom(data);
         Response response0 = new DefaultResponse(response.getRequestId());
-        response0.setResponseEntity(ResponseEntity.Of(ResponseStatus.valueOf(response.getStatus()),
-            response.getReturnValue().toByteArray()));
+        response0.setValue(response.getReturnValue().toByteArray());
         return response0;
       }
       throw new CodecException("Illegal DataTypeEnum: " + dataTypeEnum);
@@ -77,4 +73,5 @@ public class CattyCodec implements Codec {
       throw new CodecException("Decode error", e);
     }
   }
+
 }

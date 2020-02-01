@@ -8,10 +8,7 @@ import io.catty.core.InvokerHolder;
 import io.catty.core.MappedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
-import io.catty.core.Response.ResponseEntity;
-import io.catty.core.Response.ResponseStatus;
 import io.catty.core.service.MethodMeta;
-import io.catty.core.utils.ExceptionUtils;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerRouterInvoker extends MappedInvoker {
@@ -26,9 +23,8 @@ public class ServerRouterInvoker extends MappedInvoker {
     InvokerHolder invokerHolder = invokerMap.get(serviceName);
     if (invokerHolder == null) {
       Response response = new DefaultResponse(request.getRequestId());
-      response.setResponseEntity(
-          ResponseEntity.Of(ResponseStatus.OUTER_ERROR, ExceptionUtils.toString(new CattyException(
-              "No such service found! Service name: " + request.getInterfaceName()))));
+      response.setValue(
+          new CattyException("No such service found! Service name: " + request.getInterfaceName()));
       return response;
     }
 

@@ -11,6 +11,9 @@ public class RandomLoadBalance implements LoadBalance {
 
   @Override
   public InvokerHolder select(List<InvokerHolder> invokers) {
+    if(invokers.size() == 1) {
+      return invokers.get(0);
+    }
     ThreadLocalRandom random = ThreadLocalRandom.current();
     return invokers.get(random.nextInt(invokers.size()));
   }

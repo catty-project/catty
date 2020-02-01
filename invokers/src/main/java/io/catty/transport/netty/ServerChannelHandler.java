@@ -43,12 +43,12 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
 
   private void processRequest(ChannelHandlerContext ctx, Request request) {
     Response response = nettyServer.invoke(request, new Invocation(InvokerLinkTypeEnum.PROVIDER));
-    response.whenComplete((v, t) -> {
-      if (v.getValue() == null || v.getValue() instanceof Void) {
+    response.whenComplete((value, throwable) -> {
+      if (value == null || value instanceof Void) {
         return;
       }
-      if (t == null) {
-        response.setResponseEntity(v);
+      if (throwable == null) {
+        response.setValue(value);
       } else {
         // todo:
       }
