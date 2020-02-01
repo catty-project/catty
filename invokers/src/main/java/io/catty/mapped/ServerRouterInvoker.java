@@ -1,7 +1,6 @@
 package io.catty.mapped;
 
 import io.catty.core.CattyException;
-import io.catty.core.DefaultResponse;
 import io.catty.core.Invocation;
 import io.catty.core.Invocation.InvokerLinkTypeEnum;
 import io.catty.core.InvokerHolder;
@@ -22,10 +21,8 @@ public class ServerRouterInvoker extends MappedInvoker {
     String serviceName = request.getInterfaceName();
     InvokerHolder invokerHolder = invokerMap.get(serviceName);
     if (invokerHolder == null) {
-      Response response = new DefaultResponse(request.getRequestId());
-      response.setValue(
-          new CattyException("No such service found! Service name: " + request.getInterfaceName()));
-      return response;
+      throw new CattyException(
+          "No such service found! Service name: " + request.getInterfaceName());
     }
 
     if (invocation == null) {
