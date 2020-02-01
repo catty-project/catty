@@ -1,4 +1,4 @@
-package io.catty.core.extension.api;
+package io.catty.core.extension.spi;
 
 
 import io.catty.core.CodecException;

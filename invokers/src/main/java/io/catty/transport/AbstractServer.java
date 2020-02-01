@@ -1,7 +1,7 @@
 package io.catty.transport;
 
 import io.catty.core.GlobalConstants;
-import io.catty.core.extension.api.Codec;
+import io.catty.core.extension.spi.Codec;
 import io.catty.core.Invocation;
 import io.catty.core.Invoker;
 import io.catty.core.LinkedInvoker;

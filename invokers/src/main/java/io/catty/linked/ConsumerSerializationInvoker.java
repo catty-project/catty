@@ -7,7 +7,7 @@ import io.catty.core.Invoker;
 import io.catty.core.LinkedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
-import io.catty.core.extension.api.Serialization;
+import io.catty.core.extension.spi.Serialization;
 import io.catty.core.service.MethodMeta;
 import io.catty.core.utils.AsyncUtils;
 import io.catty.core.utils.ExceptionUtils;

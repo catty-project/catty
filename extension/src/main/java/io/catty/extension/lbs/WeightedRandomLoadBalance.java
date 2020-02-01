@@ -2,7 +2,7 @@ package io.catty.extension.lbs;
 
 import io.catty.core.InvokerHolder;
 import io.catty.core.extension.Extension;
-import io.catty.core.extension.api.LoadBalance;
+import io.catty.core.extension.spi.LoadBalance;
 import io.catty.core.meta.MetaInfo;
 import io.catty.core.meta.MetaInfoEnum;
 import java.util.List;

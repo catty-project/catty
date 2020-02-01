@@ -5,7 +5,7 @@ import io.catty.core.Invocation;
 import io.catty.core.Invocation.InvokerLinkTypeEnum;
 import io.catty.core.Request;
 import io.catty.core.Response;
-import io.catty.core.extension.api.Codec.DataTypeEnum;
+import io.catty.core.extension.spi.Codec.DataTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;

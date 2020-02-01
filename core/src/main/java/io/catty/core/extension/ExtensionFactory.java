@@ -1,9 +1,9 @@
 package io.catty.core.extension;
 
-import io.catty.core.extension.api.Codec;
-import io.catty.core.extension.api.InvokerChainBuilder;
-import io.catty.core.extension.api.LoadBalance;
-import io.catty.core.extension.api.Serialization;
+import io.catty.core.extension.spi.Codec;
+import io.catty.core.extension.spi.InvokerChainBuilder;
+import io.catty.core.extension.spi.LoadBalance;
+import io.catty.core.extension.spi.Serialization;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
