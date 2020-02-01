@@ -31,7 +31,7 @@
 //    timer.newTimeout((timeout) -> {
 //      Response response = new DefaultResponse(request.getRequestId());
 //      response.setStatus(ResponseStatus.TIMEOUT_ERROR);
-//      response.setValue(ExceptionUtils.toString(new TimeoutException(request.toString())));
+//      response.setValue(ExceptionUtils.toString(new RpcTimeoutException(request.toString())));
 //
 //    }, delay, TimeUnit.MILLISECONDS);
 //    Response response = next.invoke(request, invocation);

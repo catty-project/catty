@@ -19,7 +19,7 @@ public abstract class MappedInvoker implements Invoker {
     this.invokerMap = invokerMap;
   }
 
-  public void registerInvoker(String serverIdentify, InvokerHolder invokerHolder) {
-    invokerMap.put(serverIdentify, invokerHolder);
+  public void registerInvoker(String serviceIdentify, InvokerHolder invokerHolder) {
+    invokerMap.put(serviceIdentify, invokerHolder);
   }
 }
