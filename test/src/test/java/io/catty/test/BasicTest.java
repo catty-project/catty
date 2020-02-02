@@ -8,8 +8,6 @@ import io.catty.test.service.AnnotationService;
 import io.catty.test.service.AnnotationServiceImpl;
 import io.catty.test.service.TestService;
 import io.catty.test.service.TestServiceImpl;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
 
 public abstract class BasicTest {
 
@@ -21,8 +19,7 @@ public abstract class BasicTest {
 
   protected Reference<AnnotationService> annotationServiceReference;
 
-  @BeforeTest
-  public void init() {
+  protected void init() {
     ServerConfig serverConfig = ServerConfig.builder()
         .port(TEST_PORT)
         .build();
@@ -44,8 +41,7 @@ public abstract class BasicTest {
     annotationServiceReference.setInterfaceClass(AnnotationService.class);
   }
 
-  @AfterTest
-  public void destroy() {
+  protected void destroy() {
     testServiceReference.derefer();
     annotationServiceReference.derefer();
     exporter.unexport();

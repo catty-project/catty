@@ -10,9 +10,21 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import org.testng.Assert;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 public class CapableTest extends BasicTest {
+
+  @BeforeTest
+  public void before() {
+    super.init();
+  }
+
+  @AfterTest
+  public void after() {
+    super.destroy();
+  }
 
   @Test
   public void multiRefer() {
