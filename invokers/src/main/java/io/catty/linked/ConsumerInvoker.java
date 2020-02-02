@@ -8,6 +8,7 @@ import io.catty.core.InvokerHolder;
 import io.catty.core.LinkedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
+import io.catty.core.meta.MetaInfo;
 import io.catty.core.service.MethodMeta;
 import io.catty.core.service.ServiceMeta;
 import io.catty.core.utils.ReflectUtils;
@@ -22,11 +23,13 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
 
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
+  private MetaInfo metaInfo;
 
   public ConsumerInvoker(Class<T> clazz, InvokerHolder invokerHolder) {
     super(invokerHolder.getInvoker());
     this.interfaceClazz = clazz;
     this.serviceMeta = invokerHolder.getServiceMeta();
+    this.metaInfo = invokerHolder.getMetaInfo();
   }
 
   @Override
@@ -60,6 +63,8 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
     invocation.setInvokedMethod(methodMeta);
     invocation.setTarget(proxy);
+    invocation.setServiceMeta(serviceMeta);
+    invocation.setMetaInfo(metaInfo);
 
     Response response = invoke(request, invocation);
 
@@ -74,7 +79,8 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
         if (t != null) {
           future.completeExceptionally(t);
         } else {
-          if(v instanceof Throwable && !v.getClass().isAssignableFrom(methodMeta.getReturnType())) {
+          if(v instanceof Throwable
+              && !v.getClass().isAssignableFrom(methodMeta.getGenericReturnType())) {
             future.completeExceptionally((Throwable) v);
           } else {
             future.complete(v);
@@ -87,7 +93,8 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     // sync-method
     response.await(); // wait for method return.
     Object returnValue = response.getValue();
-    if(returnValue instanceof Throwable) {
+    if(returnValue instanceof Throwable
+        && !methodMeta.getReturnType().isAssignableFrom(returnValue.getClass())) {
       throw (Throwable) returnValue;
     }
     return response.getValue();

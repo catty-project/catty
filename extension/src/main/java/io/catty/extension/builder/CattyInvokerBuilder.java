@@ -31,7 +31,8 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
     Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
     LinkedInvoker serializationInvoker = new ConsumerSerializationInvoker(client, serialization);
-    return serializationInvoker;
+    LinkedInvoker timeoutInvoker = new TimeoutInvoker(serializationInvoker);
+    return timeoutInvoker;
   }
 
   @Override
@@ -40,8 +41,7 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
 
     ProviderInvoker providerInvoker = new ProviderInvoker();
-    LinkedInvoker timeoutInvoker = new TimeoutInvoker(providerInvoker);
-    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(timeoutInvoker, serialization);
+    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(providerInvoker, serialization);
     return serializationInvoker;
   }
 

@@ -14,14 +14,17 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeoutInvoker extends LinkedInvoker {
 
-  private Timer timer;
+  private static Timer timer;
+
+  static {
+    timer = new HashedWheelTimer();
+  }
 
   public TimeoutInvoker() {
   }
 
   public TimeoutInvoker(Invoker next) {
     super(next);
-    this.timer = new HashedWheelTimer();
   }
 
   @Override

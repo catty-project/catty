@@ -1,4 +1,4 @@
-package io.catty.test.timeout;
+package io.catty.test;
 
 import io.catty.core.timer.HashedWheelTimer;
 import io.catty.core.timer.Timer;
