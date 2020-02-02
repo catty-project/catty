@@ -43,4 +43,31 @@ public class TestServiceImpl implements TestService {
   public String runtimeException() {
     throw new NullPointerException("NPE");
   }
+
+  @Override
+  public CompletableFuture<String> asyncException0(String name) {
+    CompletableFuture<String> future = new CompletableFuture<>();
+    executorService.submit(() -> {
+      future.completeExceptionally(new Exception());
+    });
+    return future;
+  }
+
+  @Override
+  public CompletableFuture<String> asyncException1(String name) {
+    CompletableFuture<String> future = new CompletableFuture<>();
+    executorService.submit(() -> {
+      future.completeExceptionally(new Error());
+    });
+    return future;
+  }
+
+  @Override
+  public CompletableFuture<String> asyncException2(String name) {
+    CompletableFuture<String> future = new CompletableFuture<>();
+    executorService.submit(() -> {
+      future.completeExceptionally(new RuntimeException());
+    });
+    return future;
+  }
 }

@@ -50,7 +50,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
       if (throwable == null) {
         response.setValue(value);
       } else {
-        // todo:
+        // todo: this should never happen.
       }
       sendResponse(ctx, response);
     });

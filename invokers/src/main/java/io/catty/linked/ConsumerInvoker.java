@@ -74,7 +74,11 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
         if (t != null) {
           future.completeExceptionally(t);
         } else {
-          future.complete(v);
+          if(v instanceof Throwable && !v.getClass().isAssignableFrom(methodMeta.getReturnType())) {
+            future.completeExceptionally((Throwable) v);
+          } else {
+            future.complete(v);
+          }
         }
       });
       return future;

@@ -37,10 +37,10 @@ public abstract class ExceptionUtils {
     return new String[]{s.substring(0, s.indexOf("\n")), s.substring(s.indexOf("\n") + 1)};
   }
 
-  public static Exception getInstance(Class<?> exceptionClass, String msg) {
+  public static Throwable getInstance(Class<?> exceptionClass, String msg) {
     try {
       Constructor constructor = exceptionClass.getConstructor(String.class);
-      return (Exception) constructor.newInstance(msg);
+      return (Throwable) constructor.newInstance(msg);
     } catch (NoSuchMethodException
         | InstantiationException
         | IllegalAccessException

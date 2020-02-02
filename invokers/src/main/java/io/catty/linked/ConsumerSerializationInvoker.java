@@ -54,7 +54,12 @@ public class ConsumerSerializationInvoker extends LinkedInvoker {
           Class<?> exceptionClass = methodMeta.getCheckedExceptionByName(exceptionClassName);
           return ExceptionUtils.getInstance(exceptionClass, exceptionFullStack);
         } else {
-          return new CattyException(exceptionFullStack);
+          try {
+            Class<?> exceptionClass = Class.forName(exceptionClassName);
+            return ExceptionUtils.getInstance(exceptionClass, exceptionFullStack);
+          } catch (ClassNotFoundException e) {
+            return new CattyException(exceptionFullStack);
+          }
         }
       } else if (bytes[0] == 0) {
         return serialization.deserialize(data, invocation.getInvokedMethod().getReturnType());

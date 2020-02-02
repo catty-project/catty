@@ -16,4 +16,19 @@ public interface TestService {
    * @throws NullPointerException
    */
   String runtimeException();
+
+  /**
+   * Completed with {@link Exception}
+   */
+  CompletableFuture<String> asyncException0(String name);
+
+  /**
+   * Completed with {@link Error}
+   */
+  CompletableFuture<String> asyncException1(String name);
+
+  /**
+   * Completed with {@link RuntimeException}
+   */
+  CompletableFuture<String> asyncException2(String name);
 }
