@@ -85,7 +85,7 @@ public class Reference<T> {
       synchronized (this) {
         if (ref == null) {
           if (clientConfig == null) {
-            throw new NullPointerException("ClientConfig can't be both null");
+            throw new NullPointerException("ClientConfig can't be null");
           }
 
           ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
