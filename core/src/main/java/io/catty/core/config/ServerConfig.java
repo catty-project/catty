@@ -2,15 +2,27 @@ package io.catty.core.config;
 
 import io.catty.core.ServerAddress;
 import io.catty.core.utils.NetUtils;
-import lombok.Builder;
 
 // todo : remove lombok.
-@Builder
 public class ServerConfig {
+
+  public static ServerConfigBuilder builder() {
+    return new ServerConfigBuilder();
+  }
+
+  private ServerConfig(int port, int workerThreadNum, boolean needOrder) {
+    this.port = port;
+    this.workerThreadNum = workerThreadNum;
+    this.needOrder = needOrder;
+    String serverIp = NetUtils.getLocalAddress().getHostAddress();
+    this.address = new ServerAddress(serverIp, port);
+  }
 
   private int port;
 
   private int workerThreadNum;
+
+  private ServerAddress address;
 
   /**
    * If every request from the same TCP should be executed by order, set this
@@ -38,8 +50,36 @@ public class ServerConfig {
   }
 
   public ServerAddress getServerAddress() {
-    String serverIp = NetUtils.getLocalAddress().getHostAddress();
-    return new ServerAddress(serverIp, port);
+    return address;
+  }
+
+  /**
+   * Builder
+   */
+  public static class ServerConfigBuilder {
+
+    private int port;
+    private int workerThreadNum;
+    private boolean needOrder;
+
+    public ServerConfigBuilder port(int port) {
+      this.port = port;
+      return this;
+    }
+
+    public ServerConfigBuilder workerThreadNum(int workerThreadNum) {
+      this.workerThreadNum = workerThreadNum;
+      return this;
+    }
+
+    public ServerConfigBuilder needOrder(boolean needOrder) {
+      this.needOrder = needOrder;
+      return this;
+    }
+
+    public ServerConfig build() {
+      return new ServerConfig(port, workerThreadNum, needOrder);
+    }
   }
 
 }
