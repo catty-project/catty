@@ -1,7 +1,7 @@
 package io.catty.example.async;
 
 import io.catty.config.Reference;
-import io.catty.core.config.ClientConfig;
+import io.catty.config.ClientConfig;
 import io.catty.example.IService;
 import java.util.concurrent.CompletableFuture;
 

@@ -2,7 +2,6 @@ package io.catty.config;
 
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
-import io.catty.core.config.ClientConfig;
 import io.catty.core.Client;
 import io.catty.core.extension.ExtensionType.CodecType;
 import io.catty.core.extension.spi.InvokerChainBuilder;

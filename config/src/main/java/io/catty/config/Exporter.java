@@ -3,7 +3,6 @@ package io.catty.config;
 import io.catty.core.ServerAddress;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
-import io.catty.core.config.ServerConfig;
 import io.catty.core.InvokerHolder;
 import io.catty.core.Server;
 import io.catty.core.extension.spi.Codec;
@@ -108,7 +107,7 @@ public class Exporter {
     } else {
       serverRouterInvoker = new ServerRouterInvoker();
       Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(codecType);
-      server = new NettyServer(serverConfig, codec, serverRouterInvoker);
+      server = new NettyServer(serverConfig.toInnerConfig(), codec, serverRouterInvoker);
       serviceRouterMap.put(address, serverRouterInvoker);
       serverMap.put(address, server);
     }

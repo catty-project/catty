@@ -3,7 +3,7 @@ package io.catty.extension.builder;
 import io.catty.core.Client;
 import io.catty.core.Invoker;
 import io.catty.core.LinkedInvoker;
-import io.catty.core.config.ClientConfig;
+import io.catty.core.config.InnerClientConfig;
 import io.catty.core.extension.Extension;
 import io.catty.core.extension.ExtensionFactory;
 import io.catty.core.extension.spi.Codec;
@@ -22,9 +22,10 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
 
   @Override
   public Invoker buildConsumerInvoker(MetaInfo metaInfo) {
-    ClientConfig clientConfig = ClientConfig.builder()
-        .address(buildAddress(metaInfo))
-        .build();
+    String ip = metaInfo.getString(MetaInfoEnum.IP);
+    int port = metaInfo.getInt(MetaInfoEnum.PORT);
+    InnerClientConfig clientConfig = new InnerClientConfig(ip, port, buildAddress(metaInfo), 0);
+
     Codec codec = ExtensionFactory.getCodec()
         .getExtensionSingleton(metaInfo.getString(MetaInfoEnum.CODEC));
     Client client = new NettyClient(clientConfig, codec);

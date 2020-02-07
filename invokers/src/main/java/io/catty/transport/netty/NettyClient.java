@@ -7,7 +7,7 @@ import io.catty.core.Invocation;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.TransportException;
-import io.catty.core.config.ClientConfig;
+import io.catty.core.config.InnerClientConfig;
 import io.catty.core.extension.spi.Codec;
 import io.catty.core.extension.spi.Codec.DataTypeEnum;
 import io.catty.transport.AbstractClient;
@@ -30,7 +30,7 @@ public class NettyClient extends AbstractClient {
   private Channel clientChannel;
   private NioEventLoopGroup nioEventLoopGroup;
 
-  public NettyClient(ClientConfig clientConfig, Codec codec) {
+  public NettyClient(InnerClientConfig clientConfig, Codec codec) {
     super(clientConfig, codec);
     nioEventLoopGroup = new NioEventLoopGroup(GlobalConstants.THREAD_NUMBER + 1);
   }

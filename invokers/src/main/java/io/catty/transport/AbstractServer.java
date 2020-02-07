@@ -1,14 +1,14 @@
 package io.catty.transport;
 
 import io.catty.core.GlobalConstants;
-import io.catty.core.extension.spi.Codec;
 import io.catty.core.Invocation;
 import io.catty.core.Invoker;
 import io.catty.core.LinkedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
 import io.catty.core.Server;
-import io.catty.core.config.ServerConfig;
+import io.catty.core.config.InnerServerConfig;
+import io.catty.core.extension.spi.Codec;
 import io.catty.transport.worker.HashLoopGroup;
 import io.catty.transport.worker.HashableChooserFactory;
 import io.catty.transport.worker.HashableExecutor;
@@ -23,7 +23,7 @@ public abstract class AbstractServer extends LinkedInvoker implements Server {
   private static final int CONNECTED = 1;
   private static final int DISCONNECTED = 2;
 
-  private ServerConfig config;
+  private InnerServerConfig config;
   private volatile int status = NEW;
   private Codec codec;
 
@@ -44,7 +44,7 @@ public abstract class AbstractServer extends LinkedInvoker implements Server {
    */
   private HashableExecutor executor;
 
-  public AbstractServer(ServerConfig config, Codec codec, Invoker invoker) {
+  public AbstractServer(InnerServerConfig config, Codec codec, Invoker invoker) {
     super(invoker);
     this.config = config;
     this.codec = codec;
@@ -67,7 +67,7 @@ public abstract class AbstractServer extends LinkedInvoker implements Server {
   }
 
   @Override
-  public ServerConfig getConfig() {
+  public InnerServerConfig getConfig() {
     return config;
   }
 

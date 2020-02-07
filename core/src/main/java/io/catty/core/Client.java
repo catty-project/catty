@@ -1,10 +1,10 @@
 package io.catty.core;
 
-import io.catty.core.config.ClientConfig;
+import io.catty.core.config.InnerClientConfig;
 
 public interface Client extends Endpoint {
 
   @Override
-  ClientConfig getConfig();
+  InnerClientConfig getConfig();
 
 }

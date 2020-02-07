@@ -1,6 +1,7 @@
-package io.catty.core.config;
+package io.catty.config;
 
 import io.catty.core.IllegalAddressException;
+import io.catty.core.config.InnerClientConfig;
 
 public class ClientConfig {
 
@@ -34,6 +35,10 @@ public class ClientConfig {
 
   public int getTimeout() {
     return timeout;
+  }
+
+  public InnerClientConfig toInnerConfig() {
+    return new InnerClientConfig(ip, port, address, timeout);
   }
 
   /**

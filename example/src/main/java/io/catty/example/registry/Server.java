@@ -2,7 +2,7 @@ package io.catty.example.registry;
 
 import io.catty.config.Exporter;
 import io.catty.api.RegistryConfig;
-import io.catty.core.config.ServerConfig;
+import io.catty.config.ServerConfig;
 import io.catty.example.IService;
 import io.catty.example.IServiceImpl;
 

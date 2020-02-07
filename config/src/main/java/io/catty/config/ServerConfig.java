@@ -1,9 +1,9 @@
-package io.catty.core.config;
+package io.catty.config;
 
 import io.catty.core.ServerAddress;
+import io.catty.core.config.InnerServerConfig;
 import io.catty.core.utils.NetUtils;
 
-// todo : remove lombok.
 public class ServerConfig {
 
   public static ServerConfigBuilder builder() {
@@ -51,6 +51,10 @@ public class ServerConfig {
 
   public ServerAddress getServerAddress() {
     return address;
+  }
+
+  public InnerServerConfig toInnerConfig() {
+    return new InnerServerConfig(port, workerThreadNum, needOrder, address);
   }
 
   /**

@@ -1,7 +1,7 @@
 package io.catty.example.sync;
 
 import io.catty.config.Exporter;
-import io.catty.core.config.ServerConfig;
+import io.catty.config.ServerConfig;
 import io.catty.example.IService;
 import io.catty.example.IServiceImpl;
 

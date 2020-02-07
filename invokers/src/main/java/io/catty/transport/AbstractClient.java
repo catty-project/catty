@@ -1,9 +1,9 @@
 package io.catty.transport;
 
-import io.catty.core.extension.spi.Codec;
-import io.catty.core.config.ClientConfig;
 import io.catty.core.Client;
 import io.catty.core.Response;
+import io.catty.core.config.InnerClientConfig;
+import io.catty.core.extension.spi.Codec;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
@@ -18,13 +18,13 @@ public abstract class AbstractClient implements Client {
   private static final int CONNECTED = 1;
   private static final int DISCONNECTED = 2;
 
-  private ClientConfig config;
+  private InnerClientConfig config;
   private volatile int status = NEW;
   private Codec codec;
 
   private Map<Long, Response> currentTask = new ConcurrentHashMap<>();
 
-  public AbstractClient(ClientConfig config, Codec codec) {
+  public AbstractClient(InnerClientConfig config, Codec codec) {
     this.config = config;
     this.codec = codec;
   }
@@ -43,7 +43,7 @@ public abstract class AbstractClient implements Client {
   }
 
   @Override
-  public ClientConfig getConfig() {
+  public InnerClientConfig getConfig() {
     return config;
   }
 
