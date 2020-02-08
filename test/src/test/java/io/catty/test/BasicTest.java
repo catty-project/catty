@@ -32,7 +32,7 @@ public abstract class BasicTest {
     exporter.export();
 
     ClientConfig clientConfig = ClientConfig.builder()
-        .address("127.0.0.1:20550")
+        .addAddress("127.0.0.1:20550")
         .build();
 
     testServiceReference = new Reference<>();

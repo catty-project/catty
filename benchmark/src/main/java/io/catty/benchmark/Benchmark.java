@@ -21,7 +21,7 @@ public class Benchmark {
     exporter.export();
 
     ClientConfig clientConfig = ClientConfig.builder()
-        .address("127.0.0.1:25500")
+        .addAddress("127.0.0.1:25500")
         .build();
 
     Reference<PojoService> reference = new Reference<>();

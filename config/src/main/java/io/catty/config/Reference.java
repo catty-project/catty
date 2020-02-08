@@ -3,20 +3,24 @@ package io.catty.config;
 import io.catty.api.Registry;
 import io.catty.api.RegistryConfig;
 import io.catty.core.Client;
-import io.catty.core.extension.ExtensionType.CodecType;
-import io.catty.core.extension.spi.InvokerChainBuilder;
 import io.catty.core.InvokerHolder;
+import io.catty.core.ServerAddress;
 import io.catty.core.extension.ExtensionFactory;
+import io.catty.core.extension.ExtensionType.CodecType;
 import io.catty.core.extension.ExtensionType.InvokerBuilderType;
 import io.catty.core.extension.ExtensionType.LoadBalanceType;
 import io.catty.core.extension.ExtensionType.SerializationType;
-import io.catty.linked.ConsumerInvoker;
-import io.catty.mapped.ClusterInvoker;
+import io.catty.core.extension.spi.InvokerChainBuilder;
 import io.catty.core.meta.EndpointTypeEnum;
 import io.catty.core.meta.MetaInfo;
 import io.catty.core.meta.MetaInfoEnum;
 import io.catty.core.service.ServiceMeta;
+import io.catty.linked.ConsumerInvoker;
+import io.catty.mapped.ClusterInvoker;
 import io.catty.zk.ZookeeperRegistry;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Reference<T> {
 
@@ -80,48 +84,63 @@ public class Reference<T> {
   }
 
   public T refer() {
+    if (clientConfig == null) {
+      throw new NullPointerException("ClientConfig can't be null");
+    }
     if (ref == null) {
       synchronized (this) {
         if (ref == null) {
-          if (clientConfig == null) {
-            throw new NullPointerException("ClientConfig can't be null");
-          }
-
           ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
-
           MetaInfo metaInfo = new MetaInfo(EndpointTypeEnum.CLIENT);
           metaInfo.addMetaInfo(MetaInfoEnum.GROUP, serviceMeta.getGroup());
           metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
           metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
           metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
           metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
+          metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadbalanceType);
 
           // todo :
-          if (registryConfig == null) {
-            metaInfo.addMetaInfo(MetaInfoEnum.PORT, clientConfig.getServerPort());
-            metaInfo.addMetaInfo(MetaInfoEnum.IP, clientConfig.getServerIp());
-
-            // todo: make InvokerChainBuilder configurable
-            InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
-                .getExtensionSingleton(InvokerBuilderType.DIRECT);
-            InvokerHolder invokerHolder = InvokerHolder
-                .Of(metaInfo, serviceMeta, chainBuilder.buildConsumerInvoker(metaInfo));
-            ref = ConsumerInvoker.getProxy(interfaceClass, invokerHolder);
-          } else {
+          if (userRegistry()) {
             registry = new ZookeeperRegistry(registryConfig);
             registry.open();
-
-            metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadbalanceType);
             clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
             registry.subscribe(metaInfo, clusterInvoker);
             ref = ConsumerInvoker
-                .getProxy(interfaceClass, InvokerHolder.Of(metaInfo, serviceMeta, clusterInvoker));
+                .getProxy(interfaceClass, serviceMeta, clusterInvoker);
+          } else {
+            List<ServerAddress> addresses = clientConfig.getAddresses();
+            Map<String, InvokerHolder> invokerHolderMap = new ConcurrentHashMap<>();
+            clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
+            for(ServerAddress address : addresses) {
+              metaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());
+              metaInfo.addMetaInfo(MetaInfoEnum.PORT, address.getPort());
+
+              // todo: make InvokerChainBuilder configurable
+              InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
+                  .getExtensionSingleton(InvokerBuilderType.DIRECT);
+              InvokerHolder invokerHolder = InvokerHolder
+                  .Of(metaInfo, serviceMeta, chainBuilder.buildConsumerInvoker(metaInfo));
+              invokerHolderMap.put(metaInfo.toString(), invokerHolder);
+            }
+            clusterInvoker.setInvokerMap(invokerHolderMap);
+
+            ref = ConsumerInvoker.getProxy(interfaceClass, serviceMeta, clusterInvoker);
           }
           serviceMeta.setTarget(ref);
         }
       }
     }
     return ref;
+  }
+
+  private boolean userRegistry() {
+    if(registryConfig == null) {
+      return false;
+    }
+    if(registryConfig.getAddress().equals("N/A")) {
+      return false;
+    }
+    return true;
   }
 
   public void derefer() {

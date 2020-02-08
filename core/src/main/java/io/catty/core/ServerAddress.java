@@ -7,10 +7,36 @@ public class ServerAddress {
 
   private String ip;
   private int port;
+  private String address;
+
+  public ServerAddress(String address) {
+    this.address = address;
+    if (address.contains("://")) {
+      address = address.substring(address.indexOf("://") + "://".length());
+    }
+    String[] ipPort = address.split(":");
+    if (ipPort.length != 2) {
+      throw new IllegalAddressException(
+          "Multi ':' found in address, except one. Address: " + address);
+    }
+    this.ip = ipPort[0];
+    try {
+      this.port = Integer.valueOf(ipPort[1]);
+    } catch (NumberFormatException e) {
+      throw new IllegalAddressException("Port is not Integer Type, Address: " + address, e);
+    }
+  }
+
+  public ServerAddress(String ip, int port, String address) {
+    this.ip = ip;
+    this.port = port;
+    this.address = address;
+  }
 
   public ServerAddress(String ip, int port) {
     this.ip = ip;
     this.port = port;
+    this.address = ip + ":" + port;
   }
 
   public String getIp() {
@@ -27,6 +53,10 @@ public class ServerAddress {
 
   public void setPort(int port) {
     this.port = port;
+  }
+
+  public String getAddress() {
+    return address;
   }
 
   @Override

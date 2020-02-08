@@ -4,11 +4,10 @@ import io.catty.core.CattyException;
 import io.catty.core.DefaultRequest;
 import io.catty.core.Invocation;
 import io.catty.core.Invocation.InvokerLinkTypeEnum;
-import io.catty.core.InvokerHolder;
+import io.catty.core.Invoker;
 import io.catty.core.LinkedInvoker;
 import io.catty.core.Request;
 import io.catty.core.Response;
-import io.catty.core.meta.MetaInfo;
 import io.catty.core.service.MethodMeta;
 import io.catty.core.service.ServiceMeta;
 import io.catty.core.utils.ReflectUtils;
@@ -23,13 +22,11 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
 
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
-  private MetaInfo metaInfo;
 
-  public ConsumerInvoker(Class<T> clazz, InvokerHolder invokerHolder) {
-    super(invokerHolder.getInvoker());
+  public ConsumerInvoker(Class<T> clazz, ServiceMeta serviceMeta, Invoker invoker) {
+    super(invoker);
     this.interfaceClazz = clazz;
-    this.serviceMeta = invokerHolder.getServiceMeta();
-    this.metaInfo = invokerHolder.getMetaInfo();
+    this.serviceMeta = serviceMeta;
   }
 
   @Override
@@ -64,7 +61,6 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     invocation.setInvokedMethod(methodMeta);
     invocation.setTarget(proxy);
     invocation.setServiceMeta(serviceMeta);
-    invocation.setMetaInfo(metaInfo);
 
     Response response = invoke(request, invocation);
 
@@ -79,7 +75,7 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
         if (t != null) {
           future.completeExceptionally(t);
         } else {
-          if(v instanceof Throwable
+          if (v instanceof Throwable
               && !v.getClass().isAssignableFrom(methodMeta.getGenericReturnType())) {
             future.completeExceptionally((Throwable) v);
           } else {
@@ -93,7 +89,7 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
     // sync-method
     response.await(); // wait for method return.
     Object returnValue = response.getValue();
-    if(returnValue instanceof Throwable
+    if (returnValue instanceof Throwable
         && !methodMeta.getReturnType().isAssignableFrom(returnValue.getClass())) {
       throw (Throwable) returnValue;
     }
@@ -113,8 +109,8 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
   }
 
   @SuppressWarnings("unchecked")
-  public static <E> E getProxy(Class<E> clazz, InvokerHolder invokerHolder) {
-    return (E) Proxy.newProxyInstance(
-        clazz.getClassLoader(), new Class[]{clazz}, new ConsumerInvoker(clazz, invokerHolder));
+  public static <E> E getProxy(Class<E> clazz, ServiceMeta serviceMeta, Invoker invoker) {
+    return (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
+        new ConsumerInvoker(clazz, serviceMeta, invoker));
   }
 }

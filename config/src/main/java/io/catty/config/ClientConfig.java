@@ -1,7 +1,11 @@
 package io.catty.config;
 
-import io.catty.core.IllegalAddressException;
+import io.catty.core.CattyException;
+import io.catty.core.ServerAddress;
 import io.catty.core.config.InnerClientConfig;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ClientConfig {
 
@@ -9,63 +13,53 @@ public class ClientConfig {
     return new ClientConfigBuilder();
   }
 
-  private ClientConfig(String ip, int port, String address, int timeout) {
-    this.ip = ip;
-    this.port = port;
-    this.address = address;
+  private List<ServerAddress> addresses;
+  private int timeout;
+
+  private ClientConfig(List<ServerAddress> addresses, int timeout) {
+    this.addresses = addresses;
     this.timeout = timeout;
   }
 
-  private String ip;
-  private int port;
-  private String address;
-  private int timeout;
-
-  public int getServerPort() {
-    return port;
+  public ServerAddress getFirstAddress() {
+    if(addresses == null || addresses.size() <= 0) {
+      throw new CattyException("No available address");
+    }
+    return addresses.get(0);
   }
 
-  public String getServerIp() {
-    return ip;
-  }
-
-  public String getAddress() {
-    return address;
+  public List<ServerAddress> getAddresses() {
+    if(addresses == null || addresses.size() <= 0) {
+      throw new CattyException("No available address");
+    }
+    return addresses;
   }
 
   public int getTimeout() {
     return timeout;
   }
 
-  public InnerClientConfig toInnerConfig() {
-    return new InnerClientConfig(ip, port, address, timeout);
+  public List<InnerClientConfig> toInnerConfig() {
+    if(addresses == null || addresses.size() <= 0) {
+      throw new CattyException("No available address");
+    }
+    return addresses.stream()
+        .map(address -> new InnerClientConfig(address.getIp(), address.getPort(), address.getAddress(), timeout))
+        .collect(Collectors.toList());
   }
 
   /**
    * Builder
    */
   public static class ClientConfigBuilder {
-    private String ip;
-    private int port;
-    private String address;
+    private List<ServerAddress> addresses;
     private int timeout;
 
-    public ClientConfigBuilder address(String address) {
-      this.address = address;
-      if (address.contains("://")) {
-        address = address.substring(address.indexOf("://") + "://".length());
+    public ClientConfigBuilder addAddress(String address) {
+      if(addresses == null) {
+        addresses = new ArrayList<>();
       }
-      String[] ipPort = address.split(":");
-      if (ipPort.length != 2) {
-        throw new IllegalAddressException(
-            "Multi ':' found in address, except one. Address: " + address);
-      }
-      this.ip = ipPort[0];
-      try {
-        this.port = Integer.valueOf(ipPort[1]);
-      } catch (NumberFormatException e) {
-        throw new IllegalAddressException("Port is not Integer Type, Address: " + address, e);
-      }
+      addresses.add(new ServerAddress(address));
       return this;
     }
 
@@ -75,7 +69,7 @@ public class ClientConfig {
     }
 
     public ClientConfig build() {
-      return new ClientConfig(ip, port, address, timeout);
+      return new ClientConfig(addresses, timeout);
     }
   }
 }

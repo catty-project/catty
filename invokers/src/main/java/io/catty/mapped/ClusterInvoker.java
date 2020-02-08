@@ -44,10 +44,21 @@ public class ClusterInvoker extends MappedInvoker implements Registry.NotifyList
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    InvokerHolder invokerHolder = loadBalance.select(invokerList);
+    InvokerHolder invokerHolder;
+    if(invokerList.size() == 1) {
+      invokerHolder = invokerList.get(0);
+    } else {
+      invokerHolder = loadBalance.select(invokerList);
+    }
     invocation.setMetaInfo(invokerHolder.getMetaInfo());
     invocation.setServiceMeta(invokerHolder.getServiceMeta());
     return invokerHolder.getInvoker().invoke(request, invocation);
+  }
+
+  @Override
+  public void setInvokerMap(Map<String, InvokerHolder> invokerMap) {
+    super.setInvokerMap(invokerMap);
+    this.invokerList = new ArrayList<>(invokerMap.values());
   }
 
   public void destroy() {
