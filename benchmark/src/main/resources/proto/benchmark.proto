@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package io.catty.benchmark;
+package pink.catty.benchmark;
 
-option java_package = "io.catty.benchmark.generated";
+option java_package = "pink.catty.benchmark.generated";
 option java_outer_classname = "BenchmarkProtocol";
 
 message Request {

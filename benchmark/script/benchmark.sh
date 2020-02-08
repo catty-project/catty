@@ -7,7 +7,7 @@ set -e
 set -x
 
 SCRIPT_DIR=$(cd "$(dirname "$0")";pwd)
-JAR_PATH=$SCRIPT_DIR/../target/catty-benchmark-1.0-SNAPSHOT-jar-with-dependencies.jar
+JAR_PATH=$SCRIPT_DIR/../target/catty-benchmark-0.1.0-jar-with-dependencies.jar
 
 JAVA_BIN=$(which java)
 nohup $JAVA_BIN -jar $JAR_PATH 2>&1 &

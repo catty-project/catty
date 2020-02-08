@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pink.catty.core.codec;
+
+option java_package = "pink.catty.core.codec.generated";
+option java_outer_classname = "CattyProtocol";
+
+message Request {
+  int64 requestId = 1;
+  string interfaceName = 2;
+  string methodName = 3;
+  repeated bytes arguments = 4;
+};
+
+message Response {
+  int64 requestId = 1;
+  bytes returnValue = 3;
+};
