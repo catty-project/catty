@@ -56,7 +56,7 @@
               <includeStdTypes>true</includeStdTypes>
               <outputDirectory>src/main/java</outputDirectory>
               <inputDirectories>
-                <include>src/main/java/io/catty/core/codec</include>
+                <include>src/main/java/pink/catty/core/codec</include>
               </inputDirectories>
             </configuration>
           </execution>
