@@ -22,6 +22,9 @@ import pink.catty.core.extension.spi.Serialization;
  * extension-module. You can use Reference and Exporter(you can find both in config-module) to
  * config different implements to make Catty work in another way.
  *
+ * Every extension implements in extension-module will be auto registered in ExtensionFactory when
+ * ExtensionFactory class initializing.
+ *
  * If you want to use you own implements, you can use {@link this#register(String, Object)} method
  * to add you own and specify your extension name. There is an example of extension usage in
  * example-module.
@@ -32,8 +35,6 @@ import pink.catty.core.extension.spi.Serialization;
 public final class ExtensionFactory<T> {
 
   private static final String EXTENSION_PATH = "pink.catty.extension";
-
-  private static List<ExtensionFactory> extensionFactories;
 
   private static ExtensionFactory<Serialization> SERIALIZATION;
   private static ExtensionFactory<LoadBalance> LOAD_BALANCE;
@@ -46,15 +47,6 @@ public final class ExtensionFactory<T> {
     CODEC = new ExtensionFactory<>(Codec.class);
     INVOKER_BUILDER = new ExtensionFactory<>(InvokerChainBuilder.class);
 
-    extensionFactories = new ArrayList<ExtensionFactory>() {
-      {
-        add(SERIALIZATION);
-        add(LOAD_BALANCE);
-        add(CODEC);
-        add(INVOKER_BUILDER);
-      }
-    };
-
     try {
       loadExtension();
     } catch (ClassNotFoundException | IOException e) {
@@ -64,6 +56,14 @@ public final class ExtensionFactory<T> {
 
   @SuppressWarnings("unchecked")
   private static void loadExtension() throws ClassNotFoundException, IOException {
+    List<ExtensionFactory> extensionFactories = new ArrayList<ExtensionFactory>() {
+      {
+        add(SERIALIZATION);
+        add(LOAD_BALANCE);
+        add(CODEC);
+        add(INVOKER_BUILDER);
+      }
+    };
     Class<?>[] classes = getClasses(EXTENSION_PATH);
     for (Class<?> clz : classes) {
       if (!clz.isAnnotationPresent(Extension.class)) {
