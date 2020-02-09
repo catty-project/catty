@@ -3,11 +3,12 @@ package pink.catty.core.service;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import pink.catty.core.timer.HashedWheelTimer;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
+import pink.catty.core.timer.HashedWheelTimer;
 
 /**
  * Setting of the method.
@@ -42,5 +43,20 @@ public @interface Function {
    * @see HashedWheelTimer
    */
   int timeout() default -1;
+
+  /**
+   * Method's name. It need be unique in one Service. If does'nt, {@link
+   * DuplicatedMethodNameException} will be thrown. If name equals with "", the signature string of
+   * this method will be taken as the name.
+   *
+   * @see pink.catty.core.utils.ReflectUtils#getMethodSign(Method)
+   */
+  String name() default "";
+
+  /**
+   * Alias, other names of this method. Each alias also need be unique in one Service. If does'nt,
+   * {@link DuplicatedMethodNameException} will be thrown.
+   */
+  String[] alias() default {};
 
 }

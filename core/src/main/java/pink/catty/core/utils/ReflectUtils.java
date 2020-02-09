@@ -70,6 +70,10 @@ public abstract class ReflectUtils {
     return classTypes;
   }
 
+  /**
+   * Get the signature of the method. Taking this method as example, this method's signature is:
+   * "getMethodSign(java.lang.reflect.Method)".
+   */
   public static String getMethodSign(Method method) {
     StringBuilder sb = new StringBuilder();
     sb.append(method.getName()).append("(");

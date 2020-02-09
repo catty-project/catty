@@ -3,13 +3,20 @@ package pink.catty.core.service;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Future;
+import pink.catty.core.utils.ReflectUtils;
 
 public class MethodMeta {
+
+  private String name;
+
+  private List<String> alias;
 
   private Method method;
 
@@ -23,13 +30,13 @@ public class MethodMeta {
 
   private int timeout = -1; /* -1 means no timeout */
 
-  public MethodMeta(Method method, int timeout) {
-    this(method);
-    this.timeout = timeout;
+  public static MethodMeta parse(Method method) {
+    return new MethodMeta(method);
   }
 
-  public MethodMeta(Method method) {
+  private MethodMeta(Method method) {
     this.method = method;
+    this.name = ReflectUtils.getMethodSign(method);
     this.checkedExceptions = new HashMap<>();
     Arrays.stream(method.getExceptionTypes())
         .forEach(aClass -> checkedExceptions.put(aClass.getName(), aClass));
@@ -40,12 +47,18 @@ public class MethodMeta {
      *
      * NOTICE: Future interface could not imply an async method.
      */
-    isAsync = CompletionStage.class.isAssignableFrom(returnType);
+    this.isAsync = CompletionStage.class.isAssignableFrom(returnType);
     resolveReturnTypes(method);
 
     if (method.isAnnotationPresent(Function.class)) {
       Function function = method.getDeclaredAnnotation(Function.class);
       this.timeout = function.timeout();
+      if(!"".equals(function.name())) {
+        this.name = function.name();
+      }
+      if(function.alias() != null && function.alias().length > 0) {
+        alias = new ArrayList<>(Arrays.asList(function.alias()));
+      }
     }
   }
 
@@ -75,6 +88,14 @@ public class MethodMeta {
 
   public Class<?> getGenericReturnType() {
     return genericReturnType;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public List<String> getAlias() {
+    return alias;
   }
 
   // fixme : bug.

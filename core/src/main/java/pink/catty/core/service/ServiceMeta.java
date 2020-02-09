@@ -1,12 +1,12 @@
 package pink.catty.core.service;
 
-import pink.catty.core.utils.ReflectUtils;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import pink.catty.core.utils.ReflectUtils;
 
 /**
  * Service meta info.
@@ -33,8 +33,6 @@ public class ServiceMeta {
 
   private int timeout = -1;
 
-  // todo: support service's timeout
-
   public static ServiceMeta parse(Class<?> interfaceClass) {
     return new ServiceMeta(interfaceClass);
   }
@@ -47,21 +45,39 @@ public class ServiceMeta {
 
     List<Method> methods = ReflectUtils.getPublicMethod(interfaceClass);
     for (Method method : methods) {
-      String methodSign = ReflectUtils.getMethodSign(method);
-      if(methodMap.containsKey(methodSign)) {
-        throw new Error("Duplicated method sign: " + methodSign + "#" + method
-            + ". Method's signature excepted unique.");
+      MethodMeta methodMeta = MethodMeta.parse(method);
+
+      // method's name
+      String methodName = methodMeta.getName();
+      if (methodMap.containsKey(methodName)) {
+        throw new DuplicatedMethodNameException(
+            "Duplicated method name: " + methodName + "#" + method
+                + ". Method's signature excepted unique.");
       }
-      methodMap.put(methodSign, method);
+      methodMap.put(methodName, method);
+
+      // method's alias
+      List<String> methodAlias = methodMeta.getAlias();
+      if(methodAlias != null && methodAlias.size() > 0) {
+        for(String alias : methodAlias) {
+          if (methodMap.containsKey(alias)) {
+            throw new DuplicatedMethodNameException(
+                "Duplicated method alias: " + alias + "#" + method
+                    + ". Method's signature excepted unique.");
+          }
+          methodMap.put(alias, method);
+        }
+      }
+
       validMethod.add(method);
-      methodMetaMap.put(method, new MethodMeta(method));
+      methodMetaMap.put(method, methodMeta);
     }
 
-    if(interfaceClass.isAnnotationPresent(Service.class)) {
+    if (interfaceClass.isAnnotationPresent(Service.class)) {
       Service serviceInfo = interfaceClass.getAnnotation(Service.class);
       this.version = serviceInfo.version();
       this.group = serviceInfo.group();
-      if("".equals(serviceInfo.name())) {
+      if ("".equals(serviceInfo.name())) {
         this.serviceName = interfaceClass.getName();
       } else {
         this.serviceName = serviceInfo.name();
@@ -108,7 +124,7 @@ public class ServiceMeta {
 
   public MethodMeta getMethodMetaBySign(String methodSign) {
     Method method = methodMap.get(methodSign);
-    if(method == null) {
+    if (method == null) {
       return null;
     } else {
       return methodMetaMap.get(method);
