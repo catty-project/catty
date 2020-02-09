@@ -1,9 +1,5 @@
 package pink.catty.core.extension;
 
-import pink.catty.core.extension.spi.Codec;
-import pink.catty.core.extension.spi.InvokerChainBuilder;
-import pink.catty.core.extension.spi.LoadBalance;
-import pink.catty.core.extension.spi.Serialization;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -14,7 +10,25 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.extension.spi.InvokerChainBuilder;
+import pink.catty.core.extension.spi.LoadBalance;
+import pink.catty.core.extension.spi.Serialization;
 
+/**
+ * Catty has some build-in extension interface for customizing, such as: {@link Serialization}
+ * {@link pink.catty.core.Invoker} {@link InvokerChainBuilder} {@link Codec} {@link LoadBalance}.
+ * And there are also some build-in implements of those extension interface you can find them in
+ * extension-module. You can use Reference and Exporter(you can find both in config-module) to
+ * config different implements to make Catty work in another way.
+ *
+ * If you want to use you own implements, you can use {@link this#register(String, Object)} method
+ * to add you own and specify your extension name. There is an example of extension usage in
+ * example-module.
+ *
+ * {@link Extension} annotation is for inner using to config extension's name, so your own extension
+ * implements has no need to use this annotation.
+ */
 public final class ExtensionFactory<T> {
 
   private static final String EXTENSION_PATH = "pink.catty.extension";
@@ -213,7 +227,7 @@ public final class ExtensionFactory<T> {
   }
 
   private void checkName(Object name) {
-    if(name == null) {
+    if (name == null) {
       throw new NullPointerException("null name");
     }
   }
