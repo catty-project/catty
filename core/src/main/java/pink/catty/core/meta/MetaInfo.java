@@ -10,11 +10,6 @@ public class MetaInfo {
 
   private EndpointTypeEnum endpointTypeEnum;
 
-  /**
-   * Cache this.toString() result.
-   */
-  private String toString;
-
   public MetaInfo(EndpointTypeEnum endpointTypeEnum) {
     this.endpointTypeEnum = endpointTypeEnum;
   }
@@ -22,7 +17,6 @@ public class MetaInfo {
   public MetaInfo(Map<String, String> info, EndpointTypeEnum endpointTypeEnum) {
     this.info = info;
     this.endpointTypeEnum = endpointTypeEnum;
-    toString();
   }
 
   public EndpointTypeEnum getEndpointTypeEnum() {
@@ -30,14 +24,13 @@ public class MetaInfo {
   }
 
   /**
-   * System setting style: setting1=a;setting2=b;setting3=c;
-   * todo : need more robust
+   * System setting style: setting1=a;setting2=b;setting3=c; todo : need more robust
    */
   public static MetaInfo parse(String metaInfoStr, EndpointTypeEnum endpointTypeEnum) {
     Map<String, String> map = new HashMap<>();
     String[] metaInfoEntryArray = metaInfoStr.split(";");
-    for(String entry : metaInfoEntryArray) {
-      if(entry == null || "".equals(entry)) {
+    for (String entry : metaInfoEntryArray) {
+      if (entry == null || "".equals(entry)) {
         continue;
       }
       map.put(entry.substring(0, entry.indexOf("=")), entry.substring(entry.indexOf("=") + 1));
@@ -47,14 +40,11 @@ public class MetaInfo {
 
   @Override
   public String toString() {
-    if(this.toString == null) {
-      StringBuilder sb = new StringBuilder();
-      for(Entry<String, String> entry : info.entrySet()) {
-        sb.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
-      }
-      this.toString = sb.toString();
+    StringBuilder sb = new StringBuilder();
+    for (Entry<String, String> entry : info.entrySet()) {
+      sb.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
     }
-    return toString;
+    return sb.toString();
   }
 
   public void addMetaInfo(MetaInfoEnum key, String value) {
@@ -94,49 +84,49 @@ public class MetaInfo {
   }
 
   public byte getByteDef(MetaInfoEnum key, byte def) {
-    if(info.containsKey(key.toString())) {
+    if (info.containsKey(key.toString())) {
       return Byte.valueOf(info.get(key.toString()));
     }
     return def;
   }
 
   public short getShortDef(MetaInfoEnum key, short def) {
-    if(info.containsKey(key.toString())) {
+    if (info.containsKey(key.toString())) {
       return Short.valueOf(info.get(key.toString()));
     }
     return def;
   }
 
   public int getIntDef(MetaInfoEnum key, int def) {
-    if(info.containsKey(key.toString())) {
+    if (info.containsKey(key.toString())) {
       return Integer.valueOf(info.get(key.toString()));
     }
     return def;
   }
 
   public long getLongDef(MetaInfoEnum key, long def) {
-    if(info.containsKey(key.toString())) {
+    if (info.containsKey(key.toString())) {
       return Long.valueOf(info.get(key.toString()));
     }
     return def;
   }
 
   public String getStringDef(MetaInfoEnum key, String def) {
-    if(info.containsKey(key.toString())) {
+    if (info.containsKey(key.toString())) {
       return info.get(key.toString());
     }
     return def;
   }
 
   public boolean getBoolDef(MetaInfoEnum key, boolean def) {
-    if(info.containsKey(key.toString())) {
+    if (info.containsKey(key.toString())) {
       return Boolean.valueOf(info.get(key.toString()));
     }
     return def;
   }
 
   public double getDoubleDef(MetaInfoEnum key, double def) {
-    if(info.containsKey(key.toString())) {
+    if (info.containsKey(key.toString())) {
       return Double.valueOf(info.get(key.toString()));
     }
     return def;
@@ -175,49 +165,49 @@ public class MetaInfo {
   }
 
   public byte getCustomByteDef(String key, byte def) {
-    if(info.containsKey(key)) {
+    if (info.containsKey(key)) {
       return Byte.valueOf(info.get(key));
     }
     return def;
   }
 
   public short getCustomShortDef(String key, short def) {
-    if(info.containsKey(key)) {
+    if (info.containsKey(key)) {
       return Short.valueOf(info.get(key));
     }
     return def;
   }
 
   public int getCustomIntDef(String key, int def) {
-    if(info.containsKey(key)) {
+    if (info.containsKey(key)) {
       return Integer.valueOf(info.get(key));
     }
     return def;
   }
 
   public long getCustomLongDef(String key, long def) {
-    if(info.containsKey(key)) {
+    if (info.containsKey(key)) {
       return Long.valueOf(info.get(key));
     }
     return def;
   }
 
   public String getCustomStringDef(String key, String def) {
-    if(info.containsKey(key)) {
+    if (info.containsKey(key)) {
       return info.get(key);
     }
     return def;
   }
 
   public boolean getCustomBoolDef(String key, boolean def) {
-    if(info.containsKey(key)) {
+    if (info.containsKey(key)) {
       return Boolean.valueOf(info.get(key));
     }
     return def;
   }
 
   public double getCustomDoubleDef(String key, double def) {
-    if(info.containsKey(key)) {
+    if (info.containsKey(key)) {
       return Double.valueOf(info.get(key));
     }
     return def;
@@ -230,10 +220,14 @@ public class MetaInfo {
 
   @Override
   public boolean equals(Object o) {
-    if(!(o instanceof MetaInfo)) {
+    if (!(o instanceof MetaInfo)) {
       return false;
     }
     return info.equals(((MetaInfo) o).info);
   }
 
+  @Override
+  public MetaInfo clone() {
+    return new MetaInfo(new HashMap<>(info), endpointTypeEnum);
+  }
 }

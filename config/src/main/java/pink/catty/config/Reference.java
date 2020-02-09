@@ -112,15 +112,16 @@ public class Reference<T> {
             Map<String, InvokerHolder> invokerHolderMap = new ConcurrentHashMap<>();
             clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
             for(ServerAddress address : addresses) {
-              metaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());
-              metaInfo.addMetaInfo(MetaInfoEnum.PORT, address.getPort());
+              MetaInfo newMetaInfo = metaInfo.clone();
+              newMetaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());
+              newMetaInfo.addMetaInfo(MetaInfoEnum.PORT, address.getPort());
 
               // todo: make InvokerChainBuilder configurable
               InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
                   .getExtensionSingleton(InvokerBuilderType.DIRECT);
               InvokerHolder invokerHolder = InvokerHolder
-                  .Of(metaInfo, serviceMeta, chainBuilder.buildConsumerInvoker(metaInfo));
-              invokerHolderMap.put(metaInfo.toString(), invokerHolder);
+                  .Of(newMetaInfo, serviceMeta, chainBuilder.buildConsumerInvoker(newMetaInfo));
+              invokerHolderMap.put(newMetaInfo.toString(), invokerHolder);
             }
             clusterInvoker.setInvokerMap(invokerHolderMap);
 
