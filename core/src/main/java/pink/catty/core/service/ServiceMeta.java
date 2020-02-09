@@ -13,9 +13,9 @@ import pink.catty.core.utils.ReflectUtils;
  *
  * Cache service's interface info to mark an easy entry.
  */
-public class ServiceMeta {
+public class ServiceMeta<T> {
 
-  private Class<?> interfaceClass;
+  private Class<T> interfaceClass;
 
   private Object target;
 
@@ -33,11 +33,11 @@ public class ServiceMeta {
 
   private int timeout = -1;
 
-  public static ServiceMeta parse(Class<?> interfaceClass) {
-    return new ServiceMeta(interfaceClass);
+  public static <E> ServiceMeta parse(Class<E> interfaceClass) {
+    return new ServiceMeta<>(interfaceClass);
   }
 
-  private ServiceMeta(Class<?> interfaceClass) {
+  private ServiceMeta(Class<T> interfaceClass) {
     this.interfaceClass = interfaceClass;
     this.methodMap = new HashMap<>();
     this.validMethod = new HashSet<>();
@@ -86,7 +86,7 @@ public class ServiceMeta {
     }
   }
 
-  public Class<?> getInterfaceClass() {
+  public Class<T> getInterfaceClass() {
     return interfaceClass;
   }
 
@@ -122,8 +122,8 @@ public class ServiceMeta {
     return timeout;
   }
 
-  public MethodMeta getMethodMetaBySign(String methodSign) {
-    Method method = methodMap.get(methodSign);
+  public MethodMeta getMethodMetaByName(String methodName) {
+    Method method = methodMap.get(methodName);
     if (method == null) {
       return null;
     } else {
@@ -131,8 +131,8 @@ public class ServiceMeta {
     }
   }
 
-  public Method getMethodBySign(String methodSign) {
-    return methodMap.get(methodSign);
+  public Method getMethodByName(String methodName) {
+    return methodMap.get(methodName);
   }
 
 }

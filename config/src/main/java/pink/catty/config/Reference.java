@@ -104,7 +104,7 @@ public class Reference<T> {
             registry.open();
             clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
             registry.subscribe(metaInfo, clusterInvoker);
-            ref = ConsumerInvoker.getProxy(interfaceClass, serviceMeta, clusterInvoker);
+            ref = ConsumerInvoker.getProxy(serviceMeta, clusterInvoker);
           } else {
             List<ServerAddress> addresses = clientConfig.getAddresses();
             Map<String, InvokerHolder> invokerHolderMap = new ConcurrentHashMap<>();
@@ -123,7 +123,7 @@ public class Reference<T> {
             }
             clusterInvoker.setInvokerMap(invokerHolderMap);
 
-            ref = ConsumerInvoker.getProxy(interfaceClass, serviceMeta, clusterInvoker);
+            ref = ConsumerInvoker.getProxy(serviceMeta, clusterInvoker);
           }
           serviceMeta.setTarget(ref);
         }

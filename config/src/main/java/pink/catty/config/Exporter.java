@@ -88,7 +88,7 @@ public class Exporter {
         .getExtensionSingleton(InvokerBuilderType.DIRECT);
     InvokerHolder invokerHolder = InvokerHolder
         .Of(metaInfo, serviceMeta, chainBuilder.buildProviderInvoker(metaInfo));
-    serviceHandlers.put(interfaceClass.getName(), invokerHolder);
+    serviceHandlers.put(serviceMeta.getServiceName(), invokerHolder);
   }
 
   public void export() {

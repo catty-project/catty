@@ -1,5 +1,9 @@
 package pink.catty.linked;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.concurrent.CompletableFuture;
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.DefaultRequest;
 import pink.catty.core.invoker.Invocation;
@@ -11,12 +15,7 @@ import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.service.ServiceMeta;
-import pink.catty.core.utils.ReflectUtils;
 import pink.catty.core.utils.RequestIdGenerator;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.concurrent.CompletableFuture;
 
 
 public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandler {
@@ -24,9 +23,9 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
 
-  public ConsumerInvoker(Class<T> clazz, ServiceMeta serviceMeta, Invoker invoker) {
+  public ConsumerInvoker(ServiceMeta<T> serviceMeta, Invoker invoker) {
     super(invoker);
-    this.interfaceClazz = clazz;
+    this.interfaceClazz = serviceMeta.getInterfaceClass();
     this.serviceMeta = serviceMeta;
   }
 
@@ -51,8 +50,8 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
 
     Request request = new DefaultRequest();
     request.setRequestId(RequestIdGenerator.next());
-    request.setInterfaceName(method.getDeclaringClass().getName());
-    request.setMethodName(ReflectUtils.getMethodSign(method));
+    request.setInterfaceName(serviceMeta.getServiceName());
+    request.setMethodName(methodMeta.getName());
     request.setArgsValue(args);
 
     Class<?> returnType = method.getReturnType();
@@ -109,8 +108,9 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
   }
 
   @SuppressWarnings("unchecked")
-  public static <E> E getProxy(Class<E> clazz, ServiceMeta serviceMeta, Invoker invoker) {
+  public static <E> E getProxy(ServiceMeta serviceMeta, Invoker invoker) {
+    Class<E> clazz = serviceMeta.getInterfaceClass();
     return (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
-        new ConsumerInvoker(clazz, serviceMeta, invoker));
+        new ConsumerInvoker(serviceMeta, invoker));
   }
 }
