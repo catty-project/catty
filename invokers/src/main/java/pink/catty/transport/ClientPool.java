@@ -1,6 +1,6 @@
 package pink.catty.transport;
 
-import pink.catty.core.Client;
+import pink.catty.core.invoker.Client;
 import pink.catty.core.config.InnerClientConfig;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

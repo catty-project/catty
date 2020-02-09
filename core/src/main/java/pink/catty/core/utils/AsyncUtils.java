@@ -1,7 +1,7 @@
 package pink.catty.core.utils;
 
-import pink.catty.core.DefaultResponse;
-import pink.catty.core.Response;
+import pink.catty.core.invoker.DefaultResponse;
+import pink.catty.core.invoker.Response;
 import java.util.concurrent.CompletionStage;
 
 public abstract class AsyncUtils {

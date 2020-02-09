@@ -2,8 +2,8 @@ package pink.catty.config;
 
 import pink.catty.api.Registry;
 import pink.catty.api.RegistryConfig;
-import pink.catty.core.Client;
-import pink.catty.core.InvokerHolder;
+import pink.catty.core.invoker.Client;
+import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.CodecType;

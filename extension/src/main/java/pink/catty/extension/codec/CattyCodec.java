@@ -2,10 +2,10 @@ package pink.catty.extension.codec;
 
 import com.google.protobuf.ByteString;
 import pink.catty.core.CodecException;
-import pink.catty.core.DefaultRequest;
-import pink.catty.core.DefaultResponse;
-import pink.catty.core.Request;
-import pink.catty.core.Response;
+import pink.catty.core.invoker.DefaultRequest;
+import pink.catty.core.invoker.DefaultResponse;
+import pink.catty.core.invoker.Request;
+import pink.catty.core.invoker.Response;
 import pink.catty.core.codec.generated.CattyProtocol;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.spi.Codec;

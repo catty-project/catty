@@ -14,10 +14,11 @@ import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.extension.spi.Serialization;
+import pink.catty.core.invoker.Invoker;
 
 /**
  * Catty has some build-in extension interface for customizing, such as: {@link Serialization}
- * {@link pink.catty.core.Invoker} {@link InvokerChainBuilder} {@link Codec} {@link LoadBalance}.
+ * {@link Invoker} {@link InvokerChainBuilder} {@link Codec} {@link LoadBalance}.
  * And there are also some build-in implements of those extension interface you can find them in
  * extension-module. You can use Reference and Exporter(you can find both in config-module) to
  * config different implements to make Catty work in another way.

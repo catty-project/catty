@@ -1,7 +1,7 @@
 package pink.catty.transport;
 
-import pink.catty.core.Client;
-import pink.catty.core.Response;
+import pink.catty.core.invoker.Client;
+import pink.catty.core.invoker.Response;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.spi.Codec;
 import java.util.Map;

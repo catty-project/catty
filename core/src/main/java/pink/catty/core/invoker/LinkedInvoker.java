@@ -1,4 +1,4 @@
-package pink.catty.core;
+package pink.catty.core.invoker;
 
 abstract public class LinkedInvoker implements Invoker {
 

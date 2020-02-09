@@ -1,7 +1,7 @@
 package pink.catty.transport.netty;
 
 import pink.catty.core.CattyException;
-import pink.catty.core.Response;
+import pink.catty.core.invoker.Response;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;

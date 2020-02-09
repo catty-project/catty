@@ -1,7 +1,7 @@
 package pink.catty.core.utils;
 
-import pink.catty.core.Endpoint;
-import pink.catty.core.Invoker;
+import pink.catty.core.invoker.Endpoint;
+import pink.catty.core.invoker.Invoker;
 
 public abstract class EndpointUtils {
 

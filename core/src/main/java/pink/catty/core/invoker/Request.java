@@ -1,4 +1,4 @@
-package pink.catty.core;
+package pink.catty.core.invoker;
 
 public interface Request {
 

@@ -1,5 +1,7 @@
-package pink.catty.core;
+package pink.catty.core.invoker;
 
+
+import pink.catty.core.CattyException;
 
 /**
  * The most important interface which represent an rpc invocation. Every struct in catty which in

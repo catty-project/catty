@@ -1,6 +1,6 @@
 package pink.catty.extension.lbs;
 
-import pink.catty.core.InvokerHolder;
+import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.meta.MetaInfo;

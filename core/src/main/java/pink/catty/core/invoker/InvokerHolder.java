@@ -1,4 +1,4 @@
-package pink.catty.core;
+package pink.catty.core.invoker;
 
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.service.ServiceMeta;

@@ -1,13 +1,14 @@
 package pink.catty.linked;
 
 import pink.catty.core.CattyException;
-import pink.catty.core.DefaultRequest;
-import pink.catty.core.Invocation;
-import pink.catty.core.Invocation.InvokerLinkTypeEnum;
-import pink.catty.core.Invoker;
-import pink.catty.core.LinkedInvoker;
-import pink.catty.core.Request;
-import pink.catty.core.Response;
+import pink.catty.core.invoker.DefaultRequest;
+import pink.catty.core.invoker.Invocation;
+import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.invoker.LinkedInvoker;
+import pink.catty.core.invoker.MethodNotFoundException;
+import pink.catty.core.invoker.Request;
+import pink.catty.core.invoker.Response;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.utils.ReflectUtils;
@@ -45,8 +46,7 @@ public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandl
 
     MethodMeta methodMeta = serviceMeta.getMethodMeta(method);
     if (methodMeta == null) {
-      // todo: exception need be more accurate.
-      throw new CattyException("Method is invalid, method: " + method.getName());
+      throw new MethodNotFoundException("Method is invalid, method: " + methodMeta.getName());
     }
 
     Request request = new DefaultRequest();

@@ -1,6 +1,6 @@
 package pink.catty.transport.netty;
 
-import pink.catty.core.Invoker;
+import pink.catty.core.invoker.Invoker;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.transport.AbstractServer;

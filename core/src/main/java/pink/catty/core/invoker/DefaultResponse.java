@@ -1,4 +1,4 @@
-package pink.catty.core;
+package pink.catty.core.invoker;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;

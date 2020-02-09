@@ -1,8 +1,8 @@
 package pink.catty.extension.builder;
 
-import pink.catty.core.Client;
-import pink.catty.core.Invoker;
-import pink.catty.core.LinkedInvoker;
+import pink.catty.core.invoker.Client;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.invoker.LinkedInvoker;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionFactory;

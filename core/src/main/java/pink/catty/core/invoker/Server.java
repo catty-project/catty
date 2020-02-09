@@ -1,4 +1,4 @@
-package pink.catty.core;
+package pink.catty.core.invoker;
 
 import pink.catty.core.config.InnerServerConfig;
 
