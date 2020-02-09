@@ -99,14 +99,12 @@ public class Reference<T> {
           metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
           metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadbalanceType);
 
-          // todo :
           if (userRegistry()) {
             registry = new ZookeeperRegistry(registryConfig);
             registry.open();
             clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
             registry.subscribe(metaInfo, clusterInvoker);
-            ref = ConsumerInvoker
-                .getProxy(interfaceClass, serviceMeta, clusterInvoker);
+            ref = ConsumerInvoker.getProxy(interfaceClass, serviceMeta, clusterInvoker);
           } else {
             List<ServerAddress> addresses = clientConfig.getAddresses();
             Map<String, InvokerHolder> invokerHolderMap = new ConcurrentHashMap<>();
