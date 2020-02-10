@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package pink.catty.core.timer;
+package pink.catty.core.support.timer;
 
 /**
  * A handle associated with a {@link TimerTask} that is returned by a

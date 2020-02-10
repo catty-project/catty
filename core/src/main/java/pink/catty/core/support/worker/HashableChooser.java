@@ -1,4 +1,4 @@
-package pink.catty.transport.worker;
+package pink.catty.core.support.worker;
 
 import io.netty.util.concurrent.EventExecutor;
 import io.netty.util.concurrent.EventExecutorChooserFactory;

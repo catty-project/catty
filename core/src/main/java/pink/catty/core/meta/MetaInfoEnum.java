@@ -13,6 +13,7 @@ public enum MetaInfoEnum {
   LOAD_BALANCE,
   CODEC,
   WEIGHT,
+  ENDPOINT,
   ;
 
 }

@@ -1,4 +1,4 @@
-package pink.catty.linked;
+package pink.catty.invokers.linked;
 
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.Invocation;

@@ -1,4 +1,4 @@
-package pink.catty.transport.netty;
+package pink.catty.invokers.endpoint;
 
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.Invocation;

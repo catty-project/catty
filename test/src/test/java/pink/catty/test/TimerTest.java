@@ -1,7 +1,7 @@
 package pink.catty.test;
 
-import pink.catty.core.timer.HashedWheelTimer;
-import pink.catty.core.timer.Timer;
+import pink.catty.core.support.timer.HashedWheelTimer;
+import pink.catty.core.support.timer.Timer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import org.testng.Assert;

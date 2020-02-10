@@ -8,7 +8,7 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import pink.catty.core.timer.HashedWheelTimer;
+import pink.catty.core.support.timer.HashedWheelTimer;
 
 /**
  * Setting of the method.

@@ -1,4 +1,4 @@
-package pink.catty.mapped;
+package pink.catty.invokers.mapped;
 
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.Invocation;

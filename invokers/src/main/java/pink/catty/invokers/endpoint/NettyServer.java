@@ -1,9 +1,9 @@
-package pink.catty.transport.netty;
+package pink.catty.invokers.endpoint;
 
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
-import pink.catty.transport.AbstractServer;
+import pink.catty.core.invoker.AbstractServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;

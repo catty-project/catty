@@ -3,6 +3,7 @@ package pink.catty.config;
 import pink.catty.core.ServerAddress;
 import pink.catty.api.Registry;
 import pink.catty.api.RegistryConfig;
+import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.invoker.Server;
 import pink.catty.core.extension.spi.Codec;
@@ -11,12 +12,12 @@ import pink.catty.core.extension.ExtensionType.CodecType;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
-import pink.catty.mapped.ServerRouterInvoker;
+import pink.catty.invokers.mapped.ServerRouterInvoker;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.ServiceMeta;
-import pink.catty.transport.netty.NettyServer;
+import pink.catty.invokers.endpoint.NettyServer;
 import pink.catty.zk.ZookeeperRegistry;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,8 @@ public class Exporter {
 
   private String codecType = CodecType.CATTY.toString();
 
+  private String endpointType = EndpointFactoryType.NETTY.toString();
+
   public Exporter(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
     this.address = serverConfig.getServerAddress();
@@ -69,6 +72,14 @@ public class Exporter {
     this.codecType = codecType;
   }
 
+  public void setEndpointType(String endpointType) {
+    this.endpointType = endpointType;
+  }
+
+  public void setEndpointType(CodecType endpointType) {
+    this.endpointType = endpointType.toString();
+  }
+
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
     ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
     serviceMeta.setTarget(serviceObject);
@@ -82,6 +93,7 @@ public class Exporter {
     metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
     metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
     metaInfo.addMetaInfo(MetaInfoEnum.WORKER_NUMBER, serverConfig.getWorkerThreadNum());
+    metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, endpointType);
 
     // todo: make InvokerChainBuilder configurable
     InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()

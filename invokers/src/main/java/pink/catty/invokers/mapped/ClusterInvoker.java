@@ -1,4 +1,4 @@
-package pink.catty.mapped;
+package pink.catty.invokers.mapped;
 
 import pink.catty.api.RegistryConfig;
 import pink.catty.api.Registry.NotifyListener;

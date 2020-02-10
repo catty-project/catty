@@ -60,6 +60,11 @@ public class ServerAddress {
   }
 
   @Override
+  public int hashCode() {
+    return Objects.hash(ip, port, address);
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (!(obj instanceof ServerAddress)) {
       return false;

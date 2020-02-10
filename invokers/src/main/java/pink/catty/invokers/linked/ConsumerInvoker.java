@@ -1,4 +1,4 @@
-package pink.catty.linked;
+package pink.catty.invokers.linked;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

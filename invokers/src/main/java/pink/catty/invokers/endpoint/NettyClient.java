@@ -1,4 +1,4 @@
-package pink.catty.transport.netty;
+package pink.catty.invokers.endpoint;
 
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.DefaultResponse;
@@ -10,7 +10,7 @@ import pink.catty.core.TransportException;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
-import pink.catty.transport.AbstractClient;
+import pink.catty.core.invoker.AbstractClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;

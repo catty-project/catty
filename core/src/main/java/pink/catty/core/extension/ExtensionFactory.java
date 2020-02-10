@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.extension.spi.Serialization;
@@ -41,12 +42,14 @@ public final class ExtensionFactory<T> {
   private static ExtensionFactory<LoadBalance> LOAD_BALANCE;
   private static ExtensionFactory<Codec> CODEC;
   private static ExtensionFactory<InvokerChainBuilder> INVOKER_BUILDER;
+  private static ExtensionFactory<EndpointFactory> ENDPOINT_FACTORY;
 
   static {
     SERIALIZATION = new ExtensionFactory<>(Serialization.class);
     LOAD_BALANCE = new ExtensionFactory<>(LoadBalance.class);
     CODEC = new ExtensionFactory<>(Codec.class);
     INVOKER_BUILDER = new ExtensionFactory<>(InvokerChainBuilder.class);
+    ENDPOINT_FACTORY = new ExtensionFactory<>(EndpointFactory.class);
 
     try {
       loadExtension();
@@ -63,6 +66,7 @@ public final class ExtensionFactory<T> {
         add(LOAD_BALANCE);
         add(CODEC);
         add(INVOKER_BUILDER);
+        add(ENDPOINT_FACTORY);
       }
     };
     Class<?>[] classes = getClasses(EXTENSION_PATH);
@@ -133,6 +137,10 @@ public final class ExtensionFactory<T> {
 
   public static ExtensionFactory<InvokerChainBuilder> getInvokerBuilder() {
     return INVOKER_BUILDER;
+  }
+
+  public static ExtensionFactory<EndpointFactory> getEndpointFactory() {
+    return ENDPOINT_FACTORY;
   }
 
   /* static over */

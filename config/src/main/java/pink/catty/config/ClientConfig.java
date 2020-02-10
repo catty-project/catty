@@ -1,11 +1,9 @@
 package pink.catty.config;
 
-import pink.catty.core.CattyException;
-import pink.catty.core.ServerAddress;
-import pink.catty.core.config.InnerClientConfig;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import pink.catty.core.CattyException;
+import pink.catty.core.ServerAddress;
 
 public class ClientConfig {
 
@@ -37,15 +35,6 @@ public class ClientConfig {
 
   public int getTimeout() {
     return timeout;
-  }
-
-  public List<InnerClientConfig> toInnerConfig() {
-    if(addresses == null || addresses.size() <= 0) {
-      throw new CattyException("No available address");
-    }
-    return addresses.stream()
-        .map(address -> new InnerClientConfig(address.getIp(), address.getPort(), address.getAddress(), timeout))
-        .collect(Collectors.toList());
   }
 
   /**

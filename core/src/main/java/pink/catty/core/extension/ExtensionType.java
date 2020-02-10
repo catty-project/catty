@@ -31,5 +31,10 @@ public final class ExtensionType {
     ;
   }
 
+  public enum EndpointFactoryType {
+    NETTY,
+    ;
+  }
+
 
 }

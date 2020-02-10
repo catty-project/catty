@@ -1,4 +1,4 @@
-package pink.catty.meta;
+package pink.catty.invokers.meta;
 
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.DefaultResponse;

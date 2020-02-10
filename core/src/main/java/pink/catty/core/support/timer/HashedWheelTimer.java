@@ -14,7 +14,7 @@
  * under the License.
  */
 
-package pink.catty.core.timer;
+package pink.catty.core.support.timer;
 
 import java.util.Collections;
 import java.util.HashSet;

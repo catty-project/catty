@@ -1,21 +1,20 @@
 package pink.catty.extension.builder;
 
-import pink.catty.core.invoker.Client;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.LinkedInvoker;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Serialization;
+import pink.catty.core.invoker.Client;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.invoker.LinkedInvoker;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
-import pink.catty.linked.ConsumerSerializationInvoker;
-import pink.catty.linked.ProviderSerializationInvoker;
-import pink.catty.linked.TimeoutInvoker;
-import pink.catty.meta.ProviderInvoker;
-import pink.catty.transport.netty.NettyClient;
+import pink.catty.invokers.linked.ConsumerSerializationInvoker;
+import pink.catty.invokers.linked.ProviderSerializationInvoker;
+import pink.catty.invokers.linked.TimeoutInvoker;
+import pink.catty.invokers.meta.ProviderInvoker;
 
 @Extension("DIRECT")
 public class CattyInvokerBuilder implements InvokerChainBuilder {
@@ -24,11 +23,14 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
   public Invoker buildConsumerInvoker(MetaInfo metaInfo) {
     String ip = metaInfo.getString(MetaInfoEnum.IP);
     int port = metaInfo.getInt(MetaInfoEnum.PORT);
-    InnerClientConfig clientConfig = new InnerClientConfig(ip, port, buildAddress(metaInfo), 0);
+    String codecType = metaInfo.getString(MetaInfoEnum.CODEC);
+    InnerClientConfig clientConfig = new InnerClientConfig(ip, port, buildAddress(metaInfo), 0,
+        codecType);
 
-    Codec codec = ExtensionFactory.getCodec()
-        .getExtensionSingleton(metaInfo.getString(MetaInfoEnum.CODEC));
-    Client client = new NettyClient(clientConfig, codec);
+    EndpointFactory factory = ExtensionFactory.getEndpointFactory().getExtensionSingleton(
+        metaInfo.getString(MetaInfoEnum.ENDPOINT));
+
+    Client client = factory.createClient(clientConfig);
     Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
     LinkedInvoker serializationInvoker = new ConsumerSerializationInvoker(client, serialization);
@@ -42,7 +44,8 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
 
     ProviderInvoker providerInvoker = new ProviderInvoker();
-    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(providerInvoker, serialization);
+    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(providerInvoker,
+        serialization);
     return serializationInvoker;
   }
 

@@ -1,26 +1,26 @@
 package pink.catty.config;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import pink.catty.api.Registry;
 import pink.catty.api.RegistryConfig;
-import pink.catty.core.invoker.Client;
-import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.CodecType;
+import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.ExtensionType.LoadBalanceType;
 import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
+import pink.catty.core.invoker.Client;
+import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.ServiceMeta;
-import pink.catty.linked.ConsumerInvoker;
-import pink.catty.mapped.ClusterInvoker;
+import pink.catty.invokers.linked.ConsumerInvoker;
+import pink.catty.invokers.mapped.ClusterInvoker;
 import pink.catty.zk.ZookeeperRegistry;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Reference<T> {
 
@@ -43,6 +43,8 @@ public class Reference<T> {
   private String loadbalanceType = LoadBalanceType.RANDOM.toString();
 
   private String codecType = CodecType.CATTY.toString();
+
+  private String endpointType = EndpointFactoryType.NETTY.toString();
 
   public Reference() {
   }
@@ -83,6 +85,14 @@ public class Reference<T> {
     this.codecType = codecType;
   }
 
+  public void setEndpointType(String endpointType) {
+    this.endpointType = endpointType;
+  }
+
+  public void setEndpointType(CodecType endpointType) {
+    this.endpointType = endpointType.toString();
+  }
+
   public T refer() {
     if (clientConfig == null) {
       throw new NullPointerException("ClientConfig can't be null");
@@ -98,18 +108,18 @@ public class Reference<T> {
           metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
           metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
           metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadbalanceType);
+          metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, endpointType);
 
-          if (userRegistry()) {
+          if (useRegistry()) {
             registry = new ZookeeperRegistry(registryConfig);
             registry.open();
             clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
             registry.subscribe(metaInfo, clusterInvoker);
             ref = ConsumerInvoker.getProxy(serviceMeta, clusterInvoker);
           } else {
-            List<ServerAddress> addresses = clientConfig.getAddresses();
             Map<String, InvokerHolder> invokerHolderMap = new ConcurrentHashMap<>();
             clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
-            for(ServerAddress address : addresses) {
+            for(ServerAddress address : clientConfig.getAddresses()) {
               MetaInfo newMetaInfo = metaInfo.clone();
               newMetaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());
               newMetaInfo.addMetaInfo(MetaInfoEnum.PORT, address.getPort());
@@ -132,7 +142,7 @@ public class Reference<T> {
     return ref;
   }
 
-  private boolean userRegistry() {
+  private boolean useRegistry() {
     if(registryConfig == null) {
       return false;
     }
