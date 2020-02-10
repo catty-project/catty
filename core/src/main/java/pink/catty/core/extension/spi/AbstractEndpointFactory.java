@@ -19,6 +19,7 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
     if(client == null) {
       Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(clientConfig.getCodecType());
       client = doCreateClient(clientConfig, codec);
+      clientCache.put(clientConfig, client);
     }
     return client;
   }

@@ -1,5 +1,6 @@
 package pink.catty.core.invoker;
 
+import java.util.Objects;
 import pink.catty.core.GlobalConstants;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
@@ -91,4 +92,20 @@ public abstract class AbstractServer extends LinkedInvoker implements Server {
     executor = new HashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
   }
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    AbstractServer that = (AbstractServer) o;
+    return Objects.equals(config, that.config);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(config);
+  }
 }

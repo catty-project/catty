@@ -51,11 +51,12 @@ public class InnerClientConfig {
     return port == that.port &&
         timeout == that.timeout &&
         Objects.equals(ip, that.ip) &&
-        Objects.equals(address, that.address);
+        Objects.equals(address, that.address) &&
+        Objects.equals(codecType, that.codecType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(ip, port, address, timeout);
+    return Objects.hash(ip, port, address, timeout, codecType);
   }
 }

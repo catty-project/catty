@@ -1,6 +1,7 @@
 package pink.catty.core.invoker;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import org.slf4j.Logger;
@@ -71,4 +72,20 @@ public abstract class AbstractClient implements Client {
 
   protected abstract void doClose();
 
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    AbstractClient that = (AbstractClient) o;
+    return Objects.equals(config, that.config);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(config);
+  }
 }
