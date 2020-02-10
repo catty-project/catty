@@ -42,6 +42,9 @@ public class ConsumerSerializationInvoker extends LinkedInvoker {
     Response response = next.invoke(request, invocation);
 
     CompletionStage<Object> newResponse = response.thenApply(returnValue -> {
+      if(!(returnValue instanceof byte[])) {
+        return returnValue;
+      }
       byte[] bytes = (byte[]) returnValue;
       byte[] data = new byte[bytes.length - 1];
       System.arraycopy(bytes, 1, data, 0, data.length);
