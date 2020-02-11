@@ -24,6 +24,29 @@
     <connection>scm:git:https://github.com/zhengrenjie/catty.git</connection>
   </scm>
 
+  <developers>
+    <developer>
+      <name>zhengrenjie</name>
+      <id>zhengrenjie</id>
+      <email>1354334940@qq.com</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+8</timezone>
+    </developer>
+  </developers>
+
+  <distributionManagement>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    </snapshotRepository>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
   <modules>
     <module>core</module>
     <module>invokers</module>
