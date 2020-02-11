@@ -14,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 
 public class TimeoutInvoker extends LinkedInvoker {
 
+  private static final String TIMEOUT_MESSAGE = "IP: %s, PORT: %d, INVOKE DETAIL: %s";
+
   private static Timer timer;
 
   static {
@@ -45,8 +47,6 @@ public class TimeoutInvoker extends LinkedInvoker {
     }, delay, TimeUnit.MILLISECONDS);
     return response;
   }
-
-  private static final String TIMEOUT_MESSAGE = "IP: %s, PORT: %d, INVOKE DETAIL: %s";
 
   private String buildTimeoutMessage(Request request, Invocation invocation) {
     MetaInfo metaInfo = invocation.getMetaInfo();
