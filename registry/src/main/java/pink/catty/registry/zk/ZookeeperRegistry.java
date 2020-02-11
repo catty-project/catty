@@ -1,7 +1,7 @@
-package pink.catty.zk;
+package pink.catty.registry.zk;
 
-import pink.catty.api.Registry;
-import pink.catty.api.RegistryConfig;
+import pink.catty.registry.api.Registry;
+import pink.catty.registry.api.RegistryConfig;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.RegistryException;
 import pink.catty.core.meta.EndpointTypeEnum;

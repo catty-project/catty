@@ -4,12 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
@@ -19,10 +22,10 @@ import pink.catty.core.invoker.Invoker;
 
 /**
  * Catty has some build-in extension interface for customizing, such as: {@link Serialization}
- * {@link Invoker} {@link InvokerChainBuilder} {@link Codec} {@link LoadBalance}.
- * And there are also some build-in implements of those extension interface you can find them in
- * extension-module. You can use Reference and Exporter(you can find both in config-module) to
- * config different implements to make Catty work in another way.
+ * {@link Invoker} {@link InvokerChainBuilder} {@link Codec} {@link LoadBalance}. And there are also
+ * some build-in implements of those extension interface you can find them in extension-module. You
+ * can use Reference and Exporter(you can find both in config-module) to config different implements
+ * to make Catty work in another way.
  *
  * Every extension implements in extension-module will be auto registered in ExtensionFactory when
  * ExtensionFactory class initializing.
@@ -37,6 +40,10 @@ import pink.catty.core.invoker.Invoker;
 public final class ExtensionFactory<T> {
 
   private static final String EXTENSION_PATH = "pink.catty.extension";
+  private static final String CLASS_SUFFIX = ".class";
+  private static final int CLASS_SUFFIX_LENGTH = CLASS_SUFFIX.length();
+  private static final String JAR_PROTOCOL = "jar";
+  private static final String FILE_PROTOCOL = "file";
 
   private static ExtensionFactory<Serialization> SERIALIZATION;
   private static ExtensionFactory<LoadBalance> LOAD_BALANCE;
@@ -89,18 +96,28 @@ public final class ExtensionFactory<T> {
     String path = packageName.replace('.', '/');
     Enumeration<URL> resources = classLoader.getResources(path);
     List<File> dirs = new ArrayList<>();
+    List<JarFile> jars = new ArrayList<>();
     while (resources.hasMoreElements()) {
       URL resource = resources.nextElement();
-      dirs.add(new File(resource.getFile()));
+      if (JAR_PROTOCOL.equals(resource.getProtocol())) {
+        JarFile jarFile = ((JarURLConnection) resource.openConnection()).getJarFile();
+        jars.add(jarFile);
+      }
+      if (FILE_PROTOCOL.equals(resource.getProtocol())) {
+        dirs.add(new File(resource.getFile()));
+      }
     }
     ArrayList<Class> classes = new ArrayList<>();
     for (File directory : dirs) {
-      classes.addAll(findClasses(directory, packageName));
+      classes.addAll(findClassesByDir(directory, packageName));
+    }
+    for (JarFile jar : jars) {
+      classes.addAll(findClassesByJar(jar, packageName));
     }
     return classes.toArray(new Class[0]);
   }
 
-  private static List<Class> findClasses(File directory, String packageName)
+  private static List<Class> findClassesByDir(File directory, String packageName)
       throws ClassNotFoundException {
     List<Class> classes = new ArrayList<>();
     if (!directory.exists()) {
@@ -113,7 +130,7 @@ public final class ExtensionFactory<T> {
     for (File file : files) {
       if (file.isDirectory()) {
         assert !file.getName().contains(".");
-        classes.addAll(findClasses(file, packageName + "." + file.getName()));
+        classes.addAll(findClassesByDir(file, packageName + "." + file.getName()));
       } else if (file.getName().endsWith(".class")) {
         classes.add(Class
             .forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
@@ -122,6 +139,28 @@ public final class ExtensionFactory<T> {
     return classes;
   }
 
+  private static List<Class> findClassesByJar(JarFile jar, String packageName)
+      throws ClassNotFoundException {
+    List<Class> classes = new ArrayList<>();
+    Enumeration<JarEntry> entries = jar.entries();
+    String packageDir = packageName.replace(".", File.separator);
+    while (entries.hasMoreElements()) {
+      JarEntry entry = entries.nextElement();
+      if (entry.isDirectory() || !entry.getName().startsWith(packageDir)
+          || !entry.getName().endsWith(CLASS_SUFFIX)) {
+        continue;
+      }
+      String entryName = entry.getName();
+      int entryNameLength = entry.getName().length();
+      String classPath = entryName.substring(0, entryNameLength - CLASS_SUFFIX_LENGTH);
+      Class<?> clazz = Class.forName(classPath.replace(File.separator, "."));
+      classes.add(clazz);
+    }
+    return classes;
+  }
+
+
+  /* public static method */
 
   public static ExtensionFactory<Serialization> getSerialization() {
     return SERIALIZATION;

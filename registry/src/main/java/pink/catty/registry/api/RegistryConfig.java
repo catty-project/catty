@@ -1,4 +1,4 @@
-package pink.catty.api;
+package pink.catty.registry.api;
 
 public class RegistryConfig {
 

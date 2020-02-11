@@ -1,8 +1,8 @@
 package pink.catty.config;
 
 import pink.catty.core.ServerAddress;
-import pink.catty.api.Registry;
-import pink.catty.api.RegistryConfig;
+import pink.catty.registry.api.Registry;
+import pink.catty.registry.api.RegistryConfig;
 import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.invoker.Server;
@@ -18,7 +18,7 @@ import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.ServiceMeta;
 import pink.catty.invokers.endpoint.NettyServer;
-import pink.catty.zk.ZookeeperRegistry;
+import pink.catty.registry.zk.ZookeeperRegistry;
 import java.util.HashMap;
 import java.util.Map;
 

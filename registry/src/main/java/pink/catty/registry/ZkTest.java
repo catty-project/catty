@@ -1,4 +1,4 @@
-package pink.catty;
+package pink.catty.registry;
 
 public class ZkTest {
 

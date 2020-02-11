@@ -2,7 +2,7 @@ package pink.catty.example.registry;
 
 import pink.catty.config.Reference;
 import pink.catty.config.ClientConfig;
-import pink.catty.api.RegistryConfig;
+import pink.catty.registry.api.RegistryConfig;
 import pink.catty.example.IService;
 
 public class Client {

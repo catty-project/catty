@@ -1,7 +1,7 @@
 package pink.catty.example.registry;
 
 import pink.catty.config.Exporter;
-import pink.catty.api.RegistryConfig;
+import pink.catty.registry.api.RegistryConfig;
 import pink.catty.config.ServerConfig;
 import pink.catty.example.IService;
 import pink.catty.example.IServiceImpl;

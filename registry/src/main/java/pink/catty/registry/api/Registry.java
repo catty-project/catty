@@ -1,4 +1,4 @@
-package pink.catty.api;
+package pink.catty.registry.api;
 
 import pink.catty.core.meta.MetaInfo;
 import java.util.List;

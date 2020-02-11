@@ -9,20 +9,20 @@
   <packaging>pom</packaging>
   <version>0.1.0</version>
 
-  <!--<name>catty</name>-->
-  <!--<description>RPC framework</description>-->
-  <!--<url>https://github.com/zhengrenjie/catty</url>-->
-  <!--<licenses>-->
-    <!--<license>-->
-      <!--<name>Apache License, Version 2.0</name>-->
-      <!--<url>http://www.apache.org/licenses/LICENSE-2.0</url>-->
-      <!--<distribution>repo</distribution>-->
-    <!--</license>-->
-  <!--</licenses>-->
-  <!--<scm>-->
-    <!--<url>https://github.com/zhengrenjie/catty</url>-->
-    <!--<connection>scm:git:https://github.com/zhengrenjie/catty.git</connection>-->
-  <!--</scm>-->
+  <name>catty</name>
+  <description>RPC framework</description>
+  <url>https://github.com/zhengrenjie/catty</url>
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/zhengrenjie/catty</url>
+    <connection>scm:git:https://github.com/zhengrenjie/catty.git</connection>
+  </scm>
 
   <modules>
     <module>core</module>
