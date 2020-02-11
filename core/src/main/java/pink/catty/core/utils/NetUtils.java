@@ -45,13 +45,6 @@ public abstract class NetUtils {
     return getLocalAddress(null);
   }
 
-  /**
-   * <pre>
-   * 查找策略：首先看是否已经查到ip --> hostname对应的ip --> 根据连接目标端口得到的本地ip --> 轮询网卡
-   * </pre>
-   *
-   * @return loca ip
-   */
   public static InetAddress getLocalAddress(Map<String, Integer> destHostPorts) {
     if (LOCAL_ADDRESS != null) {
       return LOCAL_ADDRESS;
