@@ -2,7 +2,7 @@ package pink.catty.invokers.linked;
 
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.LinkedInvoker;
+import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
 import pink.catty.core.RpcTimeoutException;
@@ -12,7 +12,7 @@ import pink.catty.core.support.timer.HashedWheelTimer;
 import pink.catty.core.support.timer.Timer;
 import java.util.concurrent.TimeUnit;
 
-public class TimeoutInvoker extends LinkedInvoker {
+public class TimeoutInvoker extends AbstractLinkedInvoker {
 
   private static final String TIMEOUT_MESSAGE = "IP: %s, PORT: %d, INVOKE DETAIL: %s";
 

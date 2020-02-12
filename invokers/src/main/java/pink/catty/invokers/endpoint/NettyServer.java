@@ -17,6 +17,7 @@ import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pink.catty.core.invoker.MappedInvoker;
 
 public class NettyServer extends AbstractServer {
 
@@ -26,7 +27,7 @@ public class NettyServer extends AbstractServer {
   private NioEventLoopGroup bossGroup;
   private NioEventLoopGroup workerGroup;
 
-  public NettyServer(InnerServerConfig serverConfig, Codec codec, Invoker invoker) {
+  public NettyServer(InnerServerConfig serverConfig, Codec codec, MappedInvoker invoker) {
     super(serverConfig, codec, invoker);
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();

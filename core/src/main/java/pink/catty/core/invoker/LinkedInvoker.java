@@ -1,18 +1,9 @@
 package pink.catty.core.invoker;
 
-abstract public class LinkedInvoker implements Invoker {
+public interface LinkedInvoker extends Invoker {
 
-  protected Invoker next;
+  void setNext(Invoker next);
 
-  public LinkedInvoker() {
-  }
-
-  public LinkedInvoker(Invoker next) {
-    this.next = next;
-  }
-
-  public void setNext(Invoker next) {
-    this.next = next;
-  }
+  Invoker getNext();
 
 }

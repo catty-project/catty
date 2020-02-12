@@ -4,7 +4,7 @@ import pink.catty.core.CattyException;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.LinkedInvoker;
+import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
 import pink.catty.core.extension.spi.Serialization;
@@ -13,7 +13,7 @@ import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
 import java.util.concurrent.CompletionStage;
 
-public class ConsumerSerializationInvoker extends LinkedInvoker {
+public class ConsumerSerializationInvoker extends AbstractLinkedInvoker {
 
   private Serialization serialization;
 

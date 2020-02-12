@@ -6,7 +6,7 @@ import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.MappedInvoker;
+import pink.catty.core.invoker.AbstractMappedInvoker;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
 import pink.catty.core.extension.ExtensionFactory;
@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class ClusterInvoker extends MappedInvoker implements NotifyListener {
+public class ClusterInvoker extends AbstractMappedInvoker implements NotifyListener {
 
   private LoadBalance loadBalance;
 

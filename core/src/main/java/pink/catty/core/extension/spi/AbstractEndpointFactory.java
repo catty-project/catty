@@ -26,9 +26,17 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
 
   @Override
   public Server createServer(InnerServerConfig serverConfig) {
-    return null;
+    Server server = serverCache.get(serverConfig);
+    if(server == null) {
+      Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(serverConfig.getCodecType());
+      server = doCreateServer(serverConfig, codec);
+      serverCache.put(serverConfig, server);
+    }
+    return server;
   }
 
   protected abstract Client doCreateClient(InnerClientConfig clientConfig, Codec codec);
+
+  protected abstract Server doCreateServer(InnerServerConfig serverConfig, Codec codec);
 
 }

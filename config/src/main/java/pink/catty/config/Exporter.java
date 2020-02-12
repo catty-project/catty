@@ -1,33 +1,29 @@
 package pink.catty.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import pink.catty.core.ServerAddress;
-import pink.catty.registry.api.Registry;
-import pink.catty.registry.api.RegistryConfig;
-import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
-import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.Server;
-import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.config.InnerServerConfig.InnerServerConfigBuilder;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.CodecType;
+import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.ExtensionType.SerializationType;
+import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
-import pink.catty.invokers.mapped.ServerRouterInvoker;
+import pink.catty.core.invoker.InvokerHolder;
+import pink.catty.core.invoker.InvokerRegistry;
+import pink.catty.core.invoker.Server;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.ServiceMeta;
-import pink.catty.invokers.endpoint.NettyServer;
+import pink.catty.registry.api.Registry;
+import pink.catty.registry.api.RegistryConfig;
 import pink.catty.registry.zk.ZookeeperRegistry;
-import java.util.HashMap;
-import java.util.Map;
 
 
 public class Exporter {
-
-  private static Map<ServerAddress, ServerRouterInvoker> serviceRouterMap = new HashMap<>();
-
-  private static Map<ServerAddress, Server> serverMap = new HashMap<>();
 
   private Map<String, InvokerHolder> serviceHandlers = new HashMap<>();
 
@@ -109,40 +105,37 @@ public class Exporter {
       registry.open();
     }
 
-    ServerRouterInvoker serverRouterInvoker;
-    if (serviceRouterMap.containsKey(address)) {
-      server = serverMap.get(address);
-      if (server == null) {
-        throw new NullPointerException("Server is not exist");
-      }
-      serverRouterInvoker = serviceRouterMap.get(address);
-    } else {
-      serverRouterInvoker = new ServerRouterInvoker();
-      Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(codecType);
-      server = new NettyServer(serverConfig.toInnerConfig(), codec, serverRouterInvoker);
-      serviceRouterMap.put(address, serverRouterInvoker);
-      serverMap.put(address, server);
+    EndpointFactory factory = ExtensionFactory.getEndpointFactory()
+        .getExtensionSingleton(endpointType);
+    InnerServerConfigBuilder builder = serverConfig.toInnerConfigBuilder();
+    builder.codecType(codecType);
+    server = factory.createServer(builder.build());
+    if (server == null) {
+      // todo: more detail about creating server fail.
+      throw new NullPointerException("Server is not exist");
+    }
+    if (!server.isAvailable()) {
+      server.init();
     }
 
+    InvokerRegistry invokerRegistry = server.getInvokerRegistry();
     serviceHandlers.forEach((s, invokerHolder) -> {
-      serverRouterInvoker.registerInvoker(s, invokerHolder);
+      invokerRegistry.registerInvoker(s, invokerHolder);
       if (registry != null) {
         registry.register(invokerHolder.getMetaInfo());
       }
     });
-
-    if (!server.isAvailable()) {
-      server.init();
-    }
   }
 
   public void unexport() {
-    serviceRouterMap.remove(address);
     address = null;
-    server.destroy();
+    InvokerRegistry invokerRegistry = server.getInvokerRegistry();
     if (registry != null && registry.isOpen()) {
       serviceHandlers
-          .forEach((s, invokerHolder) -> registry.unregister(invokerHolder.getMetaInfo()));
+          .forEach((s, invokerHolder) -> {
+            registry.unregister(invokerHolder.getMetaInfo());
+            invokerRegistry.unregisterInvoker(s);
+          });
       registry.close();
     }
   }

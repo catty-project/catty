@@ -1,25 +1,11 @@
 package pink.catty.core.invoker;
 
-import java.util.HashMap;
 import java.util.Map;
 
-public abstract class MappedInvoker implements Invoker {
+public interface MappedInvoker extends Invoker, InvokerRegistry {
 
-  protected Map<String, InvokerHolder> invokerMap;
+  void setInvokerMap(Map<String, InvokerHolder> invokerMap);
 
-  public MappedInvoker() {
-    this(new HashMap<>());
-  }
+  InvokerHolder getInvoker(String invokerIdentify);
 
-  public MappedInvoker(Map<String, InvokerHolder> invokerMap) {
-    this.invokerMap = invokerMap;
-  }
-
-  public void setInvokerMap(Map<String, InvokerHolder> invokerMap) {
-    this.invokerMap = invokerMap;
-  }
-
-  public void registerInvoker(String serviceIdentify, InvokerHolder invokerHolder) {
-    invokerMap.put(serviceIdentify, invokerHolder);
-  }
 }

@@ -9,7 +9,7 @@ import pink.catty.core.invoker.DefaultRequest;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.LinkedInvoker;
+import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.MethodNotFoundException;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
@@ -18,7 +18,7 @@ import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.utils.RequestIdGenerator;
 
 
-public class ConsumerInvoker<T> extends LinkedInvoker implements InvocationHandler {
+public class ConsumerInvoker<T> extends AbstractLinkedInvoker implements InvocationHandler {
 
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;

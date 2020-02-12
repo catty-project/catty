@@ -4,13 +4,13 @@ import pink.catty.core.CattyException;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.MappedInvoker;
+import pink.catty.core.invoker.AbstractMappedInvoker;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
 import pink.catty.core.service.MethodMeta;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ServerRouterInvoker extends MappedInvoker {
+public class ServerRouterInvoker extends AbstractMappedInvoker {
 
   public ServerRouterInvoker() {
     super(new ConcurrentHashMap<>());

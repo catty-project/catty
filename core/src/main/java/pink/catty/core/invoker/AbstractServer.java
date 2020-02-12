@@ -10,7 +10,7 @@ import pink.catty.core.support.worker.HashableExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractServer extends LinkedInvoker implements Server {
+public abstract class AbstractServer extends AbstractLinkedInvoker implements Server {
 
   private static Logger logger = LoggerFactory.getLogger(AbstractServer.class);
 
@@ -39,11 +39,16 @@ public abstract class AbstractServer extends LinkedInvoker implements Server {
    */
   private HashableExecutor executor;
 
-  public AbstractServer(InnerServerConfig config, Codec codec, Invoker invoker) {
+  public AbstractServer(InnerServerConfig config, Codec codec, MappedInvoker invoker) {
     super(invoker);
     this.config = config;
     this.codec = codec;
     createExecutor();
+  }
+
+  @Override
+  public InvokerRegistry getInvokerRegistry() {
+    return (InvokerRegistry) next;
   }
 
   @Override
