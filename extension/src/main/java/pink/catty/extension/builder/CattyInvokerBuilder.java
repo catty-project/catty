@@ -8,7 +8,7 @@ import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.Client;
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
+import pink.catty.core.invoker.LinkedInvoker;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.invokers.linked.ConsumerSerializationInvoker;
@@ -33,8 +33,8 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
     Client client = factory.createClient(clientConfig);
     Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
-    AbstractLinkedInvoker serializationInvoker = new ConsumerSerializationInvoker(client, serialization);
-    AbstractLinkedInvoker timeoutInvoker = new TimeoutInvoker(serializationInvoker);
+    LinkedInvoker serializationInvoker = new ConsumerSerializationInvoker(client, serialization);
+    LinkedInvoker timeoutInvoker = new TimeoutInvoker(serializationInvoker);
     return timeoutInvoker;
   }
 
@@ -44,7 +44,7 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
 
     ProviderInvoker providerInvoker = new ProviderInvoker();
-    AbstractLinkedInvoker serializationInvoker = new ProviderSerializationInvoker(providerInvoker,
+    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(providerInvoker,
         serialization);
     return serializationInvoker;
   }
