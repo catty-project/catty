@@ -11,6 +11,16 @@ Whole new RPC framework!
 
 # Usage
 See example package or test package.
+
+**Maven:**
+```xml
+<dependency>
+    <groupId>pink.catty</groupId>
+    <artifactId>catty-all</artifactId>
+    <version>0.1.2</version>
+</dependency>
+```
+
 ### Sync:
 #### Server:
 ```java
@@ -33,7 +43,7 @@ public class Client {
 
   public static void main(String[] args) {
     ClientConfig clientConfig = ClientConfig.builder()
-        .address("127.0.0.1:20550")
+        .addAddress("127.0.0.1:20550")
         .build();
 
     Reference<IService> reference = new Reference<>();
@@ -68,7 +78,7 @@ public class Client {
 
   public static void main(String[] args) {
     ClientConfig clientConfig = ClientConfig.builder()
-        .address("127.0.0.1:20550")
+        .addAddress("127.0.0.1:20550")
         .build();
 
     Reference<IService> reference = new Reference<>();
@@ -77,14 +87,24 @@ public class Client {
 
     IService service = reference.refer();
     CompletableFuture<String> future = service.asyncSay("catty");
-    future.whenComplete((value, t) -> {
-      System.out.println(value);
-    });
+    future.whenComplete((value, t) -> System.out.println(value));
   }
 }
 ```
 
 # Project Status
-The project is developing (means unstable), and has not a release version yet, but it will come soon!
+Catty has released a few versions, which means you could use Catty in your own project!
 
-#*Welcome to join me!*
+But as the version is senior than 1.0.0, which means catty is not stable and has not adequately 
+tested, I do not recommend you use it in any large distribution system yet. But I do recommend 
+you use it in a smaller system or point-to-point system, in which cases Catty would be more easier 
+to use and control.
+
+
+# *Welcome to join me!*
+There are lots of things need todo:
+* doc
+* benchmark
+* more useful extensions
+* log & annotation
+* code review & refactor
