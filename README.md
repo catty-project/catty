@@ -105,6 +105,7 @@ to use and control.
 There are lots of things need todo:
 * doc
 * benchmark
+* test
 * more useful extensions
 * log & annotation
 * code review & refactor
