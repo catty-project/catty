@@ -9,7 +9,7 @@ import java.util.Set;
 import pink.catty.core.utils.ReflectUtils;
 
 /**
- * Service meta info.
+ * RpcService meta info.
  *
  * Cache service's interface info to mark an easy entry.
  */
@@ -73,8 +73,8 @@ public class ServiceMeta<T> {
       methodMetaMap.put(method, methodMeta);
     }
 
-    if (interfaceClass.isAnnotationPresent(Service.class)) {
-      Service serviceInfo = interfaceClass.getAnnotation(Service.class);
+    if (interfaceClass.isAnnotationPresent(RpcService.class)) {
+      RpcService serviceInfo = interfaceClass.getAnnotation(RpcService.class);
       this.version = serviceInfo.version();
       this.group = serviceInfo.group();
       if ("".equals(serviceInfo.name())) {

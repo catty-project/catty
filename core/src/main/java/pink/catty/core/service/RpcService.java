@@ -9,13 +9,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Indicate that an interface is an RPC-service. @Service contains some useful config.
+ * Indicate that an interface is an RPC-service. @RpcService contains some useful config.
  */
 @Target({TYPE})
 @Retention(RUNTIME)
 @Documented
 @Inherited
-public @interface Service {
+public @interface RpcService {
 
   /**
    * Specify the service's name, if equals "", default name ({@link Class#getName()}) will be used
@@ -38,7 +38,7 @@ public @interface Service {
   /**
    * Each method in this service will has this timeout limit.
    * Each method could be set it's own timeout.
-   * @see Function
+   * @see RpcMethod
    */
   int timeout() default -1;
 

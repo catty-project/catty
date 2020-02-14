@@ -22,7 +22,7 @@ public class ServerRouterInvoker extends AbstractMappedInvoker {
     InvokerHolder invokerHolder = invokerMap.get(serviceName);
     if (invokerHolder == null) {
       throw new CattyException(
-          "No such service found! Service name: " + request.getInterfaceName());
+          "No such service found! RpcService name: " + request.getInterfaceName());
     }
 
     if (invocation == null) {

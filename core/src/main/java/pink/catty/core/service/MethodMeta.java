@@ -50,8 +50,8 @@ public class MethodMeta {
     this.isAsync = CompletionStage.class.isAssignableFrom(returnType);
     resolveReturnTypes(method);
 
-    if (method.isAnnotationPresent(Function.class)) {
-      Function function = method.getDeclaredAnnotation(Function.class);
+    if (method.isAnnotationPresent(RpcMethod.class)) {
+      RpcMethod function = method.getDeclaredAnnotation(RpcMethod.class);
       this.timeout = function.timeout();
       if(!"".equals(function.name())) {
         this.name = function.name();

@@ -17,24 +17,24 @@ import pink.catty.core.support.timer.HashedWheelTimer;
 @Retention(RUNTIME)
 @Documented
 @Inherited
-public @interface Function {
+public @interface RpcMethod {
 
   /**
    * Milli-seconds. After timeout milli-seconds, you will receive a TimeoutException(RuntimeException).
    *
    * NOTICE:
    *
-   * There are several timeout setting might be set at meantime such as Service setting, Function
+   * There are several timeout setting might be set at meantime such as RpcService setting, RpcMethod
    * setting and Endpoint(client & server) setting. If every timeout options are set, Endpoint
    * setting is the deadline, which means the timeout-event will be trigger when Endpoint's timeout
-   * reached even though Service timeout-setting or Function timeout-setting is longer than
-   * Endpoint's timeout. So I suggest you to set Endpoint's timeout longer than Service or Function
+   * reached even though RpcService timeout-setting or RpcMethod timeout-setting is longer than
+   * Endpoint's timeout. So I suggest you to set Endpoint's timeout longer than RpcService or RpcMethod
    * setting.
    *
-   * When there are comparable setting of Service and Function, Service timeout-setting will be the
+   * When there are comparable setting of RpcService and RpcMethod, RpcService timeout-setting will be the
    * deadline.
    *
-   * So, if you want the timeout-setting work well, Endpoint > Service > Method (timeout) will be a
+   * So, if you want the timeout-setting work well, Endpoint > RpcService > Method (timeout) will be a
    * great setting.
    *
    * And you should also be careful about "retry-strategy", when timeout triggered might cause
@@ -45,7 +45,7 @@ public @interface Function {
   int timeout() default -1;
 
   /**
-   * Method's name. It need be unique in one Service. If does'nt, {@link
+   * Method's name. It need be unique in one RpcService. If does'nt, {@link
    * DuplicatedMethodNameException} will be thrown. If name equals with "", the signature string of
    * this method will be taken as the name.
    *
@@ -54,7 +54,7 @@ public @interface Function {
   String name() default "";
 
   /**
-   * Alias, other names of this method. Each alias also need be unique in one Service. If does'nt,
+   * Alias, other names of this method. Each alias also need be unique in one RpcService. If does'nt,
    * {@link DuplicatedMethodNameException} will be thrown.
    */
   String[] alias() default {};
