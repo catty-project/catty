@@ -2,6 +2,7 @@ package pink.catty.example.sync;
 
 import pink.catty.config.Reference;
 import pink.catty.config.ClientConfig;
+import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.example.IService;
 
 public class Client {
@@ -12,6 +13,7 @@ public class Client {
         .build();
 
     Reference<IService> reference = new Reference<>();
+    reference.setSerializationType(SerializationType.HESSIAN2);
     reference.setClientConfig(clientConfig);
     reference.setInterfaceClass(IService.class);
 

@@ -6,6 +6,7 @@ public final class ExtensionType {
     PROTOBUF,
     FASTJSON,
     PROTOBUF_FASTJSON,
+    HESSIAN2,
     ;
   }
 

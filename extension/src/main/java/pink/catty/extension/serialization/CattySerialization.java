@@ -7,9 +7,10 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.google.protobuf.GeneratedMessageV3.Builder;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
+import java.lang.reflect.Method;
+import pink.catty.core.SerializationException;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.spi.Serialization;
-import java.lang.reflect.Method;
 
 @Extension("PROTOBUF_FASTJSON")
 public class CattySerialization implements Serialization {
@@ -46,7 +47,7 @@ public class CattySerialization implements Serialization {
     try {
       builder.mergeFrom(bytes);
     } catch (InvalidProtocolBufferException e) {
-      throw new IllegalArgumentException("Deserialize error", e);
+      throw new SerializationException("Deserialize error", e);
     }
     return (T) builder.build();
   }

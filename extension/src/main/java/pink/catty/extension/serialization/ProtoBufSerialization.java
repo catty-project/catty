@@ -4,8 +4,7 @@ import com.google.protobuf.GeneratedMessageV3.Builder;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import java.lang.reflect.Method;
-import pink.catty.core.CattyException;
-import pink.catty.core.CodecException;
+import pink.catty.core.SerializationException;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.spi.Serialization;
 
@@ -22,12 +21,13 @@ public class ProtoBufSerialization implements Serialization {
       result = ((Message) object).toByteArray();
     }
     if (result == null) {
-      throw new CattyException(
+      throw new SerializationException(
           "Object's class: " + object.getClass() + " isn't instance of Builder or Message.");
     }
     return result;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T deserialize(byte[] bytes, Class<T> clazz) {
     Builder builder;
@@ -35,12 +35,12 @@ public class ProtoBufSerialization implements Serialization {
       Method method = clazz.getMethod("newBuilder");
       builder = (Builder) method.invoke(null, null);
     } catch (Exception e) {
-      throw new CodecException("Class: " + clazz + " couldn't find newBuilder method.");
+      throw new SerializationException("Class: " + clazz + " couldn't find newBuilder method.");
     }
     try {
       builder.mergeFrom(bytes);
     } catch (InvalidProtocolBufferException e) {
-      throw new IllegalArgumentException("Deserialize error", e);
+      throw new SerializationException("Deserialize error", e);
     }
     return (T) builder.build();
   }
