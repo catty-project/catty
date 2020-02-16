@@ -36,7 +36,6 @@ public class MethodMeta {
 
   private MethodMeta(Method method) {
     this.method = method;
-    this.name = ReflectUtils.getMethodSign(method);
     this.checkedExceptions = new HashMap<>();
     Arrays.stream(method.getExceptionTypes())
         .forEach(aClass -> checkedExceptions.put(aClass.getName(), aClass));
@@ -59,6 +58,8 @@ public class MethodMeta {
       if(function.alias() != null && function.alias().length > 0) {
         alias = new ArrayList<>(Arrays.asList(function.alias()));
       }
+    } else {
+      this.name = ReflectUtils.getMethodSign(method);
     }
   }
 

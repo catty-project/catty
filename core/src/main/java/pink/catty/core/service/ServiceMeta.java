@@ -29,7 +29,7 @@ public class ServiceMeta<T> {
 
   private String group = "";
 
-  private String serviceName = "";
+  private String serviceName;
 
   private int timeout = -1;
 
@@ -83,6 +83,8 @@ public class ServiceMeta<T> {
         this.serviceName = serviceInfo.name();
       }
       this.timeout = serviceInfo.timeout();
+    } else {
+      this.serviceName = interfaceClass.getName();
     }
   }
 
