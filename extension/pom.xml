@@ -32,6 +32,17 @@
       <artifactId>fastjson</artifactId>
       <version>1.2.58</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.curator</groupId>
+      <artifactId>curator-framework</artifactId>
+      <version>4.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.zookeeper</groupId>
+      <artifactId>zookeeper</artifactId>
+      <version>3.4.14</version>
+      <type>pom</type>
+    </dependency>
   </dependencies>
 
 </project>

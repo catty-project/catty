@@ -39,6 +39,7 @@ public class ServiceMeta<T> {
 
   private ServiceMeta(Class<T> interfaceClass) {
     this.interfaceClass = interfaceClass;
+    this.serviceName = interfaceClass.getName();
     this.methodMap = new HashMap<>();
     this.validMethod = new HashSet<>();
     this.methodMetaMap = new HashMap<>();
@@ -77,14 +78,10 @@ public class ServiceMeta<T> {
       RpcService serviceInfo = interfaceClass.getAnnotation(RpcService.class);
       this.version = serviceInfo.version();
       this.group = serviceInfo.group();
-      if ("".equals(serviceInfo.name())) {
-        this.serviceName = interfaceClass.getName();
-      } else {
+      if (!"".equals(serviceInfo.name())) {
         this.serviceName = serviceInfo.name();
       }
       this.timeout = serviceInfo.timeout();
-    } else {
-      this.serviceName = interfaceClass.getName();
     }
   }
 

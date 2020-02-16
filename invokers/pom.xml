@@ -11,4 +11,13 @@
 
   <artifactId>catty-invokers</artifactId>
 
+  <dependencies>
+    <dependency>
+      <groupId>pink.catty</groupId>
+      <artifactId>catty-core</artifactId>
+      <version>0.1.4</version>
+    </dependency>
+
+  </dependencies>
+
 </project>
