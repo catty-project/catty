@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.config.InnerServerConfig.InnerServerConfigBuilder;
+import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.CodecType;
 import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
@@ -11,16 +12,17 @@ import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
+import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.invoker.InvokerRegistry;
 import pink.catty.core.invoker.Server;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
+import pink.catty.core.service.HeartBeatSerivceImpl;
+import pink.catty.core.service.HeartBeatService;
 import pink.catty.core.service.ServiceMeta;
-import pink.catty.registry.api.Registry;
-import pink.catty.registry.api.RegistryConfig;
-import pink.catty.registry.zk.ZookeeperRegistry;
+import pink.catty.extension.registry.ZookeeperRegistry;
 
 
 public class Exporter {
@@ -115,6 +117,8 @@ public class Exporter {
       throw new NullPointerException("Server is not exist");
     }
     if (!server.isAvailable()) {
+      // If first open server, register heartbeat service.
+      registerService(HeartBeatService.class, new HeartBeatSerivceImpl());
       server.init();
     }
 

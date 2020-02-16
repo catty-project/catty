@@ -17,15 +17,16 @@ import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.LoadBalance;
+import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.Invoker;
 
 /**
  * Catty has some build-in extension interface for customizing, such as: {@link Serialization}
- * {@link Invoker} {@link InvokerChainBuilder} {@link Codec} {@link LoadBalance}. And there are also
- * some build-in implements of those extension interface you can find them in extension-module. You
- * can use Reference and Exporter(you can find both in config-module) to config different implements
- * to make Catty work in another way.
+ * {@link Invoker} {@link InvokerChainBuilder} {@link Codec} {@link LoadBalance} {@link
+ * EndpointFactory} {@link Registry}. And there are also some build-in implements of those extension
+ * interface you can find them in extension-module. You can use Reference and Exporter(you can find
+ * both in config-module) to config different implements to make Catty work in another way.
  *
  * Every extension implements in extension-module will be auto registered in ExtensionFactory when
  * ExtensionFactory class initializing.
@@ -50,6 +51,7 @@ public final class ExtensionFactory<T> {
   private static ExtensionFactory<Codec> CODEC;
   private static ExtensionFactory<InvokerChainBuilder> INVOKER_BUILDER;
   private static ExtensionFactory<EndpointFactory> ENDPOINT_FACTORY;
+  private static ExtensionFactory<Registry> REGISTRY;
 
   static {
     SERIALIZATION = new ExtensionFactory<>(Serialization.class);
@@ -57,6 +59,7 @@ public final class ExtensionFactory<T> {
     CODEC = new ExtensionFactory<>(Codec.class);
     INVOKER_BUILDER = new ExtensionFactory<>(InvokerChainBuilder.class);
     ENDPOINT_FACTORY = new ExtensionFactory<>(EndpointFactory.class);
+    REGISTRY = new ExtensionFactory<>(Registry.class);
 
     try {
       loadExtension();
@@ -74,6 +77,7 @@ public final class ExtensionFactory<T> {
         add(CODEC);
         add(INVOKER_BUILDER);
         add(ENDPOINT_FACTORY);
+        add(REGISTRY);
       }
     };
     Class<?>[] classes = getClasses(EXTENSION_PATH);

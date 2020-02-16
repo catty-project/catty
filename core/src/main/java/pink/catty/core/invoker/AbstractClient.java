@@ -53,8 +53,8 @@ public abstract class AbstractClient implements Client {
 
   @Override
   public void init() {
-    status = CONNECTED;
     doOpen();
+    status = CONNECTED;
   }
 
   @Override

@@ -83,10 +83,7 @@ public class NettyClient extends AbstractClient {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    // fixme: need thread-safe.
-    if (!isAvailable()) {
-      init();
-    }
+    tryInit();
     Response response = new DefaultResponse(request.getRequestId());
     addCurrentTask(request.getRequestId(), response);
     try {
@@ -102,6 +99,16 @@ public class NettyClient extends AbstractClient {
     } catch (Exception e) {
       response.setValue(e);
       return response;
+    }
+  }
+
+  private void tryInit() {
+    if (!isAvailable()) {
+      synchronized (this) {
+        if (!isAvailable()) {
+          init();
+        }
+      }
     }
   }
 }

@@ -1,5 +1,6 @@
-package pink.catty.registry.api;
+package pink.catty.core.extension.spi;
 
+import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.meta.MetaInfo;
 import java.util.List;
 

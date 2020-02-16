@@ -33,7 +33,7 @@ public class ServiceMeta<T> {
 
   private int timeout = -1;
 
-  public static <E> ServiceMeta parse(Class<E> interfaceClass) {
+  public static <T> ServiceMeta<T> parse(Class<T> interfaceClass) {
     return new ServiceMeta<>(interfaceClass);
   }
 

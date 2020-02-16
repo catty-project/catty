@@ -111,7 +111,6 @@
     <module>core</module>
     <module>invokers</module>
     <module>example</module>
-    <module>registry</module>
     <module>test</module>
     <module>benchmark</module>
     <module>all</module>

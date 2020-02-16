@@ -1,7 +1,8 @@
-package pink.catty.registry.zk;
+package pink.catty.extension.registry;
 
-import pink.catty.registry.api.Registry;
-import pink.catty.registry.api.RegistryConfig;
+import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.spi.Registry;
+import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.RegistryException;
 import pink.catty.core.meta.EndpointTypeEnum;
@@ -20,6 +21,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.ZooDefs;
 
+@Extension("ZOOKEEPER")
 public class ZookeeperRegistry implements Registry {
 
   private static final String ROOT = "/catty";

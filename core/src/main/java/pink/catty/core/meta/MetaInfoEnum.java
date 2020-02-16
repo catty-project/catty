@@ -14,6 +14,7 @@ public enum MetaInfoEnum {
   CODEC,
   WEIGHT,
   ENDPOINT,
+  HEALTH_CHECK_PERIOD,
   ;
 
 }

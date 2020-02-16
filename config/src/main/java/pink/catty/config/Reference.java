@@ -2,8 +2,8 @@ package pink.catty.config;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import pink.catty.registry.api.Registry;
-import pink.catty.registry.api.RegistryConfig;
+import pink.catty.core.extension.spi.Registry;
+import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.CodecType;
@@ -20,7 +20,7 @@ import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.ServiceMeta;
 import pink.catty.invokers.linked.ConsumerInvoker;
 import pink.catty.invokers.mapped.ClusterInvoker;
-import pink.catty.registry.zk.ZookeeperRegistry;
+import pink.catty.extension.registry.ZookeeperRegistry;
 
 public class Reference<T> {
 

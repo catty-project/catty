@@ -1,7 +1,7 @@
 package pink.catty.invokers.mapped;
 
-import pink.catty.registry.api.RegistryConfig;
-import pink.catty.registry.api.Registry.NotifyListener;
+import pink.catty.core.config.RegistryConfig;
+import pink.catty.core.extension.spi.Registry.NotifyListener;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
