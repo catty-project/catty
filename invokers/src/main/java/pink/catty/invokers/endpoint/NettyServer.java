@@ -1,9 +1,5 @@
 package pink.catty.invokers.endpoint;
 
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.config.InnerServerConfig;
-import pink.catty.core.extension.spi.Codec;
-import pink.catty.core.invoker.AbstractServer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
@@ -13,10 +9,11 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pink.catty.core.config.InnerServerConfig;
+import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.invoker.AbstractServer;
 import pink.catty.core.invoker.MappedInvoker;
 
 public class NettyServer extends AbstractServer {
@@ -42,8 +39,7 @@ public class NettyServer extends AbstractServer {
           @Override
           protected void initChannel(SocketChannel ch) {
             ChannelPipeline pipeline = ch.pipeline();
-            pipeline.addLast("decoder", new ProtobufVarint32FrameDecoder());
-            pipeline.addLast("encoder", new ProtobufVarint32LengthFieldPrepender());
+            pipeline.addLast("decoder", new NettyDecoder(getCodec()));
             pipeline.addLast("handler", new ServerChannelHandler(NettyServer.this));
           }
         });

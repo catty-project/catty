@@ -21,10 +21,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
 
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) {
-    ByteBuf byteBuf = (ByteBuf) msg;
-    byte[] data = new byte[byteBuf.readableBytes()];
-    byteBuf.readBytes(data);
-    byteBuf.release();
+    byte[] data = (byte[]) msg;
     Object object = nettyServer.getCodec().decode(data, DataTypeEnum.REQUEST);
     if (!(object instanceof Request)) {
       throw new CattyException(

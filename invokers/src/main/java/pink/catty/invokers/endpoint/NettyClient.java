@@ -1,16 +1,5 @@
 package pink.catty.invokers.endpoint;
 
-import pink.catty.core.CattyException;
-import pink.catty.core.invoker.DefaultResponse;
-import pink.catty.core.GlobalConstants;
-import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
-import pink.catty.core.TransportException;
-import pink.catty.core.config.InnerClientConfig;
-import pink.catty.core.extension.spi.Codec;
-import pink.catty.core.extension.spi.Codec.DataTypeEnum;
-import pink.catty.core.invoker.AbstractClient;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -22,8 +11,17 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
-import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
+import pink.catty.core.CattyException;
+import pink.catty.core.GlobalConstants;
+import pink.catty.core.TransportException;
+import pink.catty.core.config.InnerClientConfig;
+import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.extension.spi.Codec.DataTypeEnum;
+import pink.catty.core.invoker.AbstractClient;
+import pink.catty.core.invoker.DefaultResponse;
+import pink.catty.core.invoker.Invocation;
+import pink.catty.core.invoker.Request;
+import pink.catty.core.invoker.Response;
 
 public class NettyClient extends AbstractClient {
 
@@ -50,8 +48,7 @@ public class NettyClient extends AbstractClient {
           @Override
           protected void initChannel(SocketChannel ch) {
             ChannelPipeline pipeline = ch.pipeline();
-            pipeline.addLast("decoder", new ProtobufVarint32FrameDecoder());
-            pipeline.addLast("encoder", new ProtobufVarint32LengthFieldPrepender());
+            pipeline.addLast("decoder", new NettyDecoder(getCodec()));
             pipeline.addLast("handler", new ClientChannelHandler(NettyClient.this));
           }
         });

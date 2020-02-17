@@ -17,46 +17,11 @@
       <artifactId>slf4j-api</artifactId>
       <version>1.7.25</version>
     </dependency>
-
-    <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>3.8.0</version>
-    </dependency>
-
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-all</artifactId>
       <version>4.1.42.Final</version>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.github.os72</groupId>
-        <artifactId>protoc-jar-maven-plugin</artifactId>
-        <version>3.6.0.1</version>
-        <executions>
-          <execution>
-            <id>generate-sources</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <protocVersion>3.6.0</protocVersion>
-              <addSources>none</addSources>
-              <includeStdTypes>true</includeStdTypes>
-              <outputDirectory>src/main/java</outputDirectory>
-              <inputDirectories>
-                <include>src/main/java/pink/catty/core/codec</include>
-              </inputDirectories>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

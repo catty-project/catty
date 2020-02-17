@@ -3,7 +3,7 @@ package pink.catty.core.extension.spi;
 
 import pink.catty.core.CodecException;
 
-public interface Codec {
+public interface Codec extends PackageReader {
 
   byte[] encode(Object message, DataTypeEnum dataTypeEnum) throws CodecException;
 
