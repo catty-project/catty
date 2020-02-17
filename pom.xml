@@ -7,7 +7,7 @@
   <groupId>pink.catty</groupId>
   <artifactId>catty-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.1.4</version>
+  <version>0.1.5</version>
 
   <name>catty</name>
   <description>RPC framework</description>
