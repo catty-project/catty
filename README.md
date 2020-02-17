@@ -17,7 +17,7 @@ See example package or test package.
 <dependency>
     <groupId>pink.catty</groupId>
     <artifactId>catty-all</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.5</version>
 </dependency>
 ```
 

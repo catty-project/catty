@@ -101,6 +101,7 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
           response.await();
         } catch (InterruptedException e) {
           // ignore
+          return;
         } catch (ExecutionException e) {
           throw new HealthCheckException("Invoke error", e, HealthCheckInvoker.this);
         }
