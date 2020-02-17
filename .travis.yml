@@ -8,6 +8,6 @@ cache:
   directories:
   - $HOME/.m2
 
-install: mvn clean install -DskipTests -D -Dmaven.javadoc.skip=true -Dgpg.skip
+install: mvn clean install -DskipTests -Dmaven.javadoc.skip=true -Dgpg.skip
 
 #script: mvn test
