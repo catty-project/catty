@@ -96,7 +96,7 @@ public class Client {
 Catty has released a few versions, which means you could use Catty in your own project!
 
 But as the version is senior than 1.0.0, which means catty is not stable and has not adequately 
-tested yet, I do not recommend you use it in any large distribution system temporarily. But I do 
+tested yet, I temporarily do not recommend you to use it in any large distribution system. But I do 
 recommend you to use it in a smaller system or point-to-point system, in which cases Catty would 
 be more easier to use and control.
 
