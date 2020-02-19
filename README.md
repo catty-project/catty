@@ -9,6 +9,14 @@ Whole new RPC framework!
 * Micro-kernel & Easy to customize
 * ProtoBuf supported.
 
+# Project Status
+Catty has released a few versions, which means you could use Catty in your own project!
+
+But as the version is senior than 1.0.0, which means catty is not stable and has not adequately 
+tested yet, I temporarily do not recommend you to use it in any large distribution system. But I do 
+recommend you to use it in a smaller system or point-to-point system, in which cases Catty would 
+be more easier to use and control.
+
 # Usage
 See example package or test package.
 
@@ -91,15 +99,6 @@ public class Client {
   }
 }
 ```
-
-# Project Status
-Catty has released a few versions, which means you could use Catty in your own project!
-
-But as the version is senior than 1.0.0, which means catty is not stable and has not adequately 
-tested yet, I temporarily do not recommend you to use it in any large distribution system. But I do 
-recommend you to use it in a smaller system or point-to-point system, in which cases Catty would 
-be more easier to use and control.
-
 
 # *Welcome to join me!*
 There are lots of things need todo:
