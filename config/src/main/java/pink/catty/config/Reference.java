@@ -16,16 +16,17 @@ package pink.catty.config;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import pink.catty.core.extension.spi.Registry;
-import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.ServerAddress;
+import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.CodecType;
 import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.ExtensionType.LoadBalanceType;
+import pink.catty.core.extension.ExtensionType.RegistryType;
 import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
+import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.invoker.Client;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.meta.EndpointTypeEnum;
@@ -34,7 +35,6 @@ import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.ServiceMeta;
 import pink.catty.invokers.linked.ConsumerInvoker;
 import pink.catty.invokers.mapped.ClusterInvoker;
-import pink.catty.extension.registry.ZookeeperRegistry;
 
 public class Reference<T> {
 
@@ -52,13 +52,15 @@ public class Reference<T> {
 
   private T ref;
 
-  private String serializationType = SerializationType.PROTOBUF_FASTJSON.toString();
+  private String serializationType = SerializationType.PROTOBUF_FASTJSON;
 
-  private String loadbalanceType = LoadBalanceType.RANDOM.toString();
+  private String loadbalanceType = LoadBalanceType.RANDOM;
 
-  private String codecType = CodecType.CATTY.toString();
+  private String codecType = CodecType.CATTY;
 
-  private String endpointType = EndpointFactoryType.NETTY.toString();
+  private String endpointType = EndpointFactoryType.NETTY;
+
+  private String registryType = RegistryType.ZOOKEEPER;
 
   public Reference() {
   }
@@ -75,24 +77,12 @@ public class Reference<T> {
     this.interfaceClass = interfaceClass;
   }
 
-  public void setSerializationType(SerializationType serializationType) {
-    this.serializationType = serializationType.toString();
-  }
-
   public void setSerializationType(String serializationType) {
     this.serializationType = serializationType;
   }
 
   public void setLoadbalanceType(String loadbalanceType) {
     this.loadbalanceType = loadbalanceType;
-  }
-
-  public void setLoadbalanceType(LoadBalanceType loadbalanceType) {
-    this.loadbalanceType = loadbalanceType.toString();
-  }
-
-  public void setCodecType(CodecType codecType) {
-    this.codecType = codecType.toString();
   }
 
   public void setCodecType(String codecType) {
@@ -103,8 +93,8 @@ public class Reference<T> {
     this.endpointType = endpointType;
   }
 
-  public void setEndpointType(CodecType endpointType) {
-    this.endpointType = endpointType.toString();
+  public void setRegistryType(String registryType) {
+    this.registryType = registryType;
   }
 
   public T refer() {
@@ -125,8 +115,8 @@ public class Reference<T> {
           metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, endpointType);
 
           if (useRegistry()) {
-            // todo: make Registry configurable
-            registry = new ZookeeperRegistry(registryConfig);
+            registry = ExtensionFactory.getRegistry()
+                .getExtensionSingleton(registryType, registryConfig);
             registry.open();
             clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
             registry.subscribe(metaInfo, clusterInvoker);
@@ -134,7 +124,7 @@ public class Reference<T> {
           } else {
             Map<String, InvokerHolder> invokerHolderMap = new ConcurrentHashMap<>();
             clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
-            for(ServerAddress address : clientConfig.getAddresses()) {
+            for (ServerAddress address : clientConfig.getAddresses()) {
               MetaInfo newMetaInfo = metaInfo.clone();
               newMetaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());
               newMetaInfo.addMetaInfo(MetaInfoEnum.PORT, address.getPort());
@@ -158,10 +148,10 @@ public class Reference<T> {
   }
 
   private boolean useRegistry() {
-    if(registryConfig == null) {
+    if (registryConfig == null) {
       return false;
     }
-    if(registryConfig.getAddress().equals("N/A")) {
+    if (registryConfig.getAddress().equals("N/A")) {
       return false;
     }
     return true;

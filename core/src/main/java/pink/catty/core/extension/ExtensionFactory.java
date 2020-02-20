@@ -200,6 +200,10 @@ public final class ExtensionFactory<T> {
     return ENDPOINT_FACTORY;
   }
 
+  public static ExtensionFactory<Registry> getRegistry() {
+    return REGISTRY;
+  }
+
   /* static over */
 
   private Class<T> supportedExtension;
@@ -258,7 +262,7 @@ public final class ExtensionFactory<T> {
     }
   }
 
-  public T getExtensionSingleton(String name) {
+  public T getExtensionSingleton(String name, Object... args) {
     checkName(name);
     T extension = extensionMap.get(name);
     if (extension == null) {
@@ -267,7 +271,7 @@ public final class ExtensionFactory<T> {
         throw new ExtensionNotFoundException(
             "Extension type: " + supportedExtension.getName() + " name: " + name);
       } else {
-        extension = getExtensionProtoType(name);
+        extension = getExtensionProtoType(name, args);
         register(name, extension);
       }
     }

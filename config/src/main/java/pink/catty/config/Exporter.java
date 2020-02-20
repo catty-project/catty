@@ -23,6 +23,7 @@ import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.CodecType;
 import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
+import pink.catty.core.extension.ExtensionType.RegistryType;
 import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
@@ -36,7 +37,6 @@ import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.HeartBeatSerivceImpl;
 import pink.catty.core.service.HeartBeatService;
 import pink.catty.core.service.ServiceMeta;
-import pink.catty.extension.registry.ZookeeperRegistry;
 
 
 public class Exporter {
@@ -53,11 +53,13 @@ public class Exporter {
 
   private ServerAddress address;
 
-  private String serializationType = SerializationType.PROTOBUF_FASTJSON.toString();
+  private String serializationType = SerializationType.PROTOBUF_FASTJSON;
 
-  private String codecType = CodecType.CATTY.toString();
+  private String codecType = CodecType.CATTY;
 
-  private String endpointType = EndpointFactoryType.NETTY.toString();
+  private String endpointType = EndpointFactoryType.NETTY;
+
+  private String registryType = RegistryType.ZOOKEEPER;
 
   public Exporter(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
@@ -68,16 +70,8 @@ public class Exporter {
     this.registryConfig = registryConfig;
   }
 
-  public void setSerializationType(SerializationType serializationType) {
-    this.serializationType = serializationType.toString();
-  }
-
   public void setSerializationType(String serializationType) {
     this.serializationType = serializationType;
-  }
-
-  public void setCodecType(CodecType codecType) {
-    this.codecType = codecType.toString();
   }
 
   public void setCodecType(String codecType) {
@@ -88,8 +82,8 @@ public class Exporter {
     this.endpointType = endpointType;
   }
 
-  public void setEndpointType(CodecType endpointType) {
-    this.endpointType = endpointType.toString();
+  public void setRegistryType(String registryType) {
+    this.registryType = registryType;
   }
 
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
@@ -117,7 +111,7 @@ public class Exporter {
 
   public void export() {
     if (registry == null && registryConfig != null) {
-      registry = new ZookeeperRegistry(registryConfig);
+      registry = ExtensionFactory.getRegistry().getExtensionSingleton(registryType, registryConfig);
       registry.open();
     }
 
