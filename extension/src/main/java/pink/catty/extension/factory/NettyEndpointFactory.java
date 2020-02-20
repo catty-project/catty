@@ -17,6 +17,7 @@ package pink.catty.extension.factory;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.spi.AbstractEndpointFactory;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.invoker.Client;
@@ -25,7 +26,7 @@ import pink.catty.invokers.endpoint.NettyClient;
 import pink.catty.invokers.endpoint.NettyServer;
 import pink.catty.invokers.mapped.ServerRouterInvoker;
 
-@Extension("NETTY")
+@Extension(EndpointFactoryType.NETTY)
 public class NettyEndpointFactory extends AbstractEndpointFactory {
 
   @Override

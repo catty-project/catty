@@ -14,6 +14,7 @@
  */
 package pink.catty.extension.loadbalance;
 
+import pink.catty.core.extension.ExtensionType.LoadBalanceType;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.spi.LoadBalance;
@@ -28,7 +29,7 @@ import java.util.concurrent.ThreadLocalRandom;
  * service provider, they will be treated as the same weight 100. Weight set to 0 provider will
  * never be reached.
  */
-@Extension("WEIGHTED_RANDOM")
+@Extension(LoadBalanceType.WEIGHTED_RANDOM)
 public class WeightedRandomLoadBalance implements LoadBalance {
 
   @Override

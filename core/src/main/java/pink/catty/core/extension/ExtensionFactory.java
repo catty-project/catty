@@ -226,22 +226,12 @@ public final class ExtensionFactory<T> {
     extensionClassMap.putIfAbsent(name, (Class<? extends T>) extension.getClass());
   }
 
-  public void register(Enum<?> name, T extension) {
-    checkName(name);
-    register(name.toString(), extension);
-  }
-
   public void register(String name, Class<? extends T> extensionClass) {
     checkName(name);
     if (extensionClassMap.containsKey(name)) {
       throw new DuplicatedExtensionException();
     }
     extensionClassMap.put(name, extensionClass);
-  }
-
-  public void register(Enum<?> name, Class<? extends T> extensionClass) {
-    checkName(name);
-    register(name.toString(), extensionClass);
   }
 
   public T getExtensionProtoType(String name, Object... args) {
@@ -268,10 +258,6 @@ public final class ExtensionFactory<T> {
     }
   }
 
-  public T getExtensionProtoType(Enum<?> name, Object... args) {
-    return getExtensionProtoType(name.toString(), args);
-  }
-
   public T getExtensionSingleton(String name) {
     checkName(name);
     T extension = extensionMap.get(name);
@@ -286,10 +272,6 @@ public final class ExtensionFactory<T> {
       }
     }
     return extension;
-  }
-
-  public T getExtensionSingleton(Enum<?> name) {
-    return getExtensionSingleton(name.toString());
   }
 
   private void checkName(Object name) {

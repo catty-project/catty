@@ -21,9 +21,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import pink.catty.core.SerializationException;
 import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.Serialization;
 
-@Extension("HESSIAN2")
+@Extension(SerializationType.HESSIAN2)
 public class Hessian2Serialization implements Serialization {
 
   @Override

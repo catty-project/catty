@@ -14,6 +14,7 @@
  */
 package pink.catty.extension.loadbalance;
 
+import pink.catty.core.extension.ExtensionType.LoadBalanceType;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.spi.LoadBalance;
@@ -23,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Simple random load balance.
  */
-@Extension("RANDOM")
+@Extension(LoadBalanceType.RANDOM)
 public class RandomLoadBalance implements LoadBalance {
 
   @Override

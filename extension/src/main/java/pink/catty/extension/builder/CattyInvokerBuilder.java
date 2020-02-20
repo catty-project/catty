@@ -17,6 +17,7 @@ package pink.catty.extension.builder;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionFactory;
+import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Serialization;
@@ -31,7 +32,7 @@ import pink.catty.invokers.linked.ProviderSerializationInvoker;
 import pink.catty.invokers.linked.TimeoutInvoker;
 import pink.catty.invokers.meta.ProviderInvoker;
 
-@Extension("DIRECT")
+@Extension(InvokerBuilderType.DIRECT)
 public class CattyInvokerBuilder implements InvokerChainBuilder {
 
   @Override

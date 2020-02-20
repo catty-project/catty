@@ -20,9 +20,10 @@ import com.google.protobuf.Message;
 import java.lang.reflect.Method;
 import pink.catty.core.SerializationException;
 import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.Serialization;
 
-@Extension("PROTOBUF")
+@Extension(SerializationType.PROTOBUF)
 public class ProtoBufSerialization implements Serialization {
 
   @Override

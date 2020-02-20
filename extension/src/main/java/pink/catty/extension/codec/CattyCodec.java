@@ -18,6 +18,7 @@ import com.google.protobuf.ByteString;
 import java.util.ArrayList;
 import pink.catty.core.CodecException;
 import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.ExtensionType.CodecType;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.ProtobufPackageReader;
 import pink.catty.core.invoker.DefaultRequest;
@@ -26,7 +27,7 @@ import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
 import pink.catty.extension.codec.generated.CattyProtocol;
 
-@Extension("CATTY")
+@Extension(CodecType.CATTY)
 public class CattyCodec extends ProtobufPackageReader implements Codec {
 
   @Override
