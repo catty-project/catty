@@ -1,4 +1,5 @@
 [![Build Status](https://www.travis-ci.com/zhengrenjie/catty.svg?branch=master)](https://www.travis-ci.com/zhengrenjie/catty)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # Catty
 Whole new RPC framework!
@@ -25,7 +26,7 @@ See example package or test package.
 <dependency>
     <groupId>pink.catty</groupId>
     <artifactId>catty-all</artifactId>
-    <version>0.1.5</version>
+    <version>0.1.6</version>
 </dependency>
 ```
 
