@@ -33,72 +33,54 @@ See example package or test package.
 ### Sync:
 #### Server:
 ```java
-public class Server {
+ServerConfig serverConfig = ServerConfig.builder()
+    .port(20550)
+    .build();
 
-  public static void main(String[] args) {
-    ServerConfig serverConfig = ServerConfig.builder()
-        .port(20550)
-        .build();
+Exporter exporter = new Exporter(serverConfig);
+exporter.registerService(IService.class, new IServiceImpl());
+exporter.export();
 
-    Exporter exporter = new Exporter(serverConfig);
-    exporter.registerService(IService.class, new IServiceImpl());
-    exporter.export();
-  }
-}
 ```
 #### Client:
 ```java
-public class Client {
+ClientConfig clientConfig = ClientConfig.builder()
+    .addAddress("127.0.0.1:20550")
+    .build();
 
-  public static void main(String[] args) {
-    ClientConfig clientConfig = ClientConfig.builder()
-        .addAddress("127.0.0.1:20550")
-        .build();
+Reference<IService> reference = new Reference<>();
+reference.setClientConfig(clientConfig);
+reference.setInterfaceClass(IService.class);
 
-    Reference<IService> reference = new Reference<>();
-    reference.setClientConfig(clientConfig);
-    reference.setInterfaceClass(IService.class);
+IService service = reference.refer();
+System.out.println(service.say0());
+System.out.println(service.say1("catty"));
 
-    IService service = reference.refer();
-    System.out.println(service.say0());
-    System.out.println(service.say1("catty"));
-  }
-}
 ```
 ### Async:
 #### Server:
 ```java
-public class Server {
-  
-  public static void main(String[] args) {
-    ServerConfig serverConfig = ServerConfig.builder()
-        .port(20550)
-        .build();
+ServerConfig serverConfig = ServerConfig.builder()
+    .port(20550)
+    .build();
 
-    Exporter exporter = new Exporter(serverConfig);
-    exporter.registerService(IService.class, new IServiceImpl());
-    exporter.export();
-  }
-}
+Exporter exporter = new Exporter(serverConfig);
+exporter.registerService(IService.class, new IServiceImpl());
+exporter.export();
 ```
 #### Client:
 ```java
-public class Client {
+ClientConfig clientConfig = ClientConfig.builder()
+    .addAddress("127.0.0.1:20550")
+    .build();
 
-  public static void main(String[] args) {
-    ClientConfig clientConfig = ClientConfig.builder()
-        .addAddress("127.0.0.1:20550")
-        .build();
+Reference<IService> reference = new Reference<>();
+reference.setClientConfig(clientConfig);
+reference.setInterfaceClass(IService.class);
 
-    Reference<IService> reference = new Reference<>();
-    reference.setClientConfig(clientConfig);
-    reference.setInterfaceClass(IService.class);
-
-    IService service = reference.refer();
-    CompletableFuture<String> future = service.asyncSay("catty");
-    future.whenComplete((value, t) -> System.out.println(value));
-  }
-}
+IService service = reference.refer();
+CompletableFuture<String> future = service.asyncSay("catty");
+future.whenComplete((value, t) -> System.out.println(value));
 ```
 
 # *Welcome to join me!*
