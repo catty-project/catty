@@ -21,6 +21,7 @@ import pink.catty.benchmark.service.PojoService;
 import pink.catty.benchmark.service.PojoServiceImpl;
 import pink.catty.config.ClientConfig;
 import pink.catty.config.ServerConfig;
+import pink.catty.core.extension.ExtensionType.SerializationType;
 
 public class Benchmark {
 
@@ -31,6 +32,7 @@ public class Benchmark {
         .build();
 
     Exporter exporter = new Exporter(serverConfig);
+    exporter.setSerializationType(SerializationType.HESSIAN2);
     exporter.registerService(PojoService.class, new PojoServiceImpl());
     exporter.export();
 
@@ -39,6 +41,7 @@ public class Benchmark {
         .build();
 
     Reference<PojoService> reference = new Reference<>();
+    reference.setSerializationType(SerializationType.HESSIAN2);
     reference.setClientConfig(clientConfig);
     reference.setInterfaceClass(PojoService.class);
     PojoWrkGateway gateway = new PojoWrkGateway();

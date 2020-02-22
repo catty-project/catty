@@ -70,6 +70,9 @@ public class Exporter {
     this.registryConfig = registryConfig;
   }
 
+  /**
+   * {@link SerializationType}
+   */
   public void setSerializationType(String serializationType) {
     this.serializationType = serializationType;
   }
