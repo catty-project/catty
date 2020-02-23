@@ -77,22 +77,37 @@ public class Reference<T> {
     this.interfaceClass = interfaceClass;
   }
 
+  /**
+   * {@link SerializationType}
+   */
   public void setSerializationType(String serializationType) {
     this.serializationType = serializationType;
   }
 
+  /**
+   * {@link LoadBalanceType}
+   */
   public void setLoadbalanceType(String loadbalanceType) {
     this.loadbalanceType = loadbalanceType;
   }
 
+  /**
+   * {@link CodecType}
+   */
   public void setCodecType(String codecType) {
     this.codecType = codecType;
   }
 
+  /**
+   * {@link EndpointFactoryType}
+   */
   public void setEndpointType(String endpointType) {
     this.endpointType = endpointType;
   }
 
+  /**
+   * {@link RegistryType}
+   */
   public void setRegistryType(String registryType) {
     this.registryType = registryType;
   }

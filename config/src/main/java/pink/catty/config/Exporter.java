@@ -66,6 +66,9 @@ public class Exporter {
     this.address = serverConfig.getServerAddress();
   }
 
+  /**
+   * {@link RegistryType}
+   */
   public void setRegistryConfig(RegistryConfig registryConfig) {
     this.registryConfig = registryConfig;
   }
@@ -77,14 +80,23 @@ public class Exporter {
     this.serializationType = serializationType;
   }
 
+  /**
+   * {@link CodecType}
+   */
   public void setCodecType(String codecType) {
     this.codecType = codecType;
   }
 
+  /**
+   * {@link EndpointFactoryType}
+   */
   public void setEndpointType(String endpointType) {
     this.endpointType = endpointType;
   }
 
+  /**
+   * {@link RegistryType}
+   */
   public void setRegistryType(String registryType) {
     this.registryType = registryType;
   }
