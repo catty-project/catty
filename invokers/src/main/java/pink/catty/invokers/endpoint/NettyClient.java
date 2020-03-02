@@ -25,8 +25,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import pink.catty.core.CattyException;
 import pink.catty.core.Constants;
+import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.TransportException;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.spi.Codec;
@@ -94,18 +94,26 @@ public class NettyClient extends AbstractClient {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    tryInit();
-    Response response = new DefaultResponse(request.getRequestId());
-    addCurrentTask(request.getRequestId(), response);
-    byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
-    ByteBuf byteBuf = clientChannel.alloc().heapBuffer();
-    byteBuf.writeBytes(msg);
-    if (clientChannel.isActive()) {
-      clientChannel.writeAndFlush(byteBuf).syncUninterruptibly();
-    } else {
-      throw new CattyException("ClientChannel closed");
+    try {
+      tryInit();
+      Response response = new DefaultResponse(request.getRequestId());
+      addCurrentTask(request.getRequestId(), response);
+      byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
+      ByteBuf byteBuf = clientChannel.alloc().heapBuffer();
+      byteBuf.writeBytes(msg);
+      if (clientChannel.isActive()) {
+        clientChannel.writeAndFlush(byteBuf).syncUninterruptibly();
+      } else {
+        throw new EndpointInvalidException("ClientChannel closed");
+      }
+      return response;
+    } catch (EndpointInvalidException e) {
+      status = DISCONNECTED;
+      throw e;
+    } catch (Exception e) {
+      status = DISCONNECTED;
+      throw new EndpointInvalidException("ClientChannel invalid", e);
     }
-    return response;
   }
 
   private void tryInit() {

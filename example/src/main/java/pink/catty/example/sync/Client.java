@@ -14,6 +14,7 @@
  */
 package pink.catty.example.sync;
 
+import java.util.concurrent.TimeUnit;
 import pink.catty.config.Reference;
 import pink.catty.config.ClientConfig;
 import pink.catty.core.extension.ExtensionType.SerializationType;
@@ -33,6 +34,18 @@ public class Client {
 
     IService service = reference.refer();
     System.out.println(service.say0());
-    System.out.println(service.say1("catty"));
+    sleep();
+    System.out.println(service.say1("catty1"));
+    sleep();
+    System.out.println(service.say1("catty2"));
+
+  }
+
+  private static void sleep() {
+    try {
+      TimeUnit.SECONDS.sleep(10);
+    } catch (Exception e) {
+      // ignore
+    }
   }
 }

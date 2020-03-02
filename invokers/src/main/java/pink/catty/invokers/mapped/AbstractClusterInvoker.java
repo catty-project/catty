@@ -14,23 +14,6 @@
  */
 package pink.catty.invokers.mapped;
 
-import pink.catty.core.config.RegistryConfig;
-import pink.catty.core.extension.spi.Registry.NotifyListener;
-import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.extension.spi.InvokerChainBuilder;
-import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.AbstractMappedInvoker;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
-import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
-import pink.catty.core.extension.spi.LoadBalance;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
-import pink.catty.core.service.ServiceMeta;
-import pink.catty.core.utils.EndpointUtils;
-import pink.catty.core.utils.MetaInfoUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -38,18 +21,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import pink.catty.core.config.RegistryConfig;
+import pink.catty.core.extension.ExtensionFactory;
+import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
+import pink.catty.core.extension.spi.InvokerChainBuilder;
+import pink.catty.core.extension.spi.LoadBalance;
+import pink.catty.core.extension.spi.Registry.NotifyListener;
+import pink.catty.core.invoker.AbstractMappedInvoker;
+import pink.catty.core.invoker.Invocation;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.invoker.InvokerHolder;
+import pink.catty.core.invoker.Request;
+import pink.catty.core.invoker.Response;
+import pink.catty.core.meta.MetaInfo;
+import pink.catty.core.meta.MetaInfoEnum;
+import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.utils.EndpointUtils;
+import pink.catty.core.utils.MetaInfoUtils;
 
-public class ClusterInvoker extends AbstractMappedInvoker implements NotifyListener {
+public abstract class AbstractClusterInvoker extends AbstractMappedInvoker implements
+    NotifyListener {
 
-  private LoadBalance loadBalance;
+  protected LoadBalance loadBalance;
+  protected ServiceMeta serviceMeta;
+  protected MetaInfo metaInfo;
+  protected List<InvokerHolder> invokerList;
 
-  private ServiceMeta serviceMeta;
-
-  private MetaInfo metaInfo;
-
-  private List<InvokerHolder> invokerList;
-
-  public ClusterInvoker(MetaInfo metaInfo, ServiceMeta serviceMeta) {
+  public AbstractClusterInvoker(MetaInfo metaInfo, ServiceMeta serviceMeta) {
     this.metaInfo = metaInfo;
     this.serviceMeta = serviceMeta;
     this.loadBalance = ExtensionFactory.getLoadBalance()
@@ -59,15 +57,18 @@ public class ClusterInvoker extends AbstractMappedInvoker implements NotifyListe
   @Override
   public Response invoke(Request request, Invocation invocation) {
     InvokerHolder invokerHolder;
-    if(invokerList.size() == 1) {
+    if (invokerList.size() == 1) {
       invokerHolder = invokerList.get(0);
     } else {
       invokerHolder = loadBalance.select(invokerList);
     }
     invocation.setMetaInfo(invokerHolder.getMetaInfo());
     invocation.setServiceMeta(invokerHolder.getServiceMeta());
-    return invokerHolder.getInvoker().invoke(request, invocation);
+    return doInvoke(invokerHolder, request, invocation);
   }
+
+  protected abstract Response doInvoke(InvokerHolder invokerHolder, Request request,
+      Invocation invocation);
 
   @Override
   public void setInvokerMap(Map<String, InvokerHolder> invokerMap) {
@@ -75,7 +76,25 @@ public class ClusterInvoker extends AbstractMappedInvoker implements NotifyListe
     this.invokerList = new ArrayList<>(invokerMap.values());
   }
 
-  public void destroy() {
+  @Override
+  public synchronized InvokerHolder getInvoker(String invokerIdentify) {
+    return super.getInvoker(invokerIdentify);
+  }
+
+  @Override
+  public synchronized void registerInvoker(String serviceIdentify, InvokerHolder invokerHolder) {
+    super.registerInvoker(serviceIdentify, invokerHolder);
+    invokerList.add(invokerHolder);
+  }
+
+  @Override
+  public synchronized InvokerHolder unregisterInvoker(String serviceIdentify) {
+    InvokerHolder holder = super.unregisterInvoker(serviceIdentify);
+    invokerList.remove(holder);
+    return holder;
+  }
+
+  public synchronized void destroy() {
     invokerList.forEach(invokerHolder -> EndpointUtils.destroyInvoker(invokerHolder.getInvoker()));
   }
 
@@ -139,9 +158,12 @@ public class ClusterInvoker extends AbstractMappedInvoker implements NotifyListe
   }
 
   private Invoker createClientFromMetaInfo(MetaInfo metaInfo) {
-    InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
-        .getExtensionSingleton(InvokerBuilderType.DIRECT);
+    InvokerChainBuilder chainBuilder = getChainBuilder();
     return chainBuilder.buildConsumerInvoker(metaInfo);
+  }
+
+  protected InvokerChainBuilder getChainBuilder() {
+    return ExtensionFactory.getInvokerBuilder().getExtensionSingleton(InvokerBuilderType.DIRECT);
   }
 
 }

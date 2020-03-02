@@ -34,7 +34,8 @@ import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.ServiceMeta;
 import pink.catty.invokers.linked.ConsumerInvoker;
-import pink.catty.invokers.mapped.ClusterInvoker;
+import pink.catty.invokers.mapped.AbstractClusterInvoker;
+import pink.catty.invokers.mapped.RecoveryCluster;
 
 public class Reference<T> {
 
@@ -46,7 +47,7 @@ public class Reference<T> {
 
   private Client client;
 
-  private ClusterInvoker clusterInvoker;
+  private AbstractClusterInvoker clusterInvoker;
 
   private Registry registry;
 
@@ -133,12 +134,14 @@ public class Reference<T> {
             registry = ExtensionFactory.getRegistry()
                 .getExtensionSingleton(registryType, registryConfig);
             registry.open();
-            clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
+            // todo: Cluster type should be configurable.
+            clusterInvoker = new RecoveryCluster(metaInfo, serviceMeta);
             registry.subscribe(metaInfo, clusterInvoker);
             ref = ConsumerInvoker.getProxy(serviceMeta, clusterInvoker);
           } else {
             Map<String, InvokerHolder> invokerHolderMap = new ConcurrentHashMap<>();
-            clusterInvoker = new ClusterInvoker(metaInfo, serviceMeta);
+            // todo: Cluster type should be configurable.
+            clusterInvoker = new RecoveryCluster(metaInfo, serviceMeta);
             for (ServerAddress address : clientConfig.getAddresses()) {
               MetaInfo newMetaInfo = metaInfo.clone();
               newMetaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());

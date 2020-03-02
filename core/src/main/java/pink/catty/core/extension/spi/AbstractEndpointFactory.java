@@ -30,7 +30,7 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
   @Override
   public Client createClient(InnerClientConfig clientConfig) {
     Client client = clientCache.get(clientConfig);
-    if(client == null) {
+    if(client == null || !client.isAvailable()) {
       Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(clientConfig.getCodecType());
       client = doCreateClient(clientConfig, codec);
       clientCache.put(clientConfig, client);
@@ -41,7 +41,7 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
   @Override
   public Server createServer(InnerServerConfig serverConfig) {
     Server server = serverCache.get(serverConfig);
-    if(server == null) {
+    if(server == null || !server.isAvailable()) {
       Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(serverConfig.getCodecType());
       server = doCreateServer(serverConfig, codec);
       serverCache.put(serverConfig, server);

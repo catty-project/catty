@@ -27,12 +27,12 @@ public abstract class AbstractClient implements Client {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private static final int NEW = 0;
-  private static final int CONNECTED = 1;
-  private static final int DISCONNECTED = 2;
+  protected static final int NEW = 0;
+  protected static final int CONNECTED = 1;
+  protected static final int DISCONNECTED = 2;
 
   private InnerClientConfig config;
-  private volatile int status = NEW;
+  protected volatile int status = NEW;
   private Codec codec;
 
   private Map<Long, Response> currentTask = new ConcurrentHashMap<>();

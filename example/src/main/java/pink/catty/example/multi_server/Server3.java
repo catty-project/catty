@@ -12,24 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.meta;
+package pink.catty.example.multi_server;
 
-public enum MetaInfoEnum {
+import pink.catty.config.Exporter;
+import pink.catty.config.ServerConfig;
+import pink.catty.example.IService;
+import pink.catty.example.IServiceImpl;
 
-  IP,
-  PORT,
-  SERVICE_NAME,
-  WORKER_NUMBER,
-  TIMEOUT,
-  GROUP,
-  VERSION,
-  SERIALIZATION,
-  LOAD_BALANCE,
-  CODEC,
-  WEIGHT,
-  ENDPOINT,
-  HEALTH_CHECK_PERIOD,
-  RETRY_TIMES,
-  ;
+public class Server3 {
 
+  public static void main(String[] args) {
+    ServerConfig serverConfig = ServerConfig.builder()
+        .port(20552)
+        .build();
+
+    Exporter exporter = new Exporter(serverConfig);
+    exporter.registerService(IService.class, new IServiceImpl());
+    exporter.export();
+  }
 }

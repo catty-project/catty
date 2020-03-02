@@ -12,24 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.meta;
+package pink.catty.core;
 
-public enum MetaInfoEnum {
+public class EndpointInvalidException extends CattyException {
 
-  IP,
-  PORT,
-  SERVICE_NAME,
-  WORKER_NUMBER,
-  TIMEOUT,
-  GROUP,
-  VERSION,
-  SERIALIZATION,
-  LOAD_BALANCE,
-  CODEC,
-  WEIGHT,
-  ENDPOINT,
-  HEALTH_CHECK_PERIOD,
-  RETRY_TIMES,
-  ;
+  public EndpointInvalidException() {
+  }
 
+  public EndpointInvalidException(String message) {
+    super(message);
+  }
+
+  public EndpointInvalidException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public EndpointInvalidException(Throwable cause) {
+    super(cause);
+  }
+
+  public EndpointInvalidException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
 }

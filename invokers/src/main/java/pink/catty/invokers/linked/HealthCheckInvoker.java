@@ -16,36 +16,25 @@ package pink.catty.invokers.linked;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import pink.catty.core.Constants;
 import pink.catty.core.invoker.AbstractLinkedInvoker;
-import pink.catty.core.invoker.DefaultRequest;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.HealthCheckException;
-import pink.catty.core.service.HeartBeatService;
-import pink.catty.core.service.MethodMeta;
-import pink.catty.core.service.ServiceMeta;
-import pink.catty.core.utils.RequestIdGenerator;
+import pink.catty.core.utils.HeartBeatUtils;
 
 public class HealthCheckInvoker extends AbstractLinkedInvoker {
 
   private static final int DEFAULT_HEALTH_CHECK_PERIOD = 10 * 1000; // 30s
   private static final String TIMER_NAME = "CATTY_HEARTBEAT";
-  private static ServiceMeta<HeartBeatService> heartBeatServiceMeta;
-  private static MethodMeta methodMeta;
   private static Timer timer;
 
   static {
-    heartBeatServiceMeta = ServiceMeta.parse(HeartBeatService.class);
-    methodMeta = heartBeatServiceMeta.getMethodMetaByName(Constants.HEARTBEAT_METHOD_NAME);
     timer = new Timer(TIMER_NAME);
   }
 
@@ -101,15 +90,10 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
     @Override
     public void run() {
       try {
-        String arg = UUID.randomUUID().toString();
-        Object[] args = {arg};
-        Request request = new DefaultRequest(RequestIdGenerator.next(),
-            heartBeatServiceMeta.getServiceName(), methodMeta.getName(), args);
-        Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
-        invocation.setMetaInfo(metaInfo);
-        invocation.setTarget(HealthCheckInvoker.this);
-        invocation.setServiceMeta(heartBeatServiceMeta);
-        invocation.setInvokedMethod(methodMeta);
+        Request request = HeartBeatUtils.buildHeartBeatRequest();
+        String except = (String) request.getArgsValue()[0];
+        Invocation invocation = HeartBeatUtils
+            .buildHeartBeatInvocation(HealthCheckInvoker.this, metaInfo);
         Response response = invoke(request, invocation);
         try {
           response.await();
@@ -124,9 +108,9 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
           throw new HealthCheckException("Health check error", (Throwable) returnValue,
               HealthCheckInvoker.this);
         }
-        if (!arg.equals(returnValue)) {
+        if (!except.equals(returnValue)) {
           throw new HealthCheckException(
-              "Health check error, except: " + arg + " actually: " + returnValue,
+              "Health check error, except: " + except + " actually: " + returnValue,
               HealthCheckInvoker.this);
         }
         checkErrorRecord.set(0);

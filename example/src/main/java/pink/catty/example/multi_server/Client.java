@@ -14,6 +14,7 @@
  */
 package pink.catty.example.multi_server;
 
+import java.util.concurrent.TimeUnit;
 import pink.catty.config.ClientConfig;
 import pink.catty.config.Reference;
 import pink.catty.core.extension.ExtensionType.LoadBalanceType;
@@ -25,7 +26,7 @@ public class Client {
     ClientConfig clientConfig = ClientConfig.builder()
         .addAddress("127.0.0.1:20550")
         .addAddress("127.0.0.1:20551")
-        .addAddress("127.0.0.1:20552")
+//        .addAddress("127.0.0.1:20552")
         .build();
 
     Reference<IService> reference = new Reference<>();
@@ -34,7 +35,24 @@ public class Client {
     reference.setLoadbalanceType(LoadBalanceType.RANDOM);
 
     IService service = reference.refer();
-    System.out.println(service.say0());
-    System.out.println(service.say1("catty"));
+
+    for (int i = 0; i < 10000; i++) {
+      System.out.println(service.say0());
+      sleep();
+      System.out.println(service.say1("catty1"));
+      sleep();
+      System.out.println(service.say1("catty2"));
+      sleep();
+      System.out.println(service.say1("catty3"));
+    }
   }
+
+  private static void sleep() {
+    try {
+      TimeUnit.MILLISECONDS.sleep(500);
+    } catch (Exception e) {
+      // ignore
+    }
+  }
+
 }
