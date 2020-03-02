@@ -16,7 +16,7 @@ package pink.catty.core;
 
 import java.lang.Runtime;
 
-public interface GlobalConstants {
+public interface Constants {
 
   int THREAD_NUMBER = Runtime.getRuntime().availableProcessors();
 

@@ -54,7 +54,7 @@ public class Reference<T> {
 
   private String serializationType = SerializationType.PROTOBUF_FASTJSON;
 
-  private String loadbalanceType = LoadBalanceType.RANDOM;
+  private String loadBalanceType = LoadBalanceType.RANDOM;
 
   private String codecType = CodecType.CATTY;
 
@@ -87,8 +87,8 @@ public class Reference<T> {
   /**
    * {@link LoadBalanceType}
    */
-  public void setLoadbalanceType(String loadbalanceType) {
-    this.loadbalanceType = loadbalanceType;
+  public void setLoadbalanceType(String loadBalanceType) {
+    this.loadBalanceType = loadBalanceType;
   }
 
   /**
@@ -126,7 +126,7 @@ public class Reference<T> {
           metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
           metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
           metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
-          metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadbalanceType);
+          metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadBalanceType);
           metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, endpointType);
 
           if (useRegistry()) {

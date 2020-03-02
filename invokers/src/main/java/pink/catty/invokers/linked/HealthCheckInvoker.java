@@ -19,7 +19,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import pink.catty.core.GlobalConstants;
+import pink.catty.core.Constants;
 import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.DefaultRequest;
 import pink.catty.core.invoker.Invocation;
@@ -37,7 +37,7 @@ import pink.catty.core.utils.RequestIdGenerator;
 
 public class HealthCheckInvoker extends AbstractLinkedInvoker {
 
-  private static final int DEFAULT_HEALTH_CHECK_PERIOD = 30 * 1000; // 30s
+  private static final int DEFAULT_HEALTH_CHECK_PERIOD = 10 * 1000; // 30s
   private static final String TIMER_NAME = "CATTY_HEARTBEAT";
   private static ServiceMeta<HeartBeatService> heartBeatServiceMeta;
   private static MethodMeta methodMeta;
@@ -45,7 +45,7 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
 
   static {
     heartBeatServiceMeta = ServiceMeta.parse(HeartBeatService.class);
-    methodMeta = heartBeatServiceMeta.getMethodMetaByName(GlobalConstants.HEARTBEAT_METHOD_NAME);
+    methodMeta = heartBeatServiceMeta.getMethodMetaByName(Constants.HEARTBEAT_METHOD_NAME);
     timer = new Timer(TIMER_NAME);
   }
 

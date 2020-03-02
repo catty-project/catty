@@ -15,7 +15,7 @@
 package pink.catty.core.invoker;
 
 import java.util.Objects;
-import pink.catty.core.GlobalConstants;
+import pink.catty.core.Constants;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.support.worker.HashLoopGroup;
@@ -107,7 +107,7 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
 
   private void createExecutor() {
     int workerNum = config.getWorkerThreadNum() > 0 ? config.getWorkerThreadNum() :
-        GlobalConstants.THREAD_NUMBER * 2;
+        Constants.THREAD_NUMBER * 2;
     executor = new HashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
   }
 

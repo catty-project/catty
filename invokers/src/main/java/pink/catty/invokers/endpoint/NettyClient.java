@@ -26,7 +26,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import pink.catty.core.CattyException;
-import pink.catty.core.GlobalConstants;
+import pink.catty.core.Constants;
 import pink.catty.core.TransportException;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.spi.Codec;
@@ -44,14 +44,14 @@ public class NettyClient extends AbstractClient {
 
   public NettyClient(InnerClientConfig clientConfig, Codec codec) {
     super(clientConfig, codec);
-    nioEventLoopGroup = new NioEventLoopGroup(GlobalConstants.THREAD_NUMBER + 1);
+    nioEventLoopGroup = new NioEventLoopGroup(Constants.THREAD_NUMBER + 1);
   }
 
   @Override
   protected void doOpen() {
     Bootstrap bootstrap = new Bootstrap();
     int connectTimeoutMillis = getConfig().getTimeout() > 0 ? getConfig().getTimeout()
-        : GlobalConstants.DEFAULT_CLIENT_TIMEOUT;
+        : Constants.DEFAULT_CLIENT_TIMEOUT;
     bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMillis);
     bootstrap.option(ChannelOption.TCP_NODELAY, true);
     bootstrap.option(ChannelOption.SO_KEEPALIVE, true);
@@ -97,20 +97,15 @@ public class NettyClient extends AbstractClient {
     tryInit();
     Response response = new DefaultResponse(request.getRequestId());
     addCurrentTask(request.getRequestId(), response);
-    try {
-      byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
-      ByteBuf byteBuf = clientChannel.alloc().heapBuffer();
-      byteBuf.writeBytes(msg);
-      if (clientChannel.isActive()) {
-        clientChannel.writeAndFlush(byteBuf).sync();
-      } else {
-        throw new CattyException("ClientChannel closed");
-      }
-      return response;
-    } catch (Exception e) {
-      response.setValue(e);
-      return response;
+    byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
+    ByteBuf byteBuf = clientChannel.alloc().heapBuffer();
+    byteBuf.writeBytes(msg);
+    if (clientChannel.isActive()) {
+      clientChannel.writeAndFlush(byteBuf).syncUninterruptibly();
+    } else {
+      throw new CattyException("ClientChannel closed");
     }
+    return response;
   }
 
   private void tryInit() {

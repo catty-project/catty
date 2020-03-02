@@ -14,11 +14,11 @@
  */
 package pink.catty.core.service;
 
-import pink.catty.core.GlobalConstants;
+import pink.catty.core.Constants;
 
-@RpcService(name = GlobalConstants.HEARTBEAT_SERVICE_NAME)
+@RpcService(name = Constants.HEARTBEAT_SERVICE_NAME)
 public interface HeartBeatService {
 
-  @RpcMethod(name = GlobalConstants.HEARTBEAT_METHOD_NAME)
+  @RpcMethod(name = Constants.HEARTBEAT_METHOD_NAME)
   String heartBeat(String uuid);
 }
