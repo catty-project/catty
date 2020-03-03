@@ -9,5 +9,3 @@ cache:
   - $HOME/.m2
 
 install: mvn clean install -DskipTests -Dmaven.javadoc.skip=true -Dgpg.skip
-
-#script: mvn test
