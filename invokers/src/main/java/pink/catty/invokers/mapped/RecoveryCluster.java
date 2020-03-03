@@ -90,7 +90,6 @@ public class RecoveryCluster extends AbstractClusterInvoker {
                     cancel();
                   }
                 } catch (Exception e0) {
-                  System.out.println();
                   // ignore todo: maybe log
                 }
               }
