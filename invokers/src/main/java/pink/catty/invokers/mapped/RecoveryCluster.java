@@ -16,6 +16,9 @@ package pink.catty.invokers.mapped;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import pink.catty.core.CattyException;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.RpcTimeoutException;
@@ -48,10 +51,22 @@ public class RecoveryCluster extends AbstractClusterInvoker {
   @Override
   protected Response doInvoke(InvokerHolder invokerHolder, Request request, Invocation invocation) {
     int retryTimes = metaInfo.getIntDef(MetaInfoEnum.RETRY_TIMES, 3);
+    int delay = invocation.getInvokedMethod().getTimeout();
+    if (delay <= 0) {
+      delay = invocation.getServiceMeta().getTimeout();
+    }
+
     Response response = null;
     for (int i = 0; i < Math.max(retryTimes, invokerList.size()); i++) {
       try {
         response = invokerHolder.getInvoker().invoke(request, invocation);
+        if (delay >= 0) {
+          try {
+            response.await(delay, TimeUnit.MILLISECONDS);
+          } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            throw new HealthCheckException("Invoke error", e, null);
+          }
+        }
         break;
       } catch (HealthCheckException | EndpointInvalidException | RpcTimeoutException e) {
         unregisterInvoker(invokerHolder.getMetaInfo().toString());

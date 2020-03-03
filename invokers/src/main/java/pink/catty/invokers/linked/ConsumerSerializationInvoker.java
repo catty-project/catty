@@ -14,18 +14,19 @@
  */
 package pink.catty.invokers.linked;
 
+import java.util.concurrent.CompletionStage;
 import pink.catty.core.CattyException;
+import pink.catty.core.extension.spi.Serialization;
+import pink.catty.core.invoker.AbstractLinkedInvoker;
+import pink.catty.core.invoker.DefaultRequest;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
-import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
-import java.util.concurrent.CompletionStage;
 
 public class ConsumerSerializationInvoker extends AbstractLinkedInvoker {
 
@@ -42,8 +43,10 @@ public class ConsumerSerializationInvoker extends AbstractLinkedInvoker {
   @Override
   public Response invoke(Request request, Invocation invocation) {
     assert invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.CONSUMER;
-    MethodMeta methodMeta = invocation.getInvokedMethod();
+    request = new DefaultRequest(request.getRequestId(), request.getInterfaceName(),
+        request.getMethodName(), request.getArgsValue());
 
+    MethodMeta methodMeta = invocation.getInvokedMethod();
     Object[] args = request.getArgsValue();
     if (args != null) {
       Object[] afterSerialize = new Object[args.length];
@@ -56,7 +59,7 @@ public class ConsumerSerializationInvoker extends AbstractLinkedInvoker {
     Response response = next.invoke(request, invocation);
 
     CompletionStage<Object> newResponse = response.thenApply(returnValue -> {
-      if(!(returnValue instanceof byte[])) {
+      if (!(returnValue instanceof byte[])) {
         return returnValue;
       }
       byte[] bytes = (byte[]) returnValue;

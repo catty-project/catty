@@ -17,6 +17,8 @@ package pink.catty.invokers.linked;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.Invocation;
@@ -96,11 +98,11 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
             .buildHeartBeatInvocation(HealthCheckInvoker.this, metaInfo);
         Response response = invoke(request, invocation);
         try {
-          response.await();
+          response.await(period, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
           // ignore
           return;
-        } catch (ExecutionException e) {
+        } catch (ExecutionException | TimeoutException e) {
           throw new HealthCheckException("Invoke error", e, HealthCheckInvoker.this);
         }
         Object returnValue = response.getValue();
