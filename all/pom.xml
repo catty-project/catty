@@ -20,7 +20,7 @@
   <parent>
     <artifactId>catty-parent</artifactId>
     <groupId>pink.catty</groupId>
-    <version>0.1.6</version>
+    <version>0.1.7</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>catty-all</artifactId>
@@ -30,22 +30,22 @@
     <dependency>
       <groupId>pink.catty</groupId>
       <artifactId>catty-core</artifactId>
-      <version>0.1.6</version>
+      <version>0.1.7</version>
     </dependency>
     <dependency>
       <groupId>pink.catty</groupId>
       <artifactId>catty-invokers</artifactId>
-      <version>0.1.6</version>
+      <version>0.1.7</version>
     </dependency>
     <dependency>
       <groupId>pink.catty</groupId>
       <artifactId>catty-config</artifactId>
-      <version>0.1.6</version>
+      <version>0.1.7</version>
     </dependency>
     <dependency>
       <groupId>pink.catty</groupId>
       <artifactId>catty-extension</artifactId>
-      <version>0.1.6</version>
+      <version>0.1.7</version>
     </dependency>
   </dependencies>
 
