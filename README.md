@@ -26,8 +26,13 @@ See example package or test package.
 <dependency>
     <groupId>pink.catty</groupId>
     <artifactId>catty-all</artifactId>
-    <version>0.1.6</version>
+    <version>0.1.7</version>
 </dependency>
+```
+
+**build:**
+```bash
+mvn clean install -DskipTests -Dmaven.javadoc.skip=true -Dgpg.skip
 ```
 
 ### Sync:

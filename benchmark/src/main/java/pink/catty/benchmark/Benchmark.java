@@ -14,12 +14,12 @@
  */
 package pink.catty.benchmark;
 
-import pink.catty.config.Exporter;
-import pink.catty.config.Reference;
 import pink.catty.benchmark.common.PojoWrkGateway;
 import pink.catty.benchmark.service.PojoService;
 import pink.catty.benchmark.service.PojoServiceImpl;
 import pink.catty.config.ClientConfig;
+import pink.catty.config.Exporter;
+import pink.catty.config.Reference;
 import pink.catty.config.ServerConfig;
 import pink.catty.core.extension.ExtensionType.SerializationType;
 
