@@ -67,6 +67,7 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
     bd.getPropertyValues().addPropertyValue("id", id);
 
 
+
     return bd;
   }
 

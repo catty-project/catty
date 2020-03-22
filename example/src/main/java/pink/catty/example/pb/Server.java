@@ -15,7 +15,9 @@
 package pink.catty.example.pb;
 
 import pink.catty.config.Exporter;
+import pink.catty.config.ProtocolConfig;
 import pink.catty.config.ServerConfig;
+import pink.catty.core.extension.ExtensionType.SerializationType;
 
 public class Server {
 
@@ -23,8 +25,13 @@ public class Server {
     ServerConfig serverConfig = ServerConfig.builder()
         .port(20550)
         .build();
+
+    ProtocolConfig protocolConfig = new ProtocolConfig();
+    protocolConfig.setSerializationType(SerializationType.PROTOBUF);
+
     Exporter exporter = new Exporter(serverConfig);
     exporter.registerService(IService.class, new IServiceImpl());
+    exporter.setProtocolConfig(protocolConfig);
     exporter.export();
   }
 

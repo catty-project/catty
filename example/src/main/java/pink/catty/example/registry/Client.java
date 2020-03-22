@@ -14,6 +14,7 @@
  */
 package pink.catty.example.registry;
 
+import pink.catty.config.ProtocolConfig;
 import pink.catty.config.Reference;
 import pink.catty.config.ClientConfig;
 import pink.catty.core.config.RegistryConfig;
@@ -26,6 +27,8 @@ public class Client {
         .addAddress("127.0.0.1:20550")
         .build();
 
+    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
+
     RegistryConfig registryConfig = new RegistryConfig();
     registryConfig.setAddress("127.0.0.1:2181");
 
@@ -33,6 +36,7 @@ public class Client {
     reference.setClientConfig(clientConfig);
     reference.setRegistryConfig(registryConfig);
     reference.setInterfaceClass(IService.class);
+    reference.setProtocolConfig(protocolConfig);
 
     IService service = reference.refer();
     System.out.println(service.say0());

@@ -15,9 +15,9 @@
 package pink.catty.example.sync;
 
 import java.util.concurrent.TimeUnit;
-import pink.catty.config.Reference;
 import pink.catty.config.ClientConfig;
-import pink.catty.core.extension.ExtensionType.SerializationType;
+import pink.catty.config.ProtocolConfig;
+import pink.catty.config.Reference;
 import pink.catty.example.IService;
 
 public class Client {
@@ -27,9 +27,11 @@ public class Client {
         .addAddress("127.0.0.1:20550")
         .build();
 
+    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
+
     Reference<IService> reference = new Reference<>();
-    reference.setSerializationType(SerializationType.HESSIAN2);
     reference.setClientConfig(clientConfig);
+    reference.setProtocolConfig(protocolConfig);
     reference.setInterfaceClass(IService.class);
 
     IService service = reference.refer();

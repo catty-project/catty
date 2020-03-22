@@ -15,6 +15,7 @@
 package pink.catty.example.extension;
 
 import pink.catty.config.ClientConfig;
+import pink.catty.config.ProtocolConfig;
 import pink.catty.config.Reference;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.example.IService;
@@ -32,10 +33,13 @@ public class Client {
         .addAddress("127.0.0.1:20552")
         .build();
 
+    ProtocolConfig protocolConfig = new ProtocolConfig();
+    protocolConfig.setLoadBalanceType(MY_SLB);
+
     Reference<IService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);
+    reference.setProtocolConfig(protocolConfig);
     reference.setInterfaceClass(IService.class);
-    reference.setLoadbalanceType(MY_SLB);
 
     IService service = reference.refer();
     System.out.println(service.say0());

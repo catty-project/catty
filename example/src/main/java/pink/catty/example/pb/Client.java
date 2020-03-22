@@ -14,8 +14,10 @@
  */
 package pink.catty.example.pb;
 
+import pink.catty.config.ProtocolConfig;
 import pink.catty.config.Reference;
 import pink.catty.config.ClientConfig;
+import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.example.pb.generated.EchoProtocol;
 import pink.catty.example.pb.generated.EchoProtocol.Request;
 
@@ -26,9 +28,13 @@ public class Client {
         .addAddress("127.0.0.1:20550")
         .build();
 
+    ProtocolConfig protocolConfig = new ProtocolConfig();
+    protocolConfig.setSerializationType(SerializationType.PROTOBUF);
+
     Reference<IService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);
     reference.setInterfaceClass(IService.class);
+    reference.setProtocolConfig(protocolConfig);
 
     Request request = EchoProtocol.Request.newBuilder()
         .setValue("123321")

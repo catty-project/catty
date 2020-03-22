@@ -20,11 +20,7 @@ import pink.catty.core.ServerAddress;
 import pink.catty.core.config.InnerServerConfig.InnerServerConfigBuilder;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.ExtensionType.CodecType;
-import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
-import pink.catty.core.extension.ExtensionType.RegistryType;
-import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Registry;
@@ -51,51 +47,18 @@ public class Exporter {
 
   private RegistryConfig registryConfig;
 
-  private String serializationType = SerializationType.PROTOBUF_FASTJSON;
-
-  private String codecType = CodecType.CATTY;
-
-  private String endpointType = EndpointFactoryType.NETTY;
-
-  private String registryType = RegistryType.ZOOKEEPER;
+  private ProtocolConfig protocolConfig;
 
   public Exporter(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
   }
 
-  /**
-   * {@link RegistryType}
-   */
   public void setRegistryConfig(RegistryConfig registryConfig) {
     this.registryConfig = registryConfig;
   }
 
-  /**
-   * {@link SerializationType}
-   */
-  public void setSerializationType(String serializationType) {
-    this.serializationType = serializationType;
-  }
-
-  /**
-   * {@link CodecType}
-   */
-  public void setCodecType(String codecType) {
-    this.codecType = codecType;
-  }
-
-  /**
-   * {@link EndpointFactoryType}
-   */
-  public void setEndpointType(String endpointType) {
-    this.endpointType = endpointType;
-  }
-
-  /**
-   * {@link RegistryType}
-   */
-  public void setRegistryType(String registryType) {
-    this.registryType = registryType;
+  public void setProtocolConfig(ProtocolConfig protocolConfig) {
+    this.protocolConfig = protocolConfig;
   }
 
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
@@ -110,10 +73,10 @@ public class Exporter {
     metaInfo.addMetaInfo(MetaInfoEnum.GROUP, serviceMeta.getGroup());
     metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
     metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
-    metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
-    metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
+    metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, protocolConfig.getSerializationType());
+    metaInfo.addMetaInfo(MetaInfoEnum.CODEC, protocolConfig.getCodecType());
     metaInfo.addMetaInfo(MetaInfoEnum.WORKER_NUMBER, serverConfig.getWorkerThreadNum());
-    metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, endpointType);
+    metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, protocolConfig.getEndpointType());
 
     // todo: make InvokerChainBuilder configurable
     InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
@@ -125,14 +88,15 @@ public class Exporter {
 
   public void export() {
     if (registry == null && registryConfig != null) {
-      registry = ExtensionFactory.getRegistry().getExtensionSingleton(registryType, registryConfig);
+      registry = ExtensionFactory.getRegistry()
+          .getExtensionSingleton(registryConfig.getRegistryType(), registryConfig);
       registry.open();
     }
 
     EndpointFactory factory = ExtensionFactory.getEndpointFactory()
-        .getExtensionSingleton(endpointType);
+        .getExtensionSingleton(protocolConfig.getEndpointType());
     InnerServerConfigBuilder builder = serverConfig.toInnerConfigBuilder();
-    builder.codecType(codecType);
+    builder.codecType(protocolConfig.getCodecType());
     server = factory.createServer(builder.build());
     if (server == null) {
       // todo: more detail about creating server fail.
