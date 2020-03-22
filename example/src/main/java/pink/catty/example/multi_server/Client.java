@@ -16,8 +16,8 @@ package pink.catty.example.multi_server;
 
 import java.util.concurrent.TimeUnit;
 import pink.catty.config.ClientConfig;
+import pink.catty.config.ProtocolConfig;
 import pink.catty.config.Reference;
-import pink.catty.core.extension.ExtensionType.LoadBalanceType;
 import pink.catty.example.IService;
 
 public class Client {
@@ -26,13 +26,15 @@ public class Client {
     ClientConfig clientConfig = ClientConfig.builder()
         .addAddress("127.0.0.1:20550")
         .addAddress("127.0.0.1:20551")
-//        .addAddress("127.0.0.1:20552")
+        .addAddress("127.0.0.1:20552")
         .build();
+
+    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
 
     Reference<IService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);
+    reference.setProtocolConfig(protocolConfig);
     reference.setInterfaceClass(IService.class);
-    reference.setLoadbalanceType(LoadBalanceType.RANDOM);
 
     IService service = reference.refer();
 

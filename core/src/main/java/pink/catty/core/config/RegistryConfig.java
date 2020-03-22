@@ -14,9 +14,24 @@
  */
 package pink.catty.core.config;
 
+import pink.catty.core.extension.ExtensionType.RegistryType;
+
 public class RegistryConfig {
 
   private String address;
+
+  private String registryType = RegistryType.ZOOKEEPER;
+
+  public String getRegistryType() {
+    return registryType;
+  }
+
+  /**
+   * {@link RegistryType}
+   */
+  public void setRegistryType(String registryType) {
+    this.registryType = registryType;
+  }
 
   public String getAddress() {
     return address;

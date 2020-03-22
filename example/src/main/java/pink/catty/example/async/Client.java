@@ -14,10 +14,11 @@
  */
 package pink.catty.example.async;
 
-import pink.catty.config.Reference;
-import pink.catty.config.ClientConfig;
-import pink.catty.example.IService;
 import java.util.concurrent.CompletableFuture;
+import pink.catty.config.ClientConfig;
+import pink.catty.config.ProtocolConfig;
+import pink.catty.config.Reference;
+import pink.catty.example.IService;
 
 public class Client {
 
@@ -26,8 +27,11 @@ public class Client {
         .addAddress("127.0.0.1:20550")
         .build();
 
+    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
+
     Reference<IService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);
+    reference.setProtocolConfig(protocolConfig);
     reference.setInterfaceClass(IService.class);
 
     IService service = reference.refer();

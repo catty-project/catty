@@ -15,6 +15,7 @@
 package pink.catty.example.multi_server;
 
 import pink.catty.config.Exporter;
+import pink.catty.config.ProtocolConfig;
 import pink.catty.config.ServerConfig;
 import pink.catty.example.IService;
 import pink.catty.example.IServiceImpl;
@@ -26,8 +27,11 @@ public class Server1 {
         .port(20550)
         .build();
 
+    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
+
     Exporter exporter = new Exporter(serverConfig);
     exporter.registerService(IService.class, new IServiceImpl());
+    exporter.setProtocolConfig(protocolConfig);
     exporter.export();
   }
 }

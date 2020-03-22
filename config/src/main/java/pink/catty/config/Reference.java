@@ -19,15 +19,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.ExtensionType.CodecType;
-import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
-import pink.catty.core.extension.ExtensionType.LoadBalanceType;
-import pink.catty.core.extension.ExtensionType.RegistryType;
-import pink.catty.core.extension.ExtensionType.SerializationType;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Registry;
-import pink.catty.core.invoker.Client;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
@@ -45,23 +39,13 @@ public class Reference<T> {
 
   private RegistryConfig registryConfig;
 
-  private Client client;
-
   private AbstractClusterInvoker clusterInvoker;
 
   private Registry registry;
 
   private T ref;
 
-  private String serializationType = SerializationType.PROTOBUF_FASTJSON;
-
-  private String loadBalanceType = LoadBalanceType.RANDOM;
-
-  private String codecType = CodecType.CATTY;
-
-  private String endpointType = EndpointFactoryType.NETTY;
-
-  private String registryType = RegistryType.ZOOKEEPER;
+  private ProtocolConfig protocolConfig;
 
   public Reference() {
   }
@@ -74,43 +58,12 @@ public class Reference<T> {
     this.registryConfig = registryConfig;
   }
 
+  public void setProtocolConfig(ProtocolConfig protocolConfig) {
+    this.protocolConfig = protocolConfig;
+  }
+
   public void setInterfaceClass(Class<T> interfaceClass) {
     this.interfaceClass = interfaceClass;
-  }
-
-  /**
-   * {@link SerializationType}
-   */
-  public void setSerializationType(String serializationType) {
-    this.serializationType = serializationType;
-  }
-
-  /**
-   * {@link LoadBalanceType}
-   */
-  public void setLoadbalanceType(String loadBalanceType) {
-    this.loadBalanceType = loadBalanceType;
-  }
-
-  /**
-   * {@link CodecType}
-   */
-  public void setCodecType(String codecType) {
-    this.codecType = codecType;
-  }
-
-  /**
-   * {@link EndpointFactoryType}
-   */
-  public void setEndpointType(String endpointType) {
-    this.endpointType = endpointType;
-  }
-
-  /**
-   * {@link RegistryType}
-   */
-  public void setRegistryType(String registryType) {
-    this.registryType = registryType;
   }
 
   public T refer() {
@@ -125,14 +78,14 @@ public class Reference<T> {
           metaInfo.addMetaInfo(MetaInfoEnum.GROUP, serviceMeta.getGroup());
           metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
           metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
-          metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, serializationType);
-          metaInfo.addMetaInfo(MetaInfoEnum.CODEC, codecType);
-          metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, loadBalanceType);
-          metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, endpointType);
+          metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, protocolConfig.getSerializationType());
+          metaInfo.addMetaInfo(MetaInfoEnum.CODEC, protocolConfig.getCodecType());
+          metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, protocolConfig.getLoadBalanceType());
+          metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, protocolConfig.getEndpointType());
 
           if (useRegistry()) {
             registry = ExtensionFactory.getRegistry()
-                .getExtensionSingleton(registryType, registryConfig);
+                .getExtensionSingleton(registryConfig.getRegistryType(), registryConfig);
             registry.open();
             // todo: Cluster type should be configurable.
             clusterInvoker = new RecoveryCluster(metaInfo, serviceMeta);
@@ -176,10 +129,6 @@ public class Reference<T> {
   }
 
   public void derefer() {
-    if (client != null && client.isAvailable()) {
-      client.destroy();
-      client = null;
-    }
     if (registry != null && registry.isOpen()) {
       registry.close();
       registry = null;
