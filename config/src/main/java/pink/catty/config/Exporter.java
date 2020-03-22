@@ -43,15 +43,13 @@ public class Exporter {
 
   private Map<String, InvokerHolder> serviceHandlers = new HashMap<>();
 
-  private ServerConfig serverConfig;
-
   private Server server;
-
-  private RegistryConfig registryConfig;
 
   private Registry registry;
 
-  private ServerAddress address;
+  private ServerConfig serverConfig;
+
+  private RegistryConfig registryConfig;
 
   private String serializationType = SerializationType.PROTOBUF_FASTJSON;
 
@@ -63,7 +61,6 @@ public class Exporter {
 
   public Exporter(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
-    this.address = serverConfig.getServerAddress();
   }
 
   /**
@@ -102,6 +99,8 @@ public class Exporter {
   }
 
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
+    ServerAddress address = serverConfig.getServerAddress();
+
     ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
     serviceMeta.setTarget(serviceObject);
 
@@ -155,7 +154,6 @@ public class Exporter {
   }
 
   public void unexport() {
-    address = null;
     InvokerRegistry invokerRegistry = server.getInvokerRegistry();
     if (registry != null && registry.isOpen()) {
       serviceHandlers
