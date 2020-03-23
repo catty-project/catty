@@ -88,13 +88,14 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
         bd.getPropertyValues().addPropertyValue("serializationType", serialization);
       }
       if(!isEmpty(loadBalance)) {
-        bd.getPropertyValues().addPropertyValue("endpointType", endpoint);
+        bd.getPropertyValues ().addPropertyValue("endpointType", endpoint);
       }
       if(!isEmpty(loadBalance)) {
         bd.getPropertyValues().addPropertyValue("clusterType", cluster);
       }
-
     }
+
+
 
     return bd;
   }
