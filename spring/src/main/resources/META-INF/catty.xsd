@@ -15,19 +15,22 @@
   -->
 
 <xsd:schema xmlns="http://catty.pink/schema/catty"
-    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-    targetNamespace="http://catty.pink/schema/catty">
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:tool="http://www.springframework.org/schema/tool"
+  xmlns:beans="http://www.springframework.org/schema/beans"
+  targetNamespace="http://catty.pink/schema/catty">
 
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
-    <xsd:import namespace="http://www.springframework.org/schema/tool"/>
-    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+  <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+  <xsd:import namespace="http://www.springframework.org/schema/tool"/>
+  <xsd:import namespace="http://www.springframework.org/schema/beans"/>
 
-    <xsd:annotation>
-      <xsd:documentation><![CDATA[ Namespace support for the catty. ]]></xsd:documentation>
+  <xsd:annotation>
+    <xsd:documentation><![CDATA[ Namespace support for the catty. ]]></xsd:documentation>
   </xsd:annotation>
 
   <xsd:element name="server-config">
     <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:ID"/>
       <xsd:attribute name="port" type="xsd:int" use="required">
         <xsd:annotation>
           <xsd:documentation><![CDATA[ Port. ]]></xsd:documentation>
@@ -43,6 +46,7 @@
 
   <xsd:element name="client-config">
     <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:ID"/>
       <xsd:attribute name="timeout" type="xsd:int" default="999999">
         <xsd:annotation>
           <xsd:documentation><![CDATA[ Timeout. ]]></xsd:documentation>
@@ -58,6 +62,7 @@
 
   <xsd:element name="protocol" id="protocol">
     <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:ID"/>
       <xsd:attribute name="codec" type="xsd:string" default="catty">
         <xsd:annotation>
           <xsd:documentation><![CDATA[ Codec. ]]></xsd:documentation>
@@ -81,6 +86,75 @@
       <xsd:attribute name="cluster" type="xsd:string" default="auto-recovery">
         <xsd:annotation>
           <xsd:documentation><![CDATA[ Cluster. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="reference">
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="protocol" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Protocol. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="client-config" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Protocol. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="interface" type="xsd:token" use="required">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[ Interface. ]]></xsd:documentation>
+          <xsd:appinfo>
+            <tool:annotation>
+              <tool:expected-type type="java.lang.Class"/>
+            </tool:annotation>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="service">
+    <xsd:complexType>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="interface" type="xsd:token" use="required">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[ Interface. ]]></xsd:documentation>
+          <xsd:appinfo>
+            <tool:annotation>
+              <tool:expected-type type="java.lang.Class"/>
+            </tool:annotation>
+          </xsd:appinfo>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="ref" type="xsd:token" use="required">
+        <xsd:annotation>
+          <xsd:documentation>
+            <![CDATA[ Implement. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="exporter">
+    <xsd:complexType>
+      <xsd:choice minOccurs="0" maxOccurs="unbounded">
+        <xsd:element name="service-ref" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:choice>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="protocol" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Protocol. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="server-config" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Protocol. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
     </xsd:complexType>

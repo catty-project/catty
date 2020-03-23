@@ -54,6 +54,14 @@ public class ClientConfig {
     return timeout;
   }
 
+  public void setAddresses(List<ServerAddress> addresses) {
+    this.addresses = addresses;
+  }
+
+  public void setTimeout(int timeout) {
+    this.timeout = timeout;
+  }
+
   /**
    * Builder
    */

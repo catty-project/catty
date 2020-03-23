@@ -66,6 +66,14 @@ public class ServerConfig {
     return needOrder;
   }
 
+  public void setPort(int port) {
+    this.port = port;
+  }
+
+  public void setWorkerThreadNum(int workerThreadNum) {
+    this.workerThreadNum = workerThreadNum;
+  }
+
   public ServerAddress getServerAddress() {
     if(address == null) {
       synchronized (this) {

@@ -14,32 +14,24 @@
  */
 package pink.catty.spring.bean;
 
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
-import pink.catty.config.Reference;
+public class ServiceBean<T> {
 
-public class ReferenceFactoryBean<T> extends Reference<T> implements FactoryBean<T>,
-    InitializingBean, DisposableBean {
+  private Class<T> interfaceClass;
+  private T ref;
 
-
-  @Override
-  public void destroy() throws Exception {
-    derefer();
+  public Class<T> getInterfaceClass() {
+    return interfaceClass;
   }
 
-  @Override
-  public void afterPropertiesSet() throws Exception {
-    refer();
+  public void setInterfaceClass(Class<T> interfaceClass) {
+    this.interfaceClass = interfaceClass;
   }
 
-  @Override
-  public T getObject() throws Exception {
-    return refer();
+  public T getRef() {
+    return ref;
   }
 
-  @Override
-  public Class<?> getObjectType() {
-    return getInterfaceClass();
+  public void setRef(T ref) {
+    this.ref = ref;
   }
 }

@@ -49,7 +49,14 @@ public class Exporter {
 
   private ProtocolConfig protocolConfig;
 
+  public Exporter() {
+  }
+
   public Exporter(ServerConfig serverConfig) {
+    this.serverConfig = serverConfig;
+  }
+
+  public void setServerConfig(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
   }
 

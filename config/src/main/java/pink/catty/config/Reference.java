@@ -66,6 +66,10 @@ public class Reference<T> {
     this.interfaceClass = interfaceClass;
   }
 
+  public Class<T> getInterfaceClass() {
+    return interfaceClass;
+  }
+
   public T refer() {
     if (clientConfig == null) {
       throw new NullPointerException("ClientConfig can't be null");

@@ -15,31 +15,18 @@
 package pink.catty.spring.bean;
 
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import pink.catty.config.Reference;
+import pink.catty.config.Exporter;
 
-public class ReferenceFactoryBean<T> extends Reference<T> implements FactoryBean<T>,
-    InitializingBean, DisposableBean {
-
+public class ExporterBean extends Exporter implements InitializingBean, DisposableBean {
 
   @Override
   public void destroy() throws Exception {
-    derefer();
+    unexport();
   }
 
   @Override
   public void afterPropertiesSet() throws Exception {
-    refer();
-  }
-
-  @Override
-  public T getObject() throws Exception {
-    return refer();
-  }
-
-  @Override
-  public Class<?> getObjectType() {
-    return getInterfaceClass();
+    export();
   }
 }

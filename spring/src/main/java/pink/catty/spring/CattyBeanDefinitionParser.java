@@ -24,8 +24,11 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import pink.catty.spring.bean.ClientConfigBean;
-import pink.catty.spring.bean.ProtocolFactoryBean;
+import pink.catty.spring.bean.ExporterBean;
+import pink.catty.spring.bean.ProtocolConfigBean;
+import pink.catty.spring.bean.ReferenceFactoryBean;
 import pink.catty.spring.bean.ServerConfigBean;
+import pink.catty.spring.bean.ServiceBean;
 
 public class CattyBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -43,6 +46,11 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
   private static final String ADDRESS_SPLIT = ";";
   private static final String SERVER_PORT = "port";
   private static final String WORKER_NUM = "worker-num";
+  private static final String PROTOCOL_REF = "protocol";
+  private static final String CLIENT_CONFIG_REF = "client-config";
+  private static final String SERVER_CONFIG_REF = "server-config";
+  private static final String INTERFACE = "interface";
+  private static final String IMPLEMENT_REF = "ref";
 
   private Class<?> beanClass;
 
@@ -78,7 +86,7 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
       parserContext.getRegistry().registerBeanDefinition(id, bd);
     }
 
-    if (ProtocolFactoryBean.class == beanClass) {
+    if (ProtocolConfigBean.class == beanClass) {
       String loadBalance = element.getAttribute(LOAD_BALANCE);
       String codec = element.getAttribute(CODEC);
       String serialization = element.getAttribute(SERIALIZATION);
@@ -108,9 +116,7 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
       if (!isEmpty(timeout)) {
         bd.getPropertyValues().addPropertyValue("timeout", timeout);
       }
-      if(isEmpty(addresses)) {
-        throw new IllegalStateException("xml client-config's addresses can't be empty" + id);
-      }
+      assertNotEmpty(addresses, "xml client-config's addresses can't be empty" + id);
       String[] address = addresses.split(ADDRESS_SPLIT);
       bd.getPropertyValues().addPropertyValue("addresses", Arrays.asList(address));
     }
@@ -118,18 +124,65 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
     if (ServerConfigBean.class == beanClass) {
       String port = element.getAttribute(SERVER_PORT);
       String workerNum = element.getAttribute(WORKER_NUM);
-      if(isEmpty(port)) {
-        throw new IllegalStateException("xml server-config's port can't be empty" + id);
-      } else {
-        bd.getPropertyValues().addPropertyValue("port", port);
-      }
+      assertNotEmpty(port, "xml server-config's port can't be empty" + id);
+      bd.getPropertyValues().addPropertyValue("port", port);
       if (!isEmpty(workerNum)) {
         bd.getPropertyValues().addPropertyValue("workerThreadNum", workerNum);
       }
     }
 
+    if (ReferenceFactoryBean.class == beanClass) {
+      String interfaceName = element.getAttribute(INTERFACE);
+      String protocolConfig = element.getAttribute(PROTOCOL_REF);
+      String clientConfig = element.getAttribute(CLIENT_CONFIG_REF);
+      assertNotEmpty(interfaceName, "xml reference's interfaceName can't be empty" + id);
+      assertNotEmpty(protocolConfig, "xml reference's protocolConfig can't be empty" + id);
+      assertNotEmpty(clientConfig, "xml reference's clientConfig can't be empty" + id);
+      Class<?> interfaceClass;
+      try {
+        interfaceClass = Class.forName(interfaceName);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Class not found: " + interfaceName, e);
+      }
+      bd.getPropertyValues().addPropertyValue("interfaceClass", interfaceClass);
+      bd.getPropertyValues()
+          .addPropertyValue("protocolConfig", new RuntimeBeanReference(protocolConfig));
+      bd.getPropertyValues()
+          .addPropertyValue("clientConfig", new RuntimeBeanReference(clientConfig));
+    }
+
+    if (ServiceBean.class == beanClass) {
+      String interfaceName = element.getAttribute(INTERFACE);
+      String ref = element.getAttribute(IMPLEMENT_REF);
+      assertNotEmpty(interfaceName, "xml ServiceBean's interface can't be empty" + id);
+      assertNotEmpty(ref, "xml ServiceBean's ref can't be empty" + id);
+      Class<?> interfaceClass;
+      try {
+        interfaceClass = Class.forName(interfaceName);
+      } catch (ClassNotFoundException e) {
+        throw new IllegalStateException("Class not found: " + interfaceName, e);
+      }
+      bd.getPropertyValues().addPropertyValue("interfaceClass", interfaceClass);
+      bd.getPropertyValues().addPropertyValue("ref", new RuntimeBeanReference(ref));
+    }
+
+    if (ExporterBean.class == beanClass) {
+      String protocolConfig = element.getAttribute(PROTOCOL_REF);
+      String serverConfig = element.getAttribute(SERVER_CONFIG_REF);
+      assertNotEmpty(protocolConfig, "xml ExporterBean's protocolConfig can't be empty" + id);
+      assertNotEmpty(serverConfig, "xml ExporterBean's serverConfig can't be empty" + id);
+      bd.getPropertyValues()
+          .addPropertyValue("protocolConfig", new RuntimeBeanReference(protocolConfig));
+      bd.getPropertyValues()
+          .addPropertyValue("serverConfig", new RuntimeBeanReference(serverConfig));
+      parseServiceRef(element.getChildNodes());
+    }
 
     return bd;
+  }
+
+  private static void parseServiceRef(NodeList nodeList) {
+
   }
 
   private static void parseProperties(NodeList nodeList, RootBeanDefinition beanDefinition) {
@@ -165,5 +218,11 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
       return true;
     }
     return false;
+  }
+
+  private void assertNotEmpty(String str, String msg) {
+    if (isEmpty(str)) {
+      throw new IllegalStateException(msg);
+    }
   }
 }

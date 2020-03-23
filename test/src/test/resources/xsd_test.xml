@@ -22,6 +22,8 @@
   http://catty.pink/schema/catty
   http://catty.pink/schema/catty.xsd">
 
-  <catty:protocol codec="catty"/>
+  <catty:protocol id="protocol"/>
+  <catty:client-config addresses="127.0.0.1:8080;127.0.0.1:8081" timeout="3000"/>
+  <catty:server-config port="25001" worker-num="300"/>
 
 </beans>

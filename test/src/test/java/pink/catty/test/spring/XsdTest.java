@@ -14,15 +14,19 @@
  */
 package pink.catty.test.spring;
 
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import pink.catty.config.ClientConfig;
 import pink.catty.config.ProtocolConfig;
+import pink.catty.config.ServerConfig;
+import pink.catty.core.ServerAddress;
 
 public class XsdTest {
 
   @Test
-  public void test1() {
+  public void testProtocol() {
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("xsd_test.xml");
     ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
     Assert.assertEquals(protocolConfig.getClusterType(), "auto-recovery");
@@ -30,6 +34,25 @@ public class XsdTest {
     Assert.assertEquals(protocolConfig.getSerializationType(), "hessian2");
     Assert.assertEquals(protocolConfig.getEndpointType(), "netty");
     Assert.assertEquals(protocolConfig.getLoadBalanceType(), "random");
+  }
+
+  @Test
+  public void testClientConfig() {
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("xsd_test.xml");
+    ClientConfig clientConfig = context.getBean(ClientConfig.class);
+    Assert.assertEquals(clientConfig.getTimeout(), 3000);
+    List<ServerAddress> addressList = clientConfig.getAddresses();
+    Assert.assertEquals(addressList.size(), 2);
+    Assert.assertEquals(addressList.get(0), new ServerAddress("127.0.0.1", 8080));
+    Assert.assertEquals(addressList.get(1), new ServerAddress("127.0.0.1", 8081));
+  }
+
+  @Test
+  public void testServerConfig() {
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("xsd_test.xml");
+    ServerConfig serverConfig = context.getBean(ServerConfig.class);
+    Assert.assertEquals(serverConfig.getPort(), 25001);
+    Assert.assertEquals(serverConfig.getWorkerThreadNum(), 300);
   }
 
 }
