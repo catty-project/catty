@@ -31,7 +31,7 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
   private static final String NAME = "name";
   private static final String CLASS = "class";
   private static final String CODEC = "codec";
-  private static final String LOAD_BALANCE = "loadbalance";
+  private static final String LOAD_BALANCE = "load-balance";
   private static final String SERIALIZATION = "serialization";
   private static final String ENDPOINT = "endpoint";
   private static final String CLUSTER = "cluster";
@@ -69,7 +69,6 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
       }
       parserContext.getRegistry().registerBeanDefinition(id, bd);
     }
-    bd.getPropertyValues().addPropertyValue("id", id);
 
     if (ProtocolFactoryBean.class == beanClass) {
       String loadBalance = element.getAttribute(LOAD_BALANCE);

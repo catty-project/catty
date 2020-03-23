@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2020 The Catty Project
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<xsd:schema xmlns="http://catty.pink/schema/catty"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://catty.pink/schema/catty">
+
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:import namespace="http://www.springframework.org/schema/tool"/>
+    <xsd:import namespace="http://www.springframework.org/schema/beans"/>
+
+    <xsd:annotation>
+      <xsd:documentation><![CDATA[ Namespace support for the catty. ]]></xsd:documentation>
+  </xsd:annotation>
+
+  <xsd:element name="protocol" id="protocol">
+    <xsd:complexType>
+      <xsd:attribute name="codec" type="xsd:string" default="catty">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="serialization" type="xsd:string" default="hessian2">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="endpoint" type="xsd:string" default="netty">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="load-balance" type="xsd:string" default="random">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="cluster" type="xsd:string" default="auto-recovery">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+
+    </xsd:complexType>
+  </xsd:element>
+
+</xsd:schema>

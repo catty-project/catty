@@ -15,13 +15,12 @@
 package pink.catty.spring;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
-import pink.catty.spring.bean.ReferenceFactoryBean;
+import pink.catty.spring.bean.ProtocolFactoryBean;
 
 public class CattyNamespaceHandler extends NamespaceHandlerSupport {
 
   @Override
   public void init() {
-    registerBeanDefinitionParser("referer", new CattyBeanDefinitionParser(ReferenceFactoryBean.class));
-//    registerBeanDefinitionParser("service", new CattyBeanDefinitionParser());
+    registerBeanDefinitionParser("protocol", new CattyBeanDefinitionParser(ProtocolFactoryBean.class));
   }
 }

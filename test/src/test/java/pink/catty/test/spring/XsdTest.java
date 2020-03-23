@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Catty Project
+ * Copyright 2019 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,10 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.spring.bean;
+package pink.catty.test.spring;
 
+import org.junit.Assert;
+import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import pink.catty.config.ProtocolConfig;
 
-public class ProtocolFactoryBean<T> extends ProtocolConfig {
+public class XsdTest {
+
+  @Test
+  public void test1() {
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("xsd_test.xml");
+    ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
+    Assert.assertEquals(protocolConfig.getClusterType(), "");
+  }
 
 }
