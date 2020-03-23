@@ -26,34 +26,63 @@
       <xsd:documentation><![CDATA[ Namespace support for the catty. ]]></xsd:documentation>
   </xsd:annotation>
 
+  <xsd:element name="server-config">
+    <xsd:complexType>
+      <xsd:attribute name="port" type="xsd:int" use="required">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Port. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="worker-num" type="xsd:int" default="256">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Worker thread number. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="client-config">
+    <xsd:complexType>
+      <xsd:attribute name="timeout" type="xsd:int" default="999999">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Timeout. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="addresses" type="xsd:string" use="required">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Addresses, split by ';'. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+
   <xsd:element name="protocol" id="protocol">
     <xsd:complexType>
       <xsd:attribute name="codec" type="xsd:string" default="catty">
         <xsd:annotation>
-          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+          <xsd:documentation><![CDATA[ Codec. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
       <xsd:attribute name="serialization" type="xsd:string" default="hessian2">
         <xsd:annotation>
-          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+          <xsd:documentation><![CDATA[ Serialization. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
       <xsd:attribute name="endpoint" type="xsd:string" default="netty">
         <xsd:annotation>
-          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+          <xsd:documentation><![CDATA[ Endpoint. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
       <xsd:attribute name="load-balance" type="xsd:string" default="random">
         <xsd:annotation>
-          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+          <xsd:documentation><![CDATA[ LoadBalance. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
       <xsd:attribute name="cluster" type="xsd:string" default="auto-recovery">
         <xsd:annotation>
-          <xsd:documentation><![CDATA[ The method invoke timeout. ]]></xsd:documentation>
+          <xsd:documentation><![CDATA[ Cluster. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
-
     </xsd:complexType>
   </xsd:element>
 

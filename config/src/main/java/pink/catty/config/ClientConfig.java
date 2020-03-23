@@ -28,7 +28,10 @@ public class ClientConfig {
   private List<ServerAddress> addresses;
   private int timeout;
 
-  private ClientConfig(List<ServerAddress> addresses, int timeout) {
+  public ClientConfig() {
+  }
+
+  public ClientConfig(List<ServerAddress> addresses, int timeout) {
     this.addresses = addresses;
     this.timeout = timeout;
   }

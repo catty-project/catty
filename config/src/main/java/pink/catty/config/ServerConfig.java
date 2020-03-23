@@ -25,19 +25,18 @@ public class ServerConfig {
     return new ServerConfigBuilder();
   }
 
-  private ServerConfig(int port, int workerThreadNum, boolean needOrder) {
+  public ServerConfig() {
+  }
+
+  public ServerConfig(int port, int workerThreadNum, boolean needOrder) {
     this.port = port;
     this.workerThreadNum = workerThreadNum;
     this.needOrder = needOrder;
-    String serverIp = NetUtils.getLocalAddress().getHostAddress();
-    this.address = new ServerAddress(serverIp, port);
   }
 
   private int port;
-
   private int workerThreadNum;
-
-  private ServerAddress address;
+  private volatile ServerAddress address;
 
   /**
    * If every request from the same TCP should be executed by order, set this
@@ -49,7 +48,9 @@ public class ServerConfig {
    * as a consequence of severe performance.
    *
    * Actually, there are rarely conditions you should set this option true.
+   * @deprecated bad design. will be removed at 0.2.?
    */
+  @Deprecated
   private boolean needOrder = false;
 
   public int getPort() {
@@ -60,11 +61,20 @@ public class ServerConfig {
     return workerThreadNum;
   }
 
+  @Deprecated
   public boolean isNeedOrder() {
     return needOrder;
   }
 
   public ServerAddress getServerAddress() {
+    if(address == null) {
+      synchronized (this) {
+        if(address == null) {
+          String serverIp = NetUtils.getLocalAddress().getHostAddress();
+          this.address = new ServerAddress(serverIp, port);
+        }
+      }
+    }
     return address;
   }
 

@@ -14,6 +14,7 @@
  */
 package pink.catty.spring;
 
+import java.util.Arrays;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.RootBeanDefinition;
@@ -22,7 +23,9 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import pink.catty.spring.bean.ClientConfigBean;
 import pink.catty.spring.bean.ProtocolFactoryBean;
+import pink.catty.spring.bean.ServerConfigBean;
 
 public class CattyBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -35,6 +38,11 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
   private static final String SERIALIZATION = "serialization";
   private static final String ENDPOINT = "endpoint";
   private static final String CLUSTER = "cluster";
+  private static final String TIMEOUT = "timeout";
+  private static final String ADDRESSES = "addresses";
+  private static final String ADDRESS_SPLIT = ";";
+  private static final String SERVER_PORT = "port";
+  private static final String WORKER_NUM = "worker-num";
 
   private Class<?> beanClass;
 
@@ -77,23 +85,48 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
       String endpoint = element.getAttribute(ENDPOINT);
       String cluster = element.getAttribute(CLUSTER);
 
-      if(!isEmpty(loadBalance)) {
+      if (!isEmpty(loadBalance)) {
         bd.getPropertyValues().addPropertyValue("loadBalanceType", loadBalance);
       }
-      if(!isEmpty(loadBalance)) {
+      if (!isEmpty(loadBalance)) {
         bd.getPropertyValues().addPropertyValue("codecType", codec);
       }
-      if(!isEmpty(loadBalance)) {
+      if (!isEmpty(loadBalance)) {
         bd.getPropertyValues().addPropertyValue("serializationType", serialization);
       }
-      if(!isEmpty(loadBalance)) {
-        bd.getPropertyValues ().addPropertyValue("endpointType", endpoint);
+      if (!isEmpty(loadBalance)) {
+        bd.getPropertyValues().addPropertyValue("endpointType", endpoint);
       }
-      if(!isEmpty(loadBalance)) {
+      if (!isEmpty(loadBalance)) {
         bd.getPropertyValues().addPropertyValue("clusterType", cluster);
       }
     }
 
+    if (ClientConfigBean.class == beanClass) {
+      String timeout = element.getAttribute(TIMEOUT);
+      String addresses = element.getAttribute(ADDRESSES);
+      if (!isEmpty(timeout)) {
+        bd.getPropertyValues().addPropertyValue("timeout", timeout);
+      }
+      if(isEmpty(addresses)) {
+        throw new IllegalStateException("xml client-config's addresses can't be empty" + id);
+      }
+      String[] address = addresses.split(ADDRESS_SPLIT);
+      bd.getPropertyValues().addPropertyValue("addresses", Arrays.asList(address));
+    }
+
+    if (ServerConfigBean.class == beanClass) {
+      String port = element.getAttribute(SERVER_PORT);
+      String workerNum = element.getAttribute(WORKER_NUM);
+      if(isEmpty(port)) {
+        throw new IllegalStateException("xml server-config's port can't be empty" + id);
+      } else {
+        bd.getPropertyValues().addPropertyValue("port", port);
+      }
+      if (!isEmpty(workerNum)) {
+        bd.getPropertyValues().addPropertyValue("workerThreadNum", workerNum);
+      }
+    }
 
 
     return bd;
