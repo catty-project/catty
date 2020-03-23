@@ -1,4 +1,5 @@
 [![Build Status](https://www.travis-ci.com/zhengrenjie/catty.svg?branch=master)](https://www.travis-ci.com/zhengrenjie/catty)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/pink.catty/catty-all/badge.svg)](https://maven-badges.herokuapp.com/maven-central/pink.catty/catty-all)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # Catty
