@@ -34,6 +34,7 @@ public class Benchmark {
     ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
 
     Exporter exporter = new Exporter(serverConfig);
+    exporter.setProtocolConfig(protocolConfig);
     exporter.registerService(PojoService.class, new PojoServiceImpl());
     exporter.export();
 
@@ -43,6 +44,7 @@ public class Benchmark {
 
     Reference<PojoService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);
+    reference.setProtocolConfig(protocolConfig);
     reference.setInterfaceClass(PojoService.class);
     PojoWrkGateway gateway = new PojoWrkGateway();
     gateway.start(reference.refer());
