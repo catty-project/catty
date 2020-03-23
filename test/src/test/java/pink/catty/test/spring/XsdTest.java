@@ -25,7 +25,11 @@ public class XsdTest {
   public void test1() {
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("xsd_test.xml");
     ProtocolConfig protocolConfig = context.getBean(ProtocolConfig.class);
-    Assert.assertEquals(protocolConfig.getClusterType(), "");
+    Assert.assertEquals(protocolConfig.getClusterType(), "auto-recovery");
+    Assert.assertEquals(protocolConfig.getCodecType(), "catty");
+    Assert.assertEquals(protocolConfig.getSerializationType(), "hessian2");
+    Assert.assertEquals(protocolConfig.getEndpointType(), "netty");
+    Assert.assertEquals(protocolConfig.getLoadBalanceType(), "random");
   }
 
 }
