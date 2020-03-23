@@ -14,9 +14,9 @@
  */
 package pink.catty.test;
 
-import org.testng.Assert;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
 import pink.catty.core.CodecException;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.ExtensionFactory;
@@ -37,8 +37,8 @@ public class EndpointTest {
   private static final int TEST_TIMEOUT = 0;
   private static final String TEST_CODEC_TYPE = "TEST";
 
-  @BeforeTest
-  public void registerCodec() {
+  @BeforeClass
+  public static void registerCodec() {
     ExtensionFactory.getCodec().register(TEST_CODEC_TYPE, MockCodec.class);
   }
 
@@ -53,14 +53,14 @@ public class EndpointTest {
     Assert.assertEquals(TEST_ADDRESS, clientConfig.getAddress());
   }
 
-  @Test(dependsOnMethods = "clientInnerConfigTest")
+  @Test
   public void clientFactoryTest() {
     InnerClientConfig clientConfig = new InnerClientConfig(TEST_IP, TEST_PORT, TEST_ADDRESS,
         TEST_TIMEOUT, TEST_CODEC_TYPE);
     EndpointFactory factory = new NettyEndpointFactory();
     Client client0 = factory.createClient(clientConfig);
     Client client1 = factory.createClient(clientConfig);
-    Assert.assertSame(client0, client1);
+    Assert.assertEquals(client0, client1);
     clientConfig = new InnerClientConfig(TEST_IP_1, TEST_PORT, TEST_ADDRESS,
         TEST_TIMEOUT, TEST_CODEC_TYPE);
     Client client2 = factory.createClient(clientConfig);

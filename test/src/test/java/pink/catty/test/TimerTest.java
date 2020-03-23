@@ -14,12 +14,12 @@
  */
 package pink.catty.test;
 
-import pink.catty.core.support.timer.HashedWheelTimer;
-import pink.catty.core.support.timer.Timer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import org.testng.Assert;
-import org.testng.annotations.Test;
+import org.junit.Assert;
+import org.junit.Test;
+import pink.catty.core.support.timer.HashedWheelTimer;
+import pink.catty.core.support.timer.Timer;
 
 public class TimerTest {
 
@@ -34,7 +34,7 @@ public class TimerTest {
     try {
       Assert.assertSame(future.get(), obj);
     } catch (Exception e) {
-      Assert.fail("fail", e);
+      Assert.fail("fail");
     }
   }
 
@@ -47,7 +47,7 @@ public class TimerTest {
     try {
       Assert.assertSame(future.get(), obj);
     } catch (Exception e) {
-      Assert.fail("fail", e);
+      Assert.fail("fail");
     }
   }
 

@@ -22,6 +22,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import pink.catty.spring.bean.ProtocolFactoryBean;
 
 public class CattyBeanDefinitionParser implements BeanDefinitionParser {
 
@@ -29,7 +30,11 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
   private static final String ID = "id";
   private static final String NAME = "name";
   private static final String CLASS = "class";
-
+  private static final String CODEC = "codec";
+  private static final String LOAD_BALANCE = "loadbalance";
+  private static final String SERIALIZATION = "serialization";
+  private static final String ENDPOINT = "endpoint";
+  private static final String CLUSTER = "cluster";
 
   private Class<?> beanClass;
 
@@ -66,7 +71,30 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
     }
     bd.getPropertyValues().addPropertyValue("id", id);
 
+    if (ProtocolFactoryBean.class == beanClass) {
+      String loadBalance = element.getAttribute(LOAD_BALANCE);
+      String codec = element.getAttribute(CODEC);
+      String serialization = element.getAttribute(SERIALIZATION);
+      String endpoint = element.getAttribute(ENDPOINT);
+      String cluster = element.getAttribute(CLUSTER);
 
+      if(!isEmpty(loadBalance)) {
+        bd.getPropertyValues().addPropertyValue("loadBalanceType", loadBalance);
+      }
+      if(!isEmpty(loadBalance)) {
+        bd.getPropertyValues().addPropertyValue("codecType", codec);
+      }
+      if(!isEmpty(loadBalance)) {
+        bd.getPropertyValues().addPropertyValue("serializationType", serialization);
+      }
+      if(!isEmpty(loadBalance)) {
+        bd.getPropertyValues().addPropertyValue("endpointType", endpoint);
+      }
+      if(!isEmpty(loadBalance)) {
+        bd.getPropertyValues().addPropertyValue("clusterType", cluster);
+      }
+
+    }
 
     return bd;
   }

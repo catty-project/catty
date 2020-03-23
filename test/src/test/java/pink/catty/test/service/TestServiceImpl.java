@@ -19,6 +19,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import pink.catty.test.service.exception.Test1CheckedException;
+import pink.catty.test.service.exception.Test2CheckedException;
 
 public class TestServiceImpl implements TestService {
 

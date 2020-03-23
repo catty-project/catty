@@ -15,6 +15,8 @@
 package pink.catty.test.service;
 
 import java.util.concurrent.CompletableFuture;
+import pink.catty.test.service.exception.Test1CheckedException;
+import pink.catty.test.service.exception.Test2CheckedException;
 
 public interface TestService {
 

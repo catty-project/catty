@@ -39,13 +39,13 @@ public class Reference<T> {
 
   private RegistryConfig registryConfig;
 
+  private ProtocolConfig protocolConfig;
+
   private AbstractClusterInvoker clusterInvoker;
 
   private Registry registry;
 
-  private T ref;
-
-  private ProtocolConfig protocolConfig;
+  private volatile T ref;
 
   public Reference() {
   }

@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.test.service;
+package pink.catty.test.service.exception;
 
 public class Test1CheckedException extends Exception {
 
