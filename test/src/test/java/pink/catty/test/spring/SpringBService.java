@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Catty Project
+ * Copyright 2020 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,18 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.example;
+package pink.catty.test.spring;
 
-import java.util.concurrent.CompletableFuture;
-import pink.catty.core.service.RpcService;
+public interface SpringBService {
 
-@RpcService(timeout = 10000)
-public interface IService {
-
-  String say0();
-
-  String say1(String name);
-
-  CompletableFuture<String> asyncSay(String name);
+  String echo(String str);
 
 }

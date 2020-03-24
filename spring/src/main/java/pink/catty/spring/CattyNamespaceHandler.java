@@ -16,7 +16,9 @@ package pink.catty.spring;
 
 import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 import pink.catty.spring.bean.ClientConfigBean;
+import pink.catty.spring.bean.ExporterBean;
 import pink.catty.spring.bean.ProtocolConfigBean;
+import pink.catty.spring.bean.ReferenceFactoryBean;
 import pink.catty.spring.bean.ServerConfigBean;
 
 public class CattyNamespaceHandler extends NamespaceHandlerSupport {
@@ -26,5 +28,7 @@ public class CattyNamespaceHandler extends NamespaceHandlerSupport {
     registerBeanDefinitionParser("protocol", new CattyBeanDefinitionParser(ProtocolConfigBean.class));
     registerBeanDefinitionParser("client-config", new CattyBeanDefinitionParser(ClientConfigBean.class));
     registerBeanDefinitionParser("server-config", new CattyBeanDefinitionParser(ServerConfigBean.class));
+    registerBeanDefinitionParser("exporter", new CattyBeanDefinitionParser(ExporterBean.class));
+    registerBeanDefinitionParser("reference", new CattyBeanDefinitionParser(ReferenceFactoryBean.class));
   }
 }

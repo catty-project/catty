@@ -14,11 +14,18 @@
  */
 package pink.catty.spring.bean;
 
+import java.util.List;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import pink.catty.config.Exporter;
 
 public class ExporterBean extends Exporter implements InitializingBean, DisposableBean {
+
+  private List<ServiceBean> services;
+
+  public void setServices(List<ServiceBean> services) {
+    this.services = services;
+  }
 
   @Override
   public void destroy() throws Exception {
@@ -27,6 +34,9 @@ public class ExporterBean extends Exporter implements InitializingBean, Disposab
 
   @Override
   public void afterPropertiesSet() throws Exception {
+    for(ServiceBean serviceBean : services) {
+      registerService(serviceBean.getInterfaceClass(), serviceBean.getRef());
+    }
     export();
   }
 }

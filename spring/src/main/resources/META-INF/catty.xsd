@@ -144,7 +144,7 @@
   <xsd:element name="exporter">
     <xsd:complexType>
       <xsd:choice minOccurs="0" maxOccurs="unbounded">
-        <xsd:element name="service-ref" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:element ref="service" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:choice>
       <xsd:attribute name="id" type="xsd:ID"/>
       <xsd:attribute name="protocol" type="xsd:string" use="required">

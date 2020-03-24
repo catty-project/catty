@@ -22,17 +22,12 @@
   http://catty.pink/schema/catty
   http://catty.pink/schema/catty.xsd">
 
-  <bean id="serviceA" class="pink.catty.test.spring.SpringAServiceImpl"/>
-  <bean id="serviceB" class="pink.catty.test.spring.SpringBServiceImpl"/>
+  <bean id="iService" class="pink.catty.example.IServiceImpl"/>
 
   <catty:protocol id="protocol"/>
-  <catty:client-config id="client" addresses="127.0.0.1:8080;127.0.0.1:8081" timeout="3000"/>
   <catty:server-config id="server" port="25001" worker-num="300"/>
 
   <catty:exporter protocol="protocol" server-config="server">
-    <catty:service interface="pink.catty.test.spring.SpringBService" ref="serviceA"/>
-    <catty:service interface="pink.catty.test.spring.SpringAService" ref="serviceB"/>
+    <catty:service interface="pink.catty.example.IServiceImpl" ref="iService"/>
   </catty:exporter>
-
-  <catty:reference protocol="protocol" client-config="client" interface="pink.catty.test.spring.SpringAService"/>
 </beans>

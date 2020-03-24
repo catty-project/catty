@@ -17,31 +17,31 @@ package pink.catty.core.extension;
 public final class ExtensionType {
 
   public interface SerializationType {
-    String PROTOBUF = "PROTOBUF";
-    String FASTJSON = "FASTJSON";
-    String PROTOBUF_FASTJSON = "PROTOBUF_FASTJSON";
-    String HESSIAN2 = "HESSIAN2";
+    String PROTOBUF = "protobuf";
+    String FASTJSON = "fastjson";
+    String PROTOBUF_FASTJSON = "protobuf_fastjson";
+    String HESSIAN2 = "hessian2";
   }
 
   public interface LoadBalanceType {
-    String RANDOM = "RANDOM";
-    String WEIGHTED_RANDOM = "WEIGHTED_RANDOM";
+    String RANDOM = "random";
+    String WEIGHTED_RANDOM = "weighted_random";
   }
 
   public interface CodecType {
-    String CATTY = "CATTY";
+    String CATTY = "catty";
   }
 
   public interface InvokerBuilderType {
-    String DIRECT = "DIRECT";
+    String DIRECT = "direct";
   }
 
   public interface RegistryType {
-    String ZOOKEEPER = "ZOOKEEPER";
+    String ZOOKEEPER = "zookeeper";
   }
 
   public interface EndpointFactoryType {
-    String NETTY = "NETTY";
+    String NETTY = "netty";
   }
 
 }

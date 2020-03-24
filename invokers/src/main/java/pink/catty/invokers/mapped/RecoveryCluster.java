@@ -86,7 +86,6 @@ public class RecoveryCluster extends AbstractClusterInvoker {
                   if (except.equals(heartBeatResp.getValue())) {
                     InvokerHolder newHolder = new InvokerHolder(metaInfo, serviceMeta, invoker);
                     registerInvoker(metaInfo.toString(), newHolder);
-                    System.out.println("recovery");
                     cancel();
                   }
                 } catch (Exception e0) {

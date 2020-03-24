@@ -12,26 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.example.sync;
+package pink.catty.example.spring;
 
-import pink.catty.config.Exporter;
-import pink.catty.config.ProtocolConfig;
-import pink.catty.config.ServerConfig;
-import pink.catty.example.IService;
-import pink.catty.example.IServiceImpl;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class Server {
 
   public static void main(String[] args) {
-    ServerConfig serverConfig = ServerConfig.builder()
-        .port(20550)
-        .build();
-
-    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
-
-    Exporter exporter = new Exporter(serverConfig);
-    exporter.setProtocolConfig(protocolConfig);
-    exporter.registerService(IService.class, new IServiceImpl());
-    exporter.export();
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("provider.xml");
   }
+
 }

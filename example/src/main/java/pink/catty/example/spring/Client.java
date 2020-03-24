@@ -12,18 +12,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.example;
+package pink.catty.example.spring;
 
-import java.util.concurrent.CompletableFuture;
-import pink.catty.core.service.RpcService;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import pink.catty.example.IService;
 
-@RpcService(timeout = 10000)
-public interface IService {
+public class Client {
 
-  String say0();
+  public static void main(String[] args) {
+    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("consumer.xml");
 
-  String say1(String name);
+    IService service = context.getBean(IService.class);
+    System.out.println(service.say0());
+    System.out.println(service.say1("catty"));
 
-  CompletableFuture<String> asyncSay(String name);
+  }
 
 }

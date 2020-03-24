@@ -16,7 +16,9 @@ package pink.catty.spring;
 
 import java.util.Arrays;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
+import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -64,27 +66,7 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
     bd.setLazyInit(false);
     bd.setBeanClass(beanClass);
 
-    String id = element.getAttribute(ID);
-    if ((id == null || id.length() == 0)) {
-      String generatedBeanName = element.getAttribute(NAME);
-      if (generatedBeanName == null || generatedBeanName.length() == 0) {
-        generatedBeanName = element.getAttribute(CLASS);
-      }
-      if (generatedBeanName == null || generatedBeanName.length() == 0) {
-        generatedBeanName = beanClass.getName();
-      }
-      id = generatedBeanName;
-      int counter = 2;
-      while (parserContext.getRegistry().containsBeanDefinition(id)) {
-        id = generatedBeanName + (counter++);
-      }
-    }
-    if (id != null && id.length() > 0) {
-      if (parserContext.getRegistry().containsBeanDefinition(id)) {
-        throw new IllegalStateException("Duplicate spring bean id " + id);
-      }
-      parserContext.getRegistry().registerBeanDefinition(id, bd);
-    }
+    String id = parseIdAndRegister(element, parserContext, beanClass, bd);
 
     if (ProtocolConfigBean.class == beanClass) {
       String loadBalance = element.getAttribute(LOAD_BALANCE);
@@ -151,21 +133,6 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
           .addPropertyValue("clientConfig", new RuntimeBeanReference(clientConfig));
     }
 
-    if (ServiceBean.class == beanClass) {
-      String interfaceName = element.getAttribute(INTERFACE);
-      String ref = element.getAttribute(IMPLEMENT_REF);
-      assertNotEmpty(interfaceName, "xml ServiceBean's interface can't be empty" + id);
-      assertNotEmpty(ref, "xml ServiceBean's ref can't be empty" + id);
-      Class<?> interfaceClass;
-      try {
-        interfaceClass = Class.forName(interfaceName);
-      } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Class not found: " + interfaceName, e);
-      }
-      bd.getPropertyValues().addPropertyValue("interfaceClass", interfaceClass);
-      bd.getPropertyValues().addPropertyValue("ref", new RuntimeBeanReference(ref));
-    }
-
     if (ExporterBean.class == beanClass) {
       String protocolConfig = element.getAttribute(PROTOCOL_REF);
       String serverConfig = element.getAttribute(SERVER_CONFIG_REF);
@@ -175,14 +142,49 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
           .addPropertyValue("protocolConfig", new RuntimeBeanReference(protocolConfig));
       bd.getPropertyValues()
           .addPropertyValue("serverConfig", new RuntimeBeanReference(serverConfig));
-      parseServiceRef(element.getChildNodes());
+      parseServiceRef(bd, element.getChildNodes(), parserContext);
     }
 
     return bd;
   }
 
-  private static void parseServiceRef(NodeList nodeList) {
+  private void parseServiceRef(RootBeanDefinition root, NodeList nodeList,
+      ParserContext parserContext) {
+    if (nodeList != null && nodeList.getLength() > 0) {
+      ManagedList services = null;
+      for (int i = 0; i < nodeList.getLength(); i++) {
+        Node node = nodeList.item(i);
+        if (node instanceof Element && "service".equals(node.getLocalName())) {
+          if (services == null) {
+            services = new ManagedList();
+          }
+          Element element = (Element) node;
+          RootBeanDefinition service = new RootBeanDefinition();
+          service.setLazyInit(false);
+          String serviceId = parseIdAndRegister(element, parserContext, beanClass, service);
 
+          String interfaceName = element.getAttribute(INTERFACE);
+          String ref = element.getAttribute(IMPLEMENT_REF);
+          assertNotEmpty(interfaceName, "xml ServiceBean's interface can't be empty" + serviceId);
+          assertNotEmpty(ref, "xml ServiceBean's ref can't be empty" + serviceId);
+          Class<?> interfaceClass;
+          try {
+            interfaceClass = Class.forName(interfaceName);
+          } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Class not found: " + interfaceName, e);
+          }
+          service.setBeanClass(ServiceBean.class);
+          service.getPropertyValues().addPropertyValue("interfaceClass", interfaceClass);
+          service.getPropertyValues().addPropertyValue("ref", new RuntimeBeanReference(ref));
+          BeanDefinitionHolder serviceBeanDefinitionHolder = new BeanDefinitionHolder(service,
+              serviceId);
+          services.add(serviceBeanDefinitionHolder);
+        }
+      }
+      if (services != null) {
+        root.getPropertyValues().addPropertyValue("services", services);
+      }
+    }
   }
 
   private static void parseProperties(NodeList nodeList, RootBeanDefinition beanDefinition) {
@@ -213,14 +215,40 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
     }
   }
 
-  private boolean isEmpty(String str) {
+  private static String parseIdAndRegister(Element element, ParserContext parserContext,
+      Class<?> beanClass, RootBeanDefinition bd) {
+    String id = element.getAttribute(ID);
+    if ((id == null || id.length() == 0)) {
+      String generatedBeanName = element.getAttribute(NAME);
+      if (generatedBeanName == null || generatedBeanName.length() == 0) {
+        generatedBeanName = element.getAttribute(CLASS);
+      }
+      if (generatedBeanName == null || generatedBeanName.length() == 0) {
+        generatedBeanName = beanClass.getName();
+      }
+      id = generatedBeanName;
+      int counter = 2;
+      while (parserContext.getRegistry().containsBeanDefinition(id)) {
+        id = generatedBeanName + (counter++);
+      }
+    }
+    if (id != null && id.length() > 0) {
+      if (parserContext.getRegistry().containsBeanDefinition(id)) {
+        throw new IllegalStateException("Duplicate spring bean id " + id);
+      }
+      parserContext.getRegistry().registerBeanDefinition(id, bd);
+    }
+    return id;
+  }
+
+  private static boolean isEmpty(String str) {
     if (str == null || EMPTY.equals(str)) {
       return true;
     }
     return false;
   }
 
-  private void assertNotEmpty(String str, String msg) {
+  private static void assertNotEmpty(String str, String msg) {
     if (isEmpty(str)) {
       throw new IllegalStateException(msg);
     }
