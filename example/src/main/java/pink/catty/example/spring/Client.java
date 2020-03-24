@@ -24,8 +24,5 @@ public class Client {
 
     IService service = context.getBean(IService.class);
     System.out.println(service.say0());
-    System.out.println(service.say1("catty"));
-
   }
-
 }
