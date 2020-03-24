@@ -28,6 +28,6 @@
   <catty:server-config id="server" port="25001" worker-num="300"/>
 
   <catty:exporter protocol="protocol" server-config="server">
-    <catty:service interface="pink.catty.example.IServiceImpl" ref="iService"/>
+    <catty:service interface="pink.catty.example.IService" ref="iService"/>
   </catty:exporter>
 </beans>
