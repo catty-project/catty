@@ -25,7 +25,7 @@
   <bean id="serviceA" class="pink.catty.test.spring.SpringAServiceImpl"/>
   <bean id="serviceB" class="pink.catty.test.spring.SpringBServiceImpl"/>
 
-  <catty:protocol id="protocol"/>
+  <catty:protocol id="protocol" retry-times="3" recovery-period="5000"/>
   <catty:client-config id="client" addresses="127.0.0.1:8080;127.0.0.1:8081" timeout="3000"/>
   <catty:server-config id="server" port="25001" worker-num="300"/>
 

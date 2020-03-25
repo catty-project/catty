@@ -34,6 +34,8 @@ public class XsdTest {
     Assert.assertEquals(protocolConfig.getSerializationType(), "hessian2");
     Assert.assertEquals(protocolConfig.getEndpointType(), "netty");
     Assert.assertEquals(protocolConfig.getLoadBalanceType(), "random");
+    Assert.assertEquals(protocolConfig.getRetryTimes(), 3);
+    Assert.assertEquals(protocolConfig.getRecoveryPeriod(), 5000);
   }
 
   @Test

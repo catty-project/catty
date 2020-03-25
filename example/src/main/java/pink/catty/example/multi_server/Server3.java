@@ -30,8 +30,8 @@ public class Server3 {
     ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
 
     Exporter exporter = new Exporter(serverConfig);
-    exporter.registerService(IService.class, new IServiceImpl());
     exporter.setProtocolConfig(protocolConfig);
+    exporter.registerService(IService.class, new IServiceImpl());
     exporter.export();
   }
 }

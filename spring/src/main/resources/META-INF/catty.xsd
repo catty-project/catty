@@ -85,7 +85,17 @@
       </xsd:attribute>
       <xsd:attribute name="cluster" type="xsd:string" default="auto-recovery">
         <xsd:annotation>
-          <xsd:documentation><![CDATA[ Cluster. ]]></xsd:documentation>
+          <xsd:documentation><![CDATA[ Cluster Type. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="retry-times" type="xsd:int" default="1">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Retry Times. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="recovery-period" type="xsd:int" default="3000">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Recovery Period. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
     </xsd:complexType>

@@ -17,7 +17,7 @@ package pink.catty.example;
 import java.util.concurrent.CompletableFuture;
 import pink.catty.core.service.RpcService;
 
-@RpcService(timeout = 100000)
+@RpcService(timeout = 100)
 public interface IService {
 
   String say0();

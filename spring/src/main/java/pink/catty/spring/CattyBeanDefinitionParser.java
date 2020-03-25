@@ -43,6 +43,8 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
   private static final String SERIALIZATION = "serialization";
   private static final String ENDPOINT = "endpoint";
   private static final String CLUSTER = "cluster";
+  private static final String RETRY_TIMES = "retry-times";
+  private static final String RECOVERY_PERIOD = "recovery-period";
   private static final String TIMEOUT = "timeout";
   private static final String ADDRESSES = "addresses";
   private static final String ADDRESS_SPLIT = ";";
@@ -74,21 +76,29 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
       String serialization = element.getAttribute(SERIALIZATION);
       String endpoint = element.getAttribute(ENDPOINT);
       String cluster = element.getAttribute(CLUSTER);
+      String retryTime = element.getAttribute(RETRY_TIMES);
+      String recoveryPeriod = element.getAttribute(RECOVERY_PERIOD);
 
       if (!isEmpty(loadBalance)) {
         bd.getPropertyValues().addPropertyValue("loadBalanceType", loadBalance);
       }
-      if (!isEmpty(loadBalance)) {
+      if (!isEmpty(codec)) {
         bd.getPropertyValues().addPropertyValue("codecType", codec);
       }
-      if (!isEmpty(loadBalance)) {
+      if (!isEmpty(serialization)) {
         bd.getPropertyValues().addPropertyValue("serializationType", serialization);
       }
-      if (!isEmpty(loadBalance)) {
+      if (!isEmpty(endpoint)) {
         bd.getPropertyValues().addPropertyValue("endpointType", endpoint);
       }
-      if (!isEmpty(loadBalance)) {
+      if (!isEmpty(cluster)) {
         bd.getPropertyValues().addPropertyValue("clusterType", cluster);
+      }
+      if (!isEmpty(retryTime)) {
+        bd.getPropertyValues().addPropertyValue("retryTimes", retryTime);
+      }
+      if (!isEmpty(recoveryPeriod)) {
+        bd.getPropertyValues().addPropertyValue("recoveryPeriod", recoveryPeriod);
       }
     }
 

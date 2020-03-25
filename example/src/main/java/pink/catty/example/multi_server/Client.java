@@ -26,7 +26,7 @@ public class Client {
     ClientConfig clientConfig = ClientConfig.builder()
         .addAddress("127.0.0.1:20550")
         .addAddress("127.0.0.1:20551")
-        .addAddress("127.0.0.1:20552")
+//        .addAddress("127.0.0.1:20552")
         .build();
 
     ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();

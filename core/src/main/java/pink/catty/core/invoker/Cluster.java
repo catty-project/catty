@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Catty Project
+ * Copyright 2020 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,25 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.meta;
+package pink.catty.core.invoker;
 
-public enum MetaInfoEnum {
+import pink.catty.core.extension.spi.Registry.NotifyListener;
 
-  IP,
-  PORT,
-  SERVICE_NAME,
-  WORKER_NUMBER,
-  TIMEOUT,
-  GROUP,
-  VERSION,
-  SERIALIZATION,
-  LOAD_BALANCE,
-  CODEC,
-  WEIGHT,
-  ENDPOINT,
-  HEALTH_CHECK_PERIOD,
-  RETRY_TIMES,
-  RECOVERY_PERIOD,
-  ;
+public interface Cluster extends MappedInvoker, NotifyListener {
+
+  void destroy();
 
 }

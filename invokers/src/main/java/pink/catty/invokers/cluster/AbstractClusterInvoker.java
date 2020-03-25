@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.invokers.mapped;
+package pink.catty.invokers.cluster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,8 +26,8 @@ import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.LoadBalance;
-import pink.catty.core.extension.spi.Registry.NotifyListener;
 import pink.catty.core.invoker.AbstractMappedInvoker;
+import pink.catty.core.invoker.Cluster;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.InvokerHolder;
@@ -39,8 +39,7 @@ import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.utils.EndpointUtils;
 import pink.catty.core.utils.MetaInfoUtils;
 
-public abstract class AbstractClusterInvoker extends AbstractMappedInvoker implements
-    NotifyListener {
+public abstract class AbstractClusterInvoker extends AbstractMappedInvoker implements Cluster {
 
   protected LoadBalance loadBalance;
   protected ServiceMeta serviceMeta;
@@ -67,9 +66,6 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker imple
     return doInvoke(invokerHolder, request, invocation);
   }
 
-  protected abstract Response doInvoke(InvokerHolder invokerHolder, Request request,
-      Invocation invocation);
-
   @Override
   public void setInvokerMap(Map<String, InvokerHolder> invokerMap) {
     super.setInvokerMap(invokerMap);
@@ -94,6 +90,7 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker imple
     return holder;
   }
 
+  @Override
   public synchronized void destroy() {
     invokerList.forEach(invokerHolder -> EndpointUtils.destroyInvoker(invokerHolder.getInvoker()));
   }
@@ -165,5 +162,8 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker imple
   protected InvokerChainBuilder getChainBuilder() {
     return ExtensionFactory.getInvokerBuilder().getExtensionSingleton(InvokerBuilderType.DIRECT);
   }
+
+  protected abstract Response doInvoke(InvokerHolder invokerHolder, Request request,
+      Invocation invocation);
 
 }
