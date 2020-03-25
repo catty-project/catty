@@ -25,33 +25,37 @@ public class ServerConfig {
     return new ServerConfigBuilder();
   }
 
-  public ServerConfig() {
-  }
-
-  public ServerConfig(int port, int workerThreadNum, boolean needOrder) {
-    this.port = port;
-    this.workerThreadNum = workerThreadNum;
-    this.needOrder = needOrder;
-  }
-
   private int port;
   private int workerThreadNum;
+  private int minWorkerThreadNum;
+  private int maxWorkerThreadNum;
   private volatile ServerAddress address;
 
   /**
-   * If every request from the same TCP should be executed by order, set this
-   * option true.
+   * If every request from the same TCP should be executed by order, set this option true.
    *
-   * You should very carefully to set this option true. If you do so,
-   * all requests from the same rpc-client would be executed one by one in
-   * the same thread in rpc-server to guarantee to keep the invoking order,
-   * as a consequence of severe performance.
+   * You should very carefully to set this option true. If you do so, all requests from the same
+   * rpc-client would be executed one by one in the same thread in rpc-server to guarantee to keep
+   * the invoking order, as a consequence of severe performance.
    *
    * Actually, there are rarely conditions you should set this option true.
+   *
    * @deprecated bad design. will be removed at 0.2.?
    */
   @Deprecated
   private boolean needOrder = false;
+
+  public ServerConfig() {
+  }
+
+  public ServerConfig(int port, int workerThreadNum, int minWorkerThreadNum, int maxWorkerThreadNum,
+      boolean needOrder) {
+    this.port = port;
+    this.workerThreadNum = workerThreadNum;
+    this.minWorkerThreadNum = minWorkerThreadNum;
+    this.maxWorkerThreadNum = maxWorkerThreadNum;
+    this.needOrder = needOrder;
+  }
 
   public int getPort() {
     return port;
@@ -74,10 +78,26 @@ public class ServerConfig {
     this.workerThreadNum = workerThreadNum;
   }
 
+  public int getMinWorkerThreadNum() {
+    return minWorkerThreadNum;
+  }
+
+  public void setMinWorkerThreadNum(int minWorkerThreadNum) {
+    this.minWorkerThreadNum = minWorkerThreadNum;
+  }
+
+  public int getMaxWorkerThreadNum() {
+    return maxWorkerThreadNum;
+  }
+
+  public void setMaxWorkerThreadNum(int maxWorkerThreadNum) {
+    this.maxWorkerThreadNum = maxWorkerThreadNum;
+  }
+
   public ServerAddress getServerAddress() {
-    if(address == null) {
+    if (address == null) {
       synchronized (this) {
-        if(address == null) {
+        if (address == null) {
           String serverIp = NetUtils.getLocalAddress().getHostAddress();
           this.address = new ServerAddress(serverIp, port);
         }
@@ -91,7 +111,9 @@ public class ServerConfig {
         .address(address)
         .needOrder(needOrder)
         .port(port)
-        .workerThreadNum(workerThreadNum);
+        .workerThreadNum(workerThreadNum)
+        .minWorkerThreadNum(minWorkerThreadNum)
+        .maxWorkerThreadNum(maxWorkerThreadNum);
   }
 
   /**
@@ -101,6 +123,8 @@ public class ServerConfig {
 
     private int port;
     private int workerThreadNum;
+    private int minWorkerThreadNum;
+    private int maxWorkerThreadNum;
     private boolean needOrder;
 
     public ServerConfigBuilder port(int port) {
@@ -113,13 +137,24 @@ public class ServerConfig {
       return this;
     }
 
+    public ServerConfigBuilder minWorkerThreadNum(int minWorkerThreadNum) {
+      this.minWorkerThreadNum = minWorkerThreadNum;
+      return this;
+    }
+
+    public ServerConfigBuilder maxWorkerThreadNum(int maxWorkerThreadNum) {
+      this.maxWorkerThreadNum = maxWorkerThreadNum;
+      return this;
+    }
+
     public ServerConfigBuilder needOrder(boolean needOrder) {
       this.needOrder = needOrder;
       return this;
     }
 
     public ServerConfig build() {
-      return new ServerConfig(port, workerThreadNum, needOrder);
+      return new ServerConfig(port, workerThreadNum, minWorkerThreadNum, maxWorkerThreadNum,
+          needOrder);
     }
   }
 

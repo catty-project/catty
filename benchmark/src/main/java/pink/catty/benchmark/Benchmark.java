@@ -27,7 +27,8 @@ public class Benchmark {
 
   public static void main(String[] args) {
     ServerConfig serverConfig = ServerConfig.builder()
-        .workerThreadNum(256)
+        .minWorkerThreadNum(200)
+        .maxWorkerThreadNum(400)
         .port(25500)
         .build();
 

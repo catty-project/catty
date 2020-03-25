@@ -15,14 +15,16 @@
 package pink.catty.core.invoker;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pink.catty.core.Constants;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.support.worker.HashLoopGroup;
 import pink.catty.core.support.worker.HashableChooserFactory;
 import pink.catty.core.support.worker.HashableExecutor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import pink.catty.core.support.worker.StandardThreadExecutor;
 
 public abstract class AbstractServer extends AbstractLinkedInvoker implements Server {
 
@@ -51,7 +53,7 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
    * If you use the hash feature to keep order, the requests will be executed by a same thread. In
    * some cases, it could cause performance problem.
    */
-  private HashableExecutor executor;
+  private ExecutorService executor;
 
   public AbstractServer(InnerServerConfig config, Codec codec, MappedInvoker invoker) {
     super(invoker);
@@ -76,7 +78,7 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
   }
 
   @Override
-  public HashableExecutor getExecutor() {
+  public ExecutorService getExecutor() {
     return executor;
   }
 
@@ -98,7 +100,11 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
   @Override
   public void destroy() {
     doClose();
-    executor.shutdownGracefully();
+    if (executor instanceof HashableExecutor) {
+      ((HashableExecutor) executor).shutdownGracefully();
+    } else {
+      executor.shutdown();
+    }
   }
 
   protected abstract void doOpen();
@@ -106,9 +112,18 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
   protected abstract void doClose();
 
   private void createExecutor() {
-    int workerNum = config.getWorkerThreadNum() > 0 ? config.getWorkerThreadNum() :
-        Constants.THREAD_NUMBER * 2;
-    executor = new HashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
+    if (config.isNeedOrder()) {
+      int workerNum = config.getWorkerThreadNum() > 0 ? config.getWorkerThreadNum() :
+          Constants.THREAD_NUMBER * 2;
+      executor = new HashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
+    } else {
+      int minWorkerNum = config.getMinWorkerThreadNum() > 0 ? config.getMinWorkerThreadNum() :
+          Constants.THREAD_NUMBER * 2;
+      int maxWorkerNum = config.getMaxWorkerThreadNum() > 0 ? config.getMaxWorkerThreadNum() :
+          Constants.THREAD_NUMBER * 4;
+      executor = new StandardThreadExecutor(minWorkerNum, maxWorkerNum);
+      ((StandardThreadExecutor) executor).prestartAllCoreThreads();
+    }
   }
 
   @Override

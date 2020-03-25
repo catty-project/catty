@@ -21,22 +21,26 @@ import pink.catty.core.utils.NetUtils;
 public class InnerServerConfig {
 
   public static InnerServerConfigBuilder builder() {
-    return  new InnerServerConfigBuilder();
+    return new InnerServerConfigBuilder();
   }
 
   private final int port;
   private final int workerThreadNum;
+  private final int minWorkerThreadNum;
+  private final int maxWorkerThreadNum;
   private final ServerAddress address;
   private final boolean needOrder;
   private final String codecType;
 
-  private InnerServerConfig(int port, int workerThreadNum, ServerAddress address, boolean needOrder,
-      String codecType) {
+  private InnerServerConfig(int port, int workerThreadNum, int minWorkerThreadNum,
+      int maxWorkerThreadNum, ServerAddress address, boolean needOrder, String codecType) {
     this.port = port;
     this.workerThreadNum = workerThreadNum;
+    this.minWorkerThreadNum = minWorkerThreadNum;
+    this.maxWorkerThreadNum = minWorkerThreadNum;
     this.needOrder = needOrder;
     this.codecType = codecType;
-    if(address == null) {
+    if (address == null) {
       String serverIp = NetUtils.getLocalAddress().getHostAddress();
       this.address = new ServerAddress(serverIp, port);
     } else {
@@ -50,6 +54,14 @@ public class InnerServerConfig {
 
   public int getWorkerThreadNum() {
     return workerThreadNum;
+  }
+
+  public int getMinWorkerThreadNum() {
+    return minWorkerThreadNum;
+  }
+
+  public int getMaxWorkerThreadNum() {
+    return maxWorkerThreadNum;
   }
 
   public boolean isNeedOrder() {
@@ -68,8 +80,11 @@ public class InnerServerConfig {
    * builder
    */
   public static class InnerServerConfigBuilder {
+
     private int port;
     private int workerThreadNum;
+    private int minWorkerThreadNum;
+    private int maxWorkerThreadNum;
     private ServerAddress address;
     private boolean needOrder;
     private String codecType;
@@ -99,10 +114,20 @@ public class InnerServerConfig {
       return this;
     }
 
-    public InnerServerConfig build() {
-      return new InnerServerConfig(port, workerThreadNum, address, needOrder, codecType);
+    public InnerServerConfigBuilder minWorkerThreadNum(int minWorkerThreadNum) {
+      this.minWorkerThreadNum = minWorkerThreadNum;
+      return this;
     }
 
+    public InnerServerConfigBuilder maxWorkerThreadNum(int maxWorkerThreadNum) {
+      this.maxWorkerThreadNum = maxWorkerThreadNum;
+      return this;
+    }
+
+    public InnerServerConfig build() {
+      return new InnerServerConfig(port, workerThreadNum, minWorkerThreadNum, maxWorkerThreadNum,
+          address, needOrder, codecType);
+    }
   }
 
   @Override
@@ -116,13 +141,18 @@ public class InnerServerConfig {
     InnerServerConfig that = (InnerServerConfig) o;
     return port == that.port &&
         workerThreadNum == that.workerThreadNum &&
+        minWorkerThreadNum == that.minWorkerThreadNum &&
+        maxWorkerThreadNum == that.maxWorkerThreadNum &&
         needOrder == that.needOrder &&
-        Objects.equals(address, that.address);
+        Objects.equals(address, that.address) &&
+        Objects.equals(codecType, that.codecType);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(port, workerThreadNum, address, needOrder);
+    return Objects
+        .hash(port, workerThreadNum, minWorkerThreadNum, maxWorkerThreadNum, address, needOrder,
+            codecType);
   }
 
   @Override
@@ -130,6 +160,8 @@ public class InnerServerConfig {
     return "InnerServerConfig{" +
         "port=" + port +
         ", workerThreadNum=" + workerThreadNum +
+        ", minWorkerThreadNum=" + minWorkerThreadNum +
+        ", maxWorkerThreadNum=" + maxWorkerThreadNum +
         ", address=" + address +
         ", needOrder=" + needOrder +
         ", codecType='" + codecType + '\'' +

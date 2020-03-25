@@ -50,6 +50,8 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
   private static final String ADDRESS_SPLIT = ";";
   private static final String SERVER_PORT = "port";
   private static final String WORKER_NUM = "worker-num";
+  private static final String MIN_WORKER_NUM = "min-worker-num";
+  private static final String MAX_WORKER_NUM = "max-worker-num";
   private static final String PROTOCOL_REF = "protocol";
   private static final String CLIENT_CONFIG_REF = "client-config";
   private static final String SERVER_CONFIG_REF = "server-config";
@@ -116,10 +118,18 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
     if (ServerConfigBean.class == beanClass) {
       String port = element.getAttribute(SERVER_PORT);
       String workerNum = element.getAttribute(WORKER_NUM);
+      String minWorkerNum = element.getAttribute(MIN_WORKER_NUM);
+      String maxWorkerNum = element.getAttribute(MAX_WORKER_NUM);
       assertNotEmpty(port, "xml server-config's port can't be empty" + id);
       bd.getPropertyValues().addPropertyValue("port", port);
       if (!isEmpty(workerNum)) {
         bd.getPropertyValues().addPropertyValue("workerThreadNum", workerNum);
+      }
+      if (!isEmpty(minWorkerNum)) {
+        bd.getPropertyValues().addPropertyValue("minWorkerThreadNum", minWorkerNum);
+      }
+      if (!isEmpty(maxWorkerNum)) {
+        bd.getPropertyValues().addPropertyValue("maxWorkerThreadNum", maxWorkerNum);
       }
     }
 

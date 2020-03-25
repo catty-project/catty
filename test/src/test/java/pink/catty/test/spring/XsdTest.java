@@ -55,6 +55,8 @@ public class XsdTest {
     ServerConfig serverConfig = context.getBean(ServerConfig.class);
     Assert.assertEquals(serverConfig.getPort(), 25001);
     Assert.assertEquals(serverConfig.getWorkerThreadNum(), 300);
+    Assert.assertEquals(serverConfig.getMinWorkerThreadNum(), 100);
+    Assert.assertEquals(serverConfig.getMaxWorkerThreadNum(), 500);
   }
 
 }

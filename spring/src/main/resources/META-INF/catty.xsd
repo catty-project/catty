@@ -17,7 +17,6 @@
 <xsd:schema xmlns="http://catty.pink/schema/catty"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:tool="http://www.springframework.org/schema/tool"
-  xmlns:beans="http://www.springframework.org/schema/beans"
   targetNamespace="http://catty.pink/schema/catty">
 
   <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
@@ -37,6 +36,16 @@
         </xsd:annotation>
       </xsd:attribute>
       <xsd:attribute name="worker-num" type="xsd:int" default="256">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Worker thread number. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="min-worker-num" type="xsd:int" default="128">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Worker thread number. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+      <xsd:attribute name="max-worker-num" type="xsd:int" default="256">
         <xsd:annotation>
           <xsd:documentation><![CDATA[ Worker thread number. ]]></xsd:documentation>
         </xsd:annotation>

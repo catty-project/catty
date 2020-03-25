@@ -14,16 +14,17 @@
  */
 package pink.catty.invokers.endpoint;
 
-import pink.catty.core.CattyException;
-import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
-import pink.catty.core.extension.spi.Codec.DataTypeEnum;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import pink.catty.core.CattyException;
+import pink.catty.core.extension.spi.Codec.DataTypeEnum;
+import pink.catty.core.invoker.Invocation;
+import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
+import pink.catty.core.invoker.Request;
+import pink.catty.core.invoker.Response;
+import pink.catty.core.support.worker.HashableExecutor;
 
 public class ServerChannelHandler extends ChannelDuplexHandler {
 
@@ -43,7 +44,8 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
     }
     if (nettyServer.getExecutor() != null) {
       if (nettyServer.getConfig().isNeedOrder()) {
-        nettyServer.getExecutor().submit(hashCode(), () -> processRequest(ctx, (Request) object));
+        ((HashableExecutor) nettyServer.getExecutor())
+            .submit(hashCode(), () -> processRequest(ctx, (Request) object));
       } else {
         nettyServer.getExecutor().submit(() -> processRequest(ctx, (Request) object));
       }
