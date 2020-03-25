@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Catty Project
+ * Copyright 2020 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,11 +14,20 @@
  */
 package pink.catty.example.spring;
 
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import javax.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import pink.catty.example.IService;
 
-public class Client {
+@Component
+public class AService {
 
-  public static void main(String[] args) {
-    new ClassPathXmlApplicationContext("consumer.xml");
+  @Autowired
+  private IService iService;
+
+  @PostConstruct
+  public void init() {
+    System.out.println(iService.say0());
   }
+
 }

@@ -19,7 +19,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Server {
 
   public static void main(String[] args) {
-    ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("provider.xml");
+    new ClassPathXmlApplicationContext("provider.xml");
   }
 
 }
