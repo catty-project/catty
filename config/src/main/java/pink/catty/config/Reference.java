@@ -90,6 +90,8 @@ public class Reference<T> {
           metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, protocolConfig.getEndpointType());
           metaInfo.addMetaInfo(MetaInfoEnum.RETRY_TIMES, protocolConfig.getRetryTimes());
           metaInfo.addMetaInfo(MetaInfoEnum.RECOVERY_PERIOD, protocolConfig.getRecoveryPeriod());
+          metaInfo
+              .addMetaInfo(MetaInfoEnum.HEALTH_CHECK_PERIOD, protocolConfig.getHeartbeatPeriod());
 
           buildCluster(metaInfo, serviceMeta);
           if (useRegistry()) {

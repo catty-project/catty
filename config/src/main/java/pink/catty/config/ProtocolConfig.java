@@ -18,6 +18,7 @@ public class ProtocolConfig {
   private String clusterType = FAIL_FAST;
   private int retryTimes;
   private int recoveryPeriod;
+  private int heartbeatPeriod;
 
   public static ProtocolConfig defaultConfig() {
     return new ProtocolConfig();
@@ -89,5 +90,13 @@ public class ProtocolConfig {
 
   public void setRecoveryPeriod(int recoveryPeriod) {
     this.recoveryPeriod = recoveryPeriod;
+  }
+
+  public int getHeartbeatPeriod() {
+    return heartbeatPeriod;
+  }
+
+  public void setHeartbeatPeriod(int heartbeatPeriod) {
+    this.heartbeatPeriod = heartbeatPeriod;
   }
 }

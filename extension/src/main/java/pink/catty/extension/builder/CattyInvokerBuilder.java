@@ -51,6 +51,9 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
     LinkedInvoker serializationInvoker = new ConsumerSerializationInvoker(client, serialization);
     LinkedInvoker timeoutInvoker = new TimeoutInvoker(serializationInvoker);
+    if(metaInfo.getIntDef(MetaInfoEnum.HEALTH_CHECK_PERIOD, 1) <= 0) {
+      return timeoutInvoker;
+    }
     LinkedInvoker healthCheck = new HealthCheckInvoker(timeoutInvoker, metaInfo);
     return healthCheck;
   }

@@ -45,6 +45,7 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
   private static final String CLUSTER = "cluster";
   private static final String RETRY_TIMES = "retry-times";
   private static final String RECOVERY_PERIOD = "recovery-period";
+  private static final String HEARTBEAT_PERIOD = "heartbeat-period";
   private static final String TIMEOUT = "timeout";
   private static final String ADDRESSES = "addresses";
   private static final String ADDRESS_SPLIT = ";";
@@ -80,6 +81,7 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
       String cluster = element.getAttribute(CLUSTER);
       String retryTime = element.getAttribute(RETRY_TIMES);
       String recoveryPeriod = element.getAttribute(RECOVERY_PERIOD);
+      String heartbeatPeriod = element.getAttribute(HEARTBEAT_PERIOD);
 
       if (!isEmpty(loadBalance)) {
         bd.getPropertyValues().addPropertyValue("loadBalanceType", loadBalance);
@@ -101,6 +103,9 @@ public class CattyBeanDefinitionParser implements BeanDefinitionParser {
       }
       if (!isEmpty(recoveryPeriod)) {
         bd.getPropertyValues().addPropertyValue("recoveryPeriod", recoveryPeriod);
+      }
+      if (!isEmpty(heartbeatPeriod)) {
+        bd.getPropertyValues().addPropertyValue("heartbeatPeriod", heartbeatPeriod);
       }
     }
 

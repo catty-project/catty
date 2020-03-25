@@ -36,6 +36,7 @@ public class XsdTest {
     Assert.assertEquals(protocolConfig.getLoadBalanceType(), "random");
     Assert.assertEquals(protocolConfig.getRetryTimes(), 3);
     Assert.assertEquals(protocolConfig.getRecoveryPeriod(), 5000);
+    Assert.assertEquals(protocolConfig.getHeartbeatPeriod(), 30000);
   }
 
   @Test

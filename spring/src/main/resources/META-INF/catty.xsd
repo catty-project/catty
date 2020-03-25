@@ -107,6 +107,11 @@
           <xsd:documentation><![CDATA[ Recovery Period. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
+      <xsd:attribute name="heartbeat-period" type="xsd:int" default="30000">
+        <xsd:annotation>
+          <xsd:documentation><![CDATA[ Heartbeat Period, if < 0, disable heartbeat & health-check. ]]></xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
     </xsd:complexType>
   </xsd:element>
 
