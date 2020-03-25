@@ -37,7 +37,11 @@ public class Client {
     IService service = reference.refer();
     CompletableFuture<String> future = service.asyncSay("catty");
     future.whenComplete((value, t) -> {
-      System.out.println(value);
+      if(t != null) {
+        t.printStackTrace();
+      } else {
+        System.out.println(value);
+      }
     });
   }
 }
