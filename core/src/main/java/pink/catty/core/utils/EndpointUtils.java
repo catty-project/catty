@@ -17,6 +17,7 @@ package pink.catty.core.utils;
 import pink.catty.core.invoker.Endpoint;
 import pink.catty.core.invoker.Invoker;
 
+// todo: need recursive check
 public abstract class EndpointUtils {
 
   public static void destroyInvoker(Invoker invoker) {

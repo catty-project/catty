@@ -26,6 +26,8 @@ public class ClientConfig {
   }
 
   private List<ServerAddress> addresses;
+
+  // todo: divided connect timeout and read timeout.
   private int timeout;
 
   public ClientConfig() {

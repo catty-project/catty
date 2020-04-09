@@ -108,9 +108,11 @@ public class NettyClient extends AbstractClient {
       }
       return response;
     } catch (EndpointInvalidException e) {
+      // todo: need invoke destroy() method
       status = DISCONNECTED;
       throw e;
     } catch (Exception e) {
+      // todo: need invoke destroy() method
       status = DISCONNECTED;
       throw new EndpointInvalidException("ClientChannel invalid", e);
     }
