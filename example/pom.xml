@@ -42,6 +42,11 @@
       <artifactId>spring-context</artifactId>
       <version>5.0.8.RELEASE</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.8.0</version>
+    </dependency>
   </dependencies>
 
   <build>
