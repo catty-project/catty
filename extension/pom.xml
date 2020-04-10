@@ -41,7 +41,6 @@
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
       <version>3.8.0</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.caucho</groupId>
