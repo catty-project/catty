@@ -14,16 +14,17 @@
  */
 package pink.catty.core.service;
 
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Future;
 import pink.catty.core.utils.ReflectUtils;
 
 public class MethodMeta {
@@ -36,11 +37,35 @@ public class MethodMeta {
 
   private Map<String, Class<?>> checkedExceptions;
 
+  /**
+   * If CompletionStage is super-interface of return type, this method is an async method.
+   *
+   * NOTICE: Future interface could not imply an async method.
+   */
   private boolean isAsync;
 
+  /**
+   * The plain return type.
+   *
+   * Map<?, ?> foo(); returnType == Map.class;
+   *
+   * List<?> foo(); returnType == List.class;
+   *
+   * int foo(); returnType == Integer.TYPE;
+   */
   private Class<?> returnType;
 
-  private Class<?> genericReturnType;
+  /**
+   * The generic return type. Mainly used to get CompletionStage's generic return.
+   *
+   * There is more complicated situation like: Map<List<Object>, Future<T>> foo(); In this
+   * case,Map.class will be returned.
+   *
+   * CompletionStage<Integer> foo(); genericReturnType == Integer.class;
+   *
+   * Otherwise, it is same as returnType.
+   */
+  private Class<?> futureGenericReturnType;
 
   private int timeout = -1; /* -1 means no timeout */
 
@@ -67,10 +92,10 @@ public class MethodMeta {
     if (method.isAnnotationPresent(RpcMethod.class)) {
       RpcMethod function = method.getDeclaredAnnotation(RpcMethod.class);
       this.timeout = function.timeout();
-      if(!"".equals(function.name())) {
+      if (!"".equals(function.name())) {
         this.name = function.name();
       }
-      if(function.alias() != null && function.alias().length > 0) {
+      if (function.alias() != null && function.alias().length > 0) {
         alias = new ArrayList<>(Arrays.asList(function.alias()));
       }
     }
@@ -101,7 +126,7 @@ public class MethodMeta {
   }
 
   public Class<?> getGenericReturnType() {
-    return genericReturnType;
+    return futureGenericReturnType;
   }
 
   public String getName() {
@@ -112,30 +137,48 @@ public class MethodMeta {
     return alias;
   }
 
-  // fixme : bug.
+  public int getTimeout() {
+    return timeout;
+  }
+
   private void resolveReturnTypes(Method method) {
     Class<?> returnType = method.getReturnType();
     Type genericReturnType = method.getGenericReturnType();
-    if (Future.class.isAssignableFrom(returnType)) {
+
+    if (genericReturnType instanceof TypeVariable) {
+      // T foo(); Not supported yet.
+      throw new NotSupportedMethodException("TypeVariable is not supported yet");
+    } else if (isAsync()) {
+      // CompletionStage<?> foo();
       if (genericReturnType instanceof ParameterizedType) {
         Type actualArgType = ((ParameterizedType) genericReturnType).getActualTypeArguments()[0];
+        this.returnType = returnType;
         if (actualArgType instanceof ParameterizedType) {
-          returnType = (Class<?>) ((ParameterizedType) actualArgType).getRawType();
-          genericReturnType = actualArgType;
+          // CompletionStage<List<T>> foo();
+          this.futureGenericReturnType = (Class<?>) ((ParameterizedType) actualArgType)
+              .getRawType();
+        } else if (actualArgType instanceof TypeVariable) {
+          // CompletionStage<T> foo(); Not supported yet.
+          throw new NotSupportedMethodException("TypeVariable is not supported yet");
+        } else if (actualArgType instanceof GenericArrayType) {
+          // CompletionStage<T[]> foo();
+          this.futureGenericReturnType = (Class<?>) ((GenericArrayType) actualArgType)
+              .getGenericComponentType();
+        } else if (actualArgType instanceof Class<?>) {
+          // CompletionStage<Object> foo();
+          this.futureGenericReturnType = (Class<?>) actualArgType;
         } else {
-          returnType = (Class<?>) actualArgType;
-          genericReturnType = returnType;
+          throw new NotSupportedMethodException(
+              "GenericReturnType must be one of TypeVariable, ParameterizedType, GenericArrayType, Class. But now: "
+                  + actualArgType.getTypeName());
         }
       } else {
-        returnType = null;
-        genericReturnType = null;
+        throw new NotSupportedMethodException(
+            "CompletionStage return, genericReturnType must instanceof ParameterizedType");
       }
+    } else {
+      this.returnType = returnType;
+      this.futureGenericReturnType = returnType;
     }
-    this.returnType = returnType;
-    this.genericReturnType = (Class) genericReturnType;
-  }
-
-  public int getTimeout() {
-    return timeout;
   }
 }
