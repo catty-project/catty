@@ -14,17 +14,17 @@
  */
 package pink.catty.invokers.linked;
 
+import java.util.concurrent.CompletionStage;
+import pink.catty.core.extension.spi.Serialization;
+import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
-import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
-import java.util.concurrent.CompletionStage;
 
 public class ProviderSerializationInvoker extends AbstractLinkedInvoker {
 
@@ -60,8 +60,9 @@ public class ProviderSerializationInvoker extends AbstractLinkedInvoker {
     Response response = next.invoke(request, invocation);
     MethodMeta methodMeta = invocation.getInvokedMethod();
     CompletionStage<Object> newResponse = response.thenApply(returnValue -> {
-      if(returnValue instanceof Throwable
-          && !Throwable.class.isAssignableFrom(methodMeta.getReturnType()) ) {
+      Class<?> returnType =
+          methodMeta.isAsync() ? methodMeta.getGenericReturnType() : methodMeta.getReturnType();
+      if (returnValue instanceof Throwable && !Throwable.class.isAssignableFrom(returnType)) {
         // exception has been thrown.
         String exception = ExceptionUtils.toString((Throwable) returnValue);
         byte[] serialized = serialization.serialize(exception);

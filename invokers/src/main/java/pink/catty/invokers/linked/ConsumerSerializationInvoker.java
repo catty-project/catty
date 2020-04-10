@@ -82,7 +82,11 @@ public class ConsumerSerializationInvoker extends AbstractLinkedInvoker {
           }
         }
       } else if (bytes[0] == 0) {
-        return serialization.deserialize(data, invocation.getInvokedMethod().getReturnType());
+        if (methodMeta.isAsync()) {
+          return serialization.deserialize(data, methodMeta.getGenericReturnType());
+        } else {
+          return serialization.deserialize(data, methodMeta.getReturnType());
+        }
       } else {
         return new Error("Unknown serialization head byte:" + bytes[0] + " except 0 or 1");
       }
