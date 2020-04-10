@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import pink.catty.core.CattyException;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
@@ -56,6 +57,9 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker imple
   @Override
   public Response invoke(Request request, Invocation invocation) {
     InvokerHolder invokerHolder;
+    if(invokerList.size() <= 0) {
+      throw new CattyException("No valid endpoint. MetaInfo: " + metaInfo);
+    }
     if (invokerList.size() == 1) {
       invokerHolder = invokerList.get(0);
     } else {
