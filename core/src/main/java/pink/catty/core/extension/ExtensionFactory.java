@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
@@ -54,6 +56,8 @@ import pink.catty.core.invoker.Invoker;
  */
 public final class ExtensionFactory<T> {
 
+  private static final Logger logger = LoggerFactory.getLogger(ExtensionFactory.class);
+
   private static final String EXTENSION_PATH = "pink.catty.extension";
   private static final String CLASS_SUFFIX = ".class";
   private static final int CLASS_SUFFIX_LENGTH = CLASS_SUFFIX.length();
@@ -76,7 +80,9 @@ public final class ExtensionFactory<T> {
     REGISTRY = new ExtensionFactory<>(Registry.class);
 
     try {
+      logger.debug("Extension: begin loading extension...");
       loadExtension();
+      logger.debug("Extension: loading extension finished...");
     } catch (ClassNotFoundException | IOException e) {
       throw new ExceptionInInitializerError(e);
     }
@@ -97,12 +103,17 @@ public final class ExtensionFactory<T> {
     Class<?>[] classes = getClasses(EXTENSION_PATH);
     for (Class<?> clz : classes) {
       if (!clz.isAnnotationPresent(Extension.class)) {
+        logger.debug(
+            "Extension: Extension.class annotation not present at {}, this class would not be loaded.",
+            clz.toString());
         continue;
       }
       Extension extension = clz.getAnnotation(Extension.class);
       for (ExtensionFactory extensionFactory : extensionFactories) {
         if (extensionFactory.getSupportedExtension().isAssignableFrom(clz)) {
           extensionFactory.register(extension.value(), clz);
+          logger
+              .debug("Extension: register an extension: {}, {}", extension.value(), clz.toString());
         }
       }
     }
