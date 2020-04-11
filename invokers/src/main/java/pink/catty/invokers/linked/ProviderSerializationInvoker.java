@@ -59,24 +59,33 @@ public class ProviderSerializationInvoker extends AbstractLinkedInvoker {
 
     Response response = next.invoke(request, invocation);
     MethodMeta methodMeta = invocation.getInvokedMethod();
+    Class<?> returnType =
+        methodMeta.isAsync() ? methodMeta.getGenericReturnType() : methodMeta.getReturnType();
+
     CompletionStage<Object> newResponse = response.thenApply(returnValue -> {
-      Class<?> returnType =
-          methodMeta.isAsync() ? methodMeta.getGenericReturnType() : methodMeta.getReturnType();
+      byte[] serialized;
+      byte[] finalBytes;
       if (returnValue instanceof Throwable && !Throwable.class.isAssignableFrom(returnType)) {
         // exception has been thrown.
         String exception = ExceptionUtils.toString((Throwable) returnValue);
-        byte[] serialized = serialization.serialize(exception);
-        byte[] finalBytes = new byte[serialized.length + 1];
+        serialized = serialization.serialize(exception);
+        finalBytes = new byte[serialized.length + 1];
         finalBytes[0] = 1; // exception has been thrown.
         System.arraycopy(serialized, 0, finalBytes, 1, serialized.length);
-        return finalBytes;
       } else {
-        byte[] serialized = serialization.serialize(returnValue);
-        byte[] finalBytes = new byte[serialized.length + 1];
-        finalBytes[0] = 0; // response status is ok.
+        try {
+          serialized = serialization.serialize(returnValue);
+          finalBytes = new byte[serialized.length + 1];
+          finalBytes[0] = 0; // response status is ok.
+        } catch (Exception e) {
+          String exception = ExceptionUtils.toString(e);
+          serialized = serialization.serialize(exception);
+          finalBytes = new byte[serialized.length + 1];
+          finalBytes[0] = 1; // exception has been thrown.
+        }
         System.arraycopy(serialized, 0, finalBytes, 1, serialized.length);
-        return finalBytes;
       }
+      return finalBytes;
     });
     return AsyncUtils.newResponse(newResponse, request.getRequestId());
   }
