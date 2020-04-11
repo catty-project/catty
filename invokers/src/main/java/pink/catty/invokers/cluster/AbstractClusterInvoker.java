@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
@@ -41,6 +43,8 @@ import pink.catty.core.utils.EndpointUtils;
 import pink.catty.core.utils.MetaInfoUtils;
 
 public abstract class AbstractClusterInvoker extends AbstractMappedInvoker implements Cluster {
+
+  protected Logger logger = LoggerFactory.getLogger(getClass());
 
   protected LoadBalance loadBalance;
   protected ServiceMeta serviceMeta;

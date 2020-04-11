@@ -45,7 +45,6 @@ public class RecoveryCluster extends FailOverCluster {
   @Override
   protected void processError(InvokerHolder invokerHolder, Request request, Invocation invocation,
       Throwable e) {
-
     final MetaInfo metaInfo = invokerHolder.getMetaInfo();
     final ServiceMeta serviceMeta = invokerHolder.getServiceMeta();
     timer.schedule(
@@ -57,15 +56,21 @@ public class RecoveryCluster extends FailOverCluster {
             String except = (String) heartBeat.getArgsValue()[0];
             Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, metaInfo);
             try {
+              logger.info("Recovery: begin recovery of endpoint: {}", metaInfo.toString());
               Response heartBeatResp = invoker.invoke(heartBeat, inv);
               heartBeatResp.await();
               if (except.equals(heartBeatResp.getValue())) {
                 InvokerHolder newHolder = new InvokerHolder(metaInfo, serviceMeta, invoker);
                 registerInvoker(metaInfo.toString(), newHolder);
+                logger
+                    .info("Recovery: endpoint recovery succeed! endpoint: {}", metaInfo.toString());
                 cancel();
               }
             } catch (Exception e0) {
               // ignore todo: maybe log
+              logger.info(
+                  "Recovery: endpoint recovery failed, another try is going to begin, endpoint: {}",
+                  metaInfo.toString());
             }
           }
         }, defaultRecoveryDelay, defaultRecoveryDelay);

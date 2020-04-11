@@ -57,6 +57,9 @@ public class FailOverCluster extends AbstractClusterInvoker {
         }
         break;
       } catch (HealthCheckException | EndpointInvalidException | RpcTimeoutException e) {
+        logger.info(
+            "Cluster: endpoint broken, endpoint meta info: {}, this endpoint will be remove from cluster candidate.",
+            invokerHolder.getMetaInfo().toString(), e);
         unregisterInvoker(invokerHolder.getMetaInfo().toString());
         processError(invokerHolder, request, invocation, e);
         if (invokerList.size() > 0) {
@@ -67,6 +70,7 @@ public class FailOverCluster extends AbstractClusterInvoker {
     if (response != null) {
       return response;
     }
+    logger.info("RecoveryCluster, after retry: {}, not found valid endpoint.", retryTimes);
     throw new CattyException(
         "RecoveryCluster, after retry: " + retryTimes + ", not found valid endpoint.");
   }
