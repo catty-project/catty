@@ -14,7 +14,11 @@
  */
 package pink.catty.test.spring;
 
-public class SpringBServiceImpl implements SpringAService {
+import org.springframework.stereotype.Component;
+import pink.catty.test.spring.api.SpringBService;
+
+@Component("SpringBService")
+public class SpringBServiceImpl implements SpringBService {
 
   @Override
   public String echo(String str) {
