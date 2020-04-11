@@ -46,5 +46,4 @@ public class SpringTest {
     Assert.assertEquals(uuid, result);
   }
 
-
 }
