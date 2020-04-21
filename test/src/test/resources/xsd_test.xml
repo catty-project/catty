@@ -27,7 +27,7 @@
 
   <catty:protocol id="protocol" retry-times="3" recovery-period="5000"/>
   <catty:client-config id="client" addresses="127.0.0.1:8080;127.0.0.1:8081" timeout="3000"/>
-  <catty:server-config id="server" port="25001" worker-num="300" min-worker-num="100" max-worker-num="500"/>
+  <catty:server-config id="server" port="25002" worker-num="300" min-worker-num="100" max-worker-num="500"/>
 
   <catty:exporter protocol="protocol" server-config="server">
     <catty:service interface="pink.catty.test.spring.api.SpringBService" ref="serviceA"/>
