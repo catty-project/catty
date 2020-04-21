@@ -48,4 +48,6 @@ public abstract class AbstractMappedInvoker implements Invoker, MappedInvoker {
   public InvokerHolder getInvoker(String invokerIdentify) {
     return invokerMap.get(invokerIdentify);
   }
+
+
 }

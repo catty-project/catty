@@ -14,10 +14,17 @@
  */
 package pink.catty.core.service;
 
-public class HeartBeatSerivceImpl implements HeartBeatService {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class HeartBeatServiceImpl implements HeartBeatService {
+
+  private static Logger logger = LoggerFactory.getLogger(HeartBeatServiceImpl.class);
+  private static long BEGIN_TIME = System.currentTimeMillis();
 
   @Override
   public String heartBeat(String uuid) {
+    logger.info("Get heart beat: " + uuid + " time: " + (System.currentTimeMillis() - BEGIN_TIME));
     return uuid;
   }
 }

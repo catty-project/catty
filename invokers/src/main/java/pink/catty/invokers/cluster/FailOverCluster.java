@@ -28,6 +28,7 @@ import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.HealthCheckException;
 import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.utils.EndpointUtils;
 
 public class FailOverCluster extends AbstractClusterInvoker {
 
@@ -57,10 +58,11 @@ public class FailOverCluster extends AbstractClusterInvoker {
         }
         break;
       } catch (HealthCheckException | EndpointInvalidException | RpcTimeoutException e) {
-        logger.info(
+        logger.error(
             "Cluster: endpoint broken, endpoint meta info: {}, this endpoint will be remove from cluster candidate.",
             invokerHolder.getMetaInfo().toString(), e);
         unregisterInvoker(invokerHolder.getMetaInfo().toString());
+        EndpointUtils.destroyInvoker(invokerHolder.getInvoker());
         processError(invokerHolder, request, invocation, e);
         if (invokerList.size() > 0) {
           invokerHolder = loadBalance.select(invokerList);
@@ -70,7 +72,7 @@ public class FailOverCluster extends AbstractClusterInvoker {
     if (response != null) {
       return response;
     }
-    logger.info("RecoveryCluster, after retry: {}, not found valid endpoint.", retryTimes);
+    logger.error("RecoveryCluster, after retry: {}, not found valid endpoint.", retryTimes);
     throw new CattyException(
         "RecoveryCluster, after retry: " + retryTimes + ", not found valid endpoint.");
   }

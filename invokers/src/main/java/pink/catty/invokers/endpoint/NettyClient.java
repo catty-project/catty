@@ -27,7 +27,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import pink.catty.core.Constants;
 import pink.catty.core.EndpointInvalidException;
-import pink.catty.core.TransportException;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
@@ -73,7 +72,7 @@ public class NettyClient extends AbstractClient {
           .sync();
     } catch (InterruptedException i) {
       destroy();
-      throw new TransportException("NettyClient: connect().sync() interrupted", i);
+      throw new EndpointInvalidException("NettyClient: connect().sync() interrupted", i);
     }
 
     clientChannel = future.channel();
@@ -81,9 +80,6 @@ public class NettyClient extends AbstractClient {
 
   @Override
   protected void doClose() {
-    if (!isAvailable()) {
-      return;
-    }
     if (clientChannel != null) {
       clientChannel.close();
     }

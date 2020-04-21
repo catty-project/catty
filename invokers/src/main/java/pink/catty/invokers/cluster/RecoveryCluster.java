@@ -14,8 +14,11 @@
  */
 package pink.catty.invokers.cluster;
 
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import pink.catty.core.ServerAddress;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.InvokerHolder;
@@ -23,16 +26,21 @@ import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
+import pink.catty.core.service.HealthCheckException;
 import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.support.ConcurrentHashSet;
 import pink.catty.core.utils.HeartBeatUtils;
+import pink.catty.core.utils.MetaInfoUtils;
 
 public class RecoveryCluster extends FailOverCluster {
 
   private static final String TIMER_NAME = "CATTY_RECOVERY";
-  private static Timer timer;
+  private static final Set<ServerAddress> ON_RECOVERY;
+  private static Timer TIMER;
 
   static {
-    timer = new Timer(TIMER_NAME);
+    TIMER = new Timer(TIMER_NAME);
+    ON_RECOVERY = new ConcurrentHashSet<>();
   }
 
   private int defaultRecoveryDelay;
@@ -47,32 +55,58 @@ public class RecoveryCluster extends FailOverCluster {
       Throwable e) {
     final MetaInfo metaInfo = invokerHolder.getMetaInfo();
     final ServiceMeta serviceMeta = invokerHolder.getServiceMeta();
-    timer.schedule(
-        new TimerTask() {
-          @Override
-          public void run() {
-            Invoker invoker = getChainBuilder().buildConsumerInvoker(metaInfo);
-            Request heartBeat = HeartBeatUtils.buildHeartBeatRequest();
-            String except = (String) heartBeat.getArgsValue()[0];
-            Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, metaInfo);
-            try {
-              logger.info("Recovery: begin recovery of endpoint: {}", metaInfo.toString());
-              Response heartBeatResp = invoker.invoke(heartBeat, inv);
-              heartBeatResp.await();
-              if (except.equals(heartBeatResp.getValue())) {
-                InvokerHolder newHolder = new InvokerHolder(metaInfo, serviceMeta, invoker);
-                registerInvoker(metaInfo.toString(), newHolder);
-                logger
-                    .info("Recovery: endpoint recovery succeed! endpoint: {}", metaInfo.toString());
-                cancel();
+    final ServerAddress address = MetaInfoUtils.getAddressFromMeta(metaInfo);
+
+    /*
+     * Avoid duplicate recovery job.
+     */
+    synchronized (ON_RECOVERY) {
+      if (ON_RECOVERY.contains(address)) {
+        logger.info(
+            "Recovery job on this address was going on, new recovery job on this address would not be created again. address: {}",
+            address);
+      } else {
+        TIMER.schedule(
+            new TimerTask() {
+              @Override
+              public void run() {
+
+                /*
+                 * 1. create a new invoker from meta info.
+                 * 2. fire a heartbeat to endpoint, which will attempt to connect to endpoint.
+                 * 3. if heartbeat succeed, register this invoker.
+                 * 4. cancel this task.
+                 */
+                Invoker invoker = getChainBuilder().buildConsumerInvoker(metaInfo);
+                Request heartBeat = HeartBeatUtils.buildHeartBeatRequest();
+                String except = (String) heartBeat.getArgsValue()[0];
+                Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, metaInfo);
+                try {
+                  logger.info("Recovery: begin recovery of endpoint: {}", metaInfo.toString());
+                  Response heartBeatResp = invoker.invoke(heartBeat, inv);
+                  heartBeatResp.await(defaultRecoveryDelay, TimeUnit.MILLISECONDS);
+                  if (except.equals(heartBeatResp.getValue())) {
+                    InvokerHolder newHolder = new InvokerHolder(metaInfo, serviceMeta, invoker);
+                    registerInvoker(metaInfo.toString(), newHolder);
+                    logger
+                        .info("Recovery: endpoint recovery succeed! endpoint: {}",
+                            metaInfo.toString());
+                    ON_RECOVERY.remove(address);
+                    cancel();
+                  } else {
+                    throw new HealthCheckException(
+                        "Recovery: excepted: " + except + ", get: " + heartBeatResp.getValue());
+                  }
+                } catch (Exception e0) {
+                  logger.info(
+                      "Recovery: endpoint recovery failed, another try is going to begin, endpoint: {}",
+                      metaInfo.toString(), e0);
+                }
               }
-            } catch (Exception e0) {
-              // ignore todo: maybe log
-              logger.info(
-                  "Recovery: endpoint recovery failed, another try is going to begin, endpoint: {}",
-                  metaInfo.toString());
-            }
-          }
-        }, defaultRecoveryDelay, defaultRecoveryDelay);
+            }, defaultRecoveryDelay, defaultRecoveryDelay);
+
+        ON_RECOVERY.add(address);
+      }
+    }
   }
 }

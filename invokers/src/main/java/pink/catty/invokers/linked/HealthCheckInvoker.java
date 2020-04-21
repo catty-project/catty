@@ -32,7 +32,7 @@ import pink.catty.core.utils.HeartBeatUtils;
 
 public class HealthCheckInvoker extends AbstractLinkedInvoker {
 
-  private static final int DEFAULT_HEALTH_CHECK_PERIOD = 10 * 1000; // 30s
+  private static final int DEFAULT_HEALTH_CHECK_PERIOD = 10 * 1000;
   private static final String TIMER_NAME = "CATTY_HEARTBEAT";
   private static Timer timer;
 
@@ -40,7 +40,7 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
     timer = new Timer(TIMER_NAME);
   }
 
-  private final int period; // 30s
+  private final int period;
   private MetaInfo metaInfo;
   private boolean isTimerStart;
   private volatile RuntimeException heartBeatThrowable;
@@ -72,7 +72,7 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
     if (!isTimerStart) {
       synchronized (this) {
         if (!isTimerStart) {
-          timer.schedule(new HeartBeatTask(), 0, period);
+          timer.schedule(new HeartBeatTask(), period, period);
           isTimerStart = true;
         }
       }
@@ -86,7 +86,6 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
       throw t;
     }
   }
-
 
   private class HeartBeatTask extends TimerTask {
 

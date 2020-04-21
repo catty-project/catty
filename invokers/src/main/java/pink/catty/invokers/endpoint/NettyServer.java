@@ -25,6 +25,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.invoker.AbstractServer;
@@ -64,7 +65,7 @@ public class NettyServer extends AbstractServer {
       ChannelFuture f = serverBootstrap.bind(getConfig().getPort()).sync();
       serverChannel = f.channel();
     } catch (Exception e) {
-      logger.error("NettyServer bind error", e);
+      throw new EndpointInvalidException("Server bind error, port: " + getConfig().getPort(), e);
     }
   }
 

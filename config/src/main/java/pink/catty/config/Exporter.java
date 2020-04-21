@@ -30,7 +30,7 @@ import pink.catty.core.invoker.Server;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
-import pink.catty.core.service.HeartBeatSerivceImpl;
+import pink.catty.core.service.HeartBeatServiceImpl;
 import pink.catty.core.service.HeartBeatService;
 import pink.catty.core.service.ServiceMeta;
 
@@ -111,7 +111,7 @@ public class Exporter {
     }
     if (!server.isAvailable()) {
       // If first open server, register heartbeat service.
-      registerService(HeartBeatService.class, new HeartBeatSerivceImpl());
+      registerService(HeartBeatService.class, new HeartBeatServiceImpl());
       server.init();
     }
 

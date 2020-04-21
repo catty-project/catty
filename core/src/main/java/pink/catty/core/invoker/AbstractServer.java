@@ -94,11 +94,13 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
 
   @Override
   public void init() {
+    status = CONNECTED;
     doOpen();
   }
 
   @Override
   public void destroy() {
+    status = DISCONNECTED;
     doClose();
     if (executor instanceof HashableExecutor) {
       ((HashableExecutor) executor).shutdownGracefully();

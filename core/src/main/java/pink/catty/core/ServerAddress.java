@@ -74,7 +74,7 @@ public class ServerAddress {
 
   @Override
   public int hashCode() {
-    return Objects.hash(ip, port, address);
+    return Objects.hash(ip, port);
   }
 
   @Override

@@ -14,14 +14,22 @@
  */
 package pink.catty.core.utils;
 
+import pink.catty.core.invoker.Cluster;
 import pink.catty.core.invoker.Endpoint;
 import pink.catty.core.invoker.Invoker;
+import pink.catty.core.invoker.LinkedInvoker;
 
-// todo: need recursive check
 public abstract class EndpointUtils {
 
   public static void destroyInvoker(Invoker invoker) {
-    if(invoker instanceof Endpoint) {
+    if (invoker instanceof Cluster) {
+      ((Cluster) invoker).destroy();
+      return;
+    }
+    while (invoker instanceof LinkedInvoker) {
+      invoker = ((LinkedInvoker) invoker).getNext();
+    }
+    if (invoker instanceof Endpoint) {
       ((Endpoint) invoker).destroy();
     }
   }

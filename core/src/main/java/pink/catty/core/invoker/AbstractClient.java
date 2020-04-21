@@ -73,8 +73,8 @@ public abstract class AbstractClient implements Client {
 
   @Override
   public void destroy() {
-    doClose();
     status = DISCONNECTED;
+    doClose();
   }
 
   @Override
