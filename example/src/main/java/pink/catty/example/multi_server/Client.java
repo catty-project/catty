@@ -29,7 +29,9 @@ public class Client {
 //        .addAddress("127.0.0.1:20552")
         .build();
 
-    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
+    ProtocolConfig protocolConfig = new ProtocolConfig();
+    protocolConfig.setClusterType(ProtocolConfig.AUTO_RECOVERY);
+    protocolConfig.setRecoveryPeriod(3000);
 
     Reference<IService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);
