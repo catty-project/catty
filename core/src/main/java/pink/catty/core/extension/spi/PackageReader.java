@@ -14,16 +14,24 @@
  */
 package pink.catty.core.extension.spi;
 
-public interface PackageReader {
+import java.util.List;
+
+/**
+ * Distinguish integral data package from byte-streaming.
+ *
+ * @param <I> Different framework might have different encapsulation of byte-streaming such as
+ * ByteBuffer from jdk, ByteBuf from netty and byte[].
+ */
+public interface PackageReader<I, O> {
 
   /**
    * Reading data package received from tcp or other stream completely.
    *
-   * @param dataPackage data received from tcp.
-   * @return return an complete data.
+   * @param data data received from tcp.
+   * @param out integral data
+   * @return return the rest of data.
    * @throws BrokenDataPackageException If reading data package occurs some error.
-   * @throws PartialDataException If dataPackage does not contain an complete data.
    */
-  CompletePackage readPackage(byte[] dataPackage) throws PartialDataException, BrokenDataPackageException;
+  void readPackage(I data, List<O> out) throws BrokenDataPackageException;
 
 }

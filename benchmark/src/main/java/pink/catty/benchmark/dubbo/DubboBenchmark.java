@@ -50,7 +50,7 @@ public class DubboBenchmark {
 
     protocol.setName("dubbo");
     protocol.setPort(25500);
-    protocol.setThreads(256);
+    protocol.setThreads(400);
     protocol.setHost("0.0.0.0");
 
     ServiceConfig<PojoService> service = new ServiceConfig<>();

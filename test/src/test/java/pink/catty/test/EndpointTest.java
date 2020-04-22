@@ -14,6 +14,7 @@
  */
 package pink.catty.test;
 
+import java.util.List;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,9 +23,7 @@ import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.spi.BrokenDataPackageException;
 import pink.catty.core.extension.spi.Codec;
-import pink.catty.core.extension.spi.CompletePackage;
 import pink.catty.core.extension.spi.EndpointFactory;
-import pink.catty.core.extension.spi.PartialDataException;
 import pink.catty.core.invoker.Client;
 import pink.catty.extension.factory.NettyEndpointFactory;
 
@@ -71,9 +70,8 @@ public class EndpointTest {
   public static class MockCodec implements Codec {
 
     @Override
-    public CompletePackage readPackage(byte[] dataPackage)
-        throws PartialDataException, BrokenDataPackageException {
-      return null;
+    public void readPackage(Object data, List out) throws BrokenDataPackageException {
+
     }
 
     @Override

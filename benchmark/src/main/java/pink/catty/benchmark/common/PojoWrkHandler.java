@@ -59,9 +59,6 @@ public class PojoWrkHandler extends SimpleChannelInboundHandler<FullHttpRequest>
       String response = service.service(content);
       if (MD5Utils.md5(content).equals(response)) {
         okResponse(ctx);
-        if (LOGGER.isInfoEnabled()) {
-          LOGGER.info("Request result:success cost:{} ms", System.currentTimeMillis() - start);
-        }
       } else {
         badReponse(ctx);
         if (LOGGER.isInfoEnabled()) {

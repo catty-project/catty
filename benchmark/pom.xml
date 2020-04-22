@@ -20,7 +20,7 @@
   <parent>
     <artifactId>catty-parent</artifactId>
     <groupId>pink.catty</groupId>
-    <version>0.2.2</version>
+    <version>0.2.3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -30,7 +30,7 @@
     <dependency>
       <groupId>pink.catty</groupId>
       <artifactId>catty-all</artifactId>
-      <version>0.2.2</version>
+      <version>0.2.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.dubbo</groupId>
@@ -40,17 +40,49 @@
     <dependency>
       <groupId>com.weibo</groupId>
       <artifactId>motan-core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
       <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.weibo</groupId>
       <artifactId>motan-transport-netty</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
       <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>com.google.protobuf</groupId>
       <artifactId>protobuf-java</artifactId>
       <version>3.8.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-slf4j-impl</artifactId>
+      <version>2.11.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.11.2</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
 

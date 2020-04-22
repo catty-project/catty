@@ -18,6 +18,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
 import pink.catty.core.invoker.Invocation;
@@ -27,6 +29,8 @@ import pink.catty.core.invoker.Response;
 import pink.catty.core.support.worker.HashableExecutor;
 
 public class ServerChannelHandler extends ChannelDuplexHandler {
+
+  private static Logger logger = LoggerFactory.getLogger(ServerChannelHandler.class);
 
   private NettyServer nettyServer;
 
@@ -54,6 +58,11 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
     }
   }
 
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    logger.error("Uncaught exception.", cause);
+  }
+
   private void processRequest(ChannelHandlerContext ctx, Request request) {
     Response response = nettyServer.invoke(request, new Invocation(InvokerLinkTypeEnum.PROVIDER));
     response.whenComplete((value, throwable) -> {
@@ -75,7 +84,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
       ByteBuf byteBuf = ctx.channel().alloc().heapBuffer();
       byteBuf.writeBytes(msg);
       if (ctx.channel().isActive()) {
-        return ctx.channel().writeAndFlush(byteBuf).sync();
+        return ctx.channel().writeAndFlush(byteBuf);
       }
     } catch (Exception e) {
       // fixme: fix this

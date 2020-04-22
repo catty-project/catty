@@ -98,7 +98,7 @@ public class NettyClient extends AbstractClient {
       ByteBuf byteBuf = clientChannel.alloc().heapBuffer();
       byteBuf.writeBytes(msg);
       if (clientChannel.isActive()) {
-        clientChannel.writeAndFlush(byteBuf).syncUninterruptibly();
+        clientChannel.writeAndFlush(byteBuf);
       } else {
         throw new EndpointInvalidException("ClientChannel closed");
       }

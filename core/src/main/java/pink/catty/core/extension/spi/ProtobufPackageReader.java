@@ -14,67 +14,79 @@
  */
 package pink.catty.core.extension.spi;
 
-public class ProtobufPackageReader implements PackageReader {
+import io.netty.buffer.ByteBuf;
+import java.util.List;
+
+public class ProtobufPackageReader implements PackageReader<ByteBuf, byte[]> {
 
   @Override
-  public CompletePackage readPackage(byte[] dataPackage)
-      throws PartialDataException, BrokenDataPackageException {
-    if (dataPackage == null || dataPackage.length == 0) {
-      throw new BrokenDataPackageException("Data package is empty.");
+  public void readPackage(ByteBuf in, List<byte[]> out) throws BrokenDataPackageException {
+    in.markReaderIndex();
+    int preIndex = in.readerIndex();
+    int length = readRawVarint32(in);
+    if (preIndex == in.readerIndex()) {
+      return;
     }
-    int length = 0;
-
-    int pos = 0;
-    int bufferLen = dataPackage.length;
-    byte tmp = dataPackage[pos++];
-    if (tmp >= 0) {
-      length = tmp;
+    if (length < 0) {
+      throw new BrokenDataPackageException("negative length: " + length);
+    }
+    if (in.readableBytes() < length) {
+      in.resetReaderIndex();
     } else {
-      if (pos < bufferLen) {
-        int result = tmp & 127;
-        if ((tmp = dataPackage[pos++]) >= 0) {
-          result |= tmp << 7;
-          length = result;
+      byte[] data = new byte[length];
+      ByteBuf byteBuf = in.readRetainedSlice(length);
+      byteBuf.readBytes(data);
+      byteBuf.release();
+      out.add(data);
+    }
+  }
+
+  private static int readRawVarint32(ByteBuf buffer) throws BrokenDataPackageException {
+    if (!buffer.isReadable()) {
+      return 0;
+    }
+    buffer.markReaderIndex();
+    byte tmp = buffer.readByte();
+    if (tmp >= 0) {
+      return tmp;
+    } else {
+      int result = tmp & 127;
+      if (!buffer.isReadable()) {
+        buffer.resetReaderIndex();
+        return 0;
+      }
+      if ((tmp = buffer.readByte()) >= 0) {
+        result |= tmp << 7;
+      } else {
+        result |= (tmp & 127) << 7;
+        if (!buffer.isReadable()) {
+          buffer.resetReaderIndex();
+          return 0;
+        }
+        if ((tmp = buffer.readByte()) >= 0) {
+          result |= tmp << 14;
         } else {
-          if (pos < bufferLen) {
-            result |= (tmp & 127) << 7;
-            if ((tmp = dataPackage[pos++]) >= 0) {
-              result |= tmp << 14;
-              length = result;
-            } else {
-              if (pos < bufferLen) {
-                result |= (tmp & 127) << 14;
-                if ((tmp = dataPackage[pos++]) >= 0) {
-                  result |= tmp << 21;
-                  length = result;
-                } else {
-                  if (pos < bufferLen) {
-                    result |= (tmp & 127) << 21;
-                    result |= (tmp = dataPackage[pos++]) << 28;
-                    if (tmp < 0) {
-                      throw new BrokenDataPackageException("malformed varint.");
-                    }
-                    length = result;
-                  }
-                }
-              }
+          result |= (tmp & 127) << 14;
+          if (!buffer.isReadable()) {
+            buffer.resetReaderIndex();
+            return 0;
+          }
+          if ((tmp = buffer.readByte()) >= 0) {
+            result |= tmp << 21;
+          } else {
+            result |= (tmp & 127) << 21;
+            if (!buffer.isReadable()) {
+              buffer.resetReaderIndex();
+              return 0;
+            }
+            result |= (tmp = buffer.readByte()) << 28;
+            if (tmp < 0) {
+              throw new BrokenDataPackageException("malformed varint.");
             }
           }
         }
       }
-    }
-
-    if (length < 0) {
-      throw new BrokenDataPackageException("Negative length: " + length);
-    }
-    if (dataPackage.length < length) {
-      throw new PartialDataException();
-    } else {
-      byte[] completePackage = new byte[length];
-      byte[] rest = new byte[dataPackage.length - length - pos];
-      System.arraycopy(dataPackage, pos, completePackage, 0, completePackage.length);
-      System.arraycopy(dataPackage, length + pos, rest, 0, rest.length);
-      return new CompletePackage(completePackage, rest);
+      return result;
     }
   }
 }

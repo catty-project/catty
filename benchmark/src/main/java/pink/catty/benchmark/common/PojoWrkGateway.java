@@ -14,6 +14,7 @@
  */
 package pink.catty.benchmark.common;
 
+import io.netty.buffer.PooledByteBufAllocator;
 import pink.catty.benchmark.service.PojoService;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -42,6 +43,7 @@ public class PojoWrkGateway {
     workerGroup = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
     ChannelHandler handler = new PojoWrkHandler(service);
 
+    bootstrap.option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
     bootstrap.group(bossGroup, workerGroup)
         .channel(NioServerSocketChannel.class)
         .childHandler(

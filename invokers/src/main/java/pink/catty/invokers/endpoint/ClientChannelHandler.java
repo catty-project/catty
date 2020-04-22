@@ -16,11 +16,15 @@ package pink.catty.invokers.endpoint;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
 import pink.catty.core.invoker.Response;
 
 public class ClientChannelHandler extends ChannelDuplexHandler {
+
+  private static Logger logger = LoggerFactory.getLogger(ClientChannelHandler.class);
 
   private NettyClient nettyClient;
 
@@ -38,6 +42,11 @@ public class ClientChannelHandler extends ChannelDuplexHandler {
               .getClass());
     }
     processResponse((Response) object);
+  }
+
+  @Override
+  public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    logger.error("Uncaught exception.", cause);
   }
 
   private void processResponse(Response response) {

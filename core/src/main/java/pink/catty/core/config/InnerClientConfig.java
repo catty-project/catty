@@ -73,4 +73,5 @@ public class InnerClientConfig {
   public int hashCode() {
     return Objects.hash(ip, port, address, timeout, codecType);
   }
+
 }
