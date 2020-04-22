@@ -15,7 +15,6 @@
 package pink.catty.core.extension.spi;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,16 +23,13 @@ import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.invoker.Client;
 import pink.catty.core.invoker.Server;
-import pink.catty.core.support.ConcurrentHashSet;
 
 public abstract class AbstractEndpointFactory implements EndpointFactory {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private Map<InnerClientConfig, Client> clientCache = new ConcurrentHashMap<>();
-  private Map<InnerServerConfig, Server> serverCache = new ConcurrentHashMap<>();
-  private final Set<InnerClientConfig> inCreationClient = new ConcurrentHashSet<>();
-  private final Set<InnerServerConfig> inCreationServer = new ConcurrentHashSet<>();
+  private final Map<InnerClientConfig, Client> clientCache = new ConcurrentHashMap<>();
+  private final Map<InnerServerConfig, Server> serverCache = new ConcurrentHashMap<>();
 
   @Override
   public Client createClient(InnerClientConfig clientConfig) {
@@ -43,14 +39,12 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
       client = null;
     }
     if(client == null) {
-      if(!inCreationClient.contains(clientConfig)) {
-        synchronized (inCreationClient) {
-          if(!inCreationClient.contains(clientConfig)) {
-            inCreationClient.add(clientConfig);
+      if(!clientCache.containsKey(clientConfig)) {
+        synchronized (clientCache) {
+          if(!clientCache.containsKey(clientConfig)) {
             Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(clientConfig.getCodecType());
             client = doCreateClient(clientConfig, codec);
             clientCache.put(clientConfig, client);
-            inCreationClient.remove(clientConfig);
             logger.info("EndpointFactory: a new client has bean created. ip: {}, port: {}.",
                 clientConfig.getServerIp(), clientConfig.getServerPort());
           }
@@ -68,9 +62,9 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
       server = null;
     }
     if(server == null) {
-      if(!inCreationServer.contains(serverConfig)) {
-        synchronized (inCreationServer) {
-          if(!inCreationServer.contains(serverConfig)) {
+      if(!serverCache.containsKey(serverConfig)) {
+        synchronized (serverCache) {
+          if(!serverCache.containsKey(serverConfig)) {
             Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(serverConfig.getCodecType());
             server = doCreateServer(serverConfig, codec);
             serverCache.put(serverConfig, server);
