@@ -18,9 +18,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static io.netty.handler.codec.rtsp.RtspResponseStatuses.INTERNAL_SERVER_ERROR;
 
-import pink.catty.benchmark.service.PojoService;
-import pink.catty.benchmark.utils.BenchmarkConstans;
-import pink.catty.core.utils.MD5Utils;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -30,9 +27,10 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.util.CharsetUtil;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pink.catty.benchmark.service.PojoService;
+import pink.catty.benchmark.utils.BenchmarkConstans;
 
 @ChannelHandler.Sharable
 public class PojoWrkHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
@@ -52,12 +50,12 @@ public class PojoWrkHandler extends SimpleChannelInboundHandler<FullHttpRequest>
   @Override
   protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
     long start = System.currentTimeMillis();
-    String content = BenchmarkConstans._1000_BYTES + UUID.randomUUID();
+    String content = BenchmarkConstans._1000_BYTES + System.currentTimeMillis();
 
     // get
     try {
       String response = service.service(content);
-      if (MD5Utils.md5(content).equals(response)) {
+      if (content.equals(response)) {
         okResponse(ctx);
       } else {
         badReponse(ctx);
