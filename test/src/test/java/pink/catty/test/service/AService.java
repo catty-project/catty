@@ -12,9 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.test.spring.api;
+package pink.catty.test.service;
 
-public interface SpringAService {
+public interface AService {
 
   String echo(String str);
 

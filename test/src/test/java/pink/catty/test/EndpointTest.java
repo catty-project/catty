@@ -59,7 +59,7 @@ public class EndpointTest {
     EndpointFactory factory = new NettyEndpointFactory();
     Client client0 = factory.createClient(clientConfig);
     Client client1 = factory.createClient(clientConfig);
-    Assert.assertEquals(client0, client1);
+    Assert.assertSame(client0, client1);
     clientConfig = new InnerClientConfig(TEST_IP_1, TEST_PORT, TEST_ADDRESS,
         TEST_TIMEOUT, TEST_CODEC_TYPE);
     Client client2 = factory.createClient(clientConfig);

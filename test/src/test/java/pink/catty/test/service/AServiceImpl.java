@@ -12,13 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.test.spring;
+package pink.catty.test.service;
 
 import org.springframework.stereotype.Component;
-import pink.catty.test.spring.api.SpringBService;
 
-@Component("SpringBService")
-public class SpringBServiceImpl implements SpringBService {
+@Component("SpringAService")
+public class AServiceImpl implements AService {
 
   @Override
   public String echo(String str) {

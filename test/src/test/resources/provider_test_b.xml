@@ -17,22 +17,20 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:catty="http://catty.pink/schema/catty"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:context="http://www.springframework.org/schema/context"
   xsi:schemaLocation="http://www.springframework.org/schema/beans
   http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
   http://catty.pink/schema/catty
-  http://catty.pink/schema/catty.xsd">
+  http://catty.pink/schema/catty.xsd
+  http://www.springframework.org/schema/context
+  http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-  <bean id="serviceA" class="pink.catty.test.service.AServiceImpl"/>
-  <bean id="serviceB" class="pink.catty.test.service.BServiceImpl"/>
+  <context:component-scan base-package="pink.catty.test.spring" />
 
-  <catty:protocol id="protocol" retry-times="3" recovery-period="5000"/>
-  <catty:client-config id="client" addresses="127.0.0.1:8080;127.0.0.1:8081" timeout="3000"/>
-  <catty:server-config id="server" port="25002" worker-num="300" min-worker-num="100" max-worker-num="500"/>
-
+  <catty:protocol id="protocol"/>
+  <catty:server-config id="server" port="25002" worker-num="4"/>
   <catty:exporter protocol="protocol" server-config="server">
-    <catty:service interface="pink.catty.test.service.BService" ref="serviceA"/>
-    <catty:service interface="pink.catty.test.service.AService" ref="serviceB"/>
+    <catty:service interface="pink.catty.test.service.AService" ref="SpringAService"/>
+    <catty:service interface="pink.catty.test.service.BService" ref="SpringBService"/>
   </catty:exporter>
-
-  <catty:reference protocol="protocol" client-config="client" interface="pink.catty.test.service.AService"/>
 </beans>

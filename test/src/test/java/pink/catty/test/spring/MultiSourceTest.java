@@ -14,36 +14,40 @@
  */
 package pink.catty.test.spring;
 
-import java.util.UUID;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import pink.catty.test.spring.api.SpringAService;
-import pink.catty.test.spring.api.SpringBService;
+import pink.catty.test.service.AService;
+import pink.catty.test.service.BService;
 
-public class SpringTest {
+public class MultiSourceTest {
 
-  private static ApplicationContext consumer;
+  private static AService aService;
+  private static BService bService;
+
+  private static ApplicationContext providerA;
+  private static ApplicationContext providerB;
 
   @BeforeClass
   public static void init() {
-    consumer = new ClassPathXmlApplicationContext("consumer_basic_test.xml");
-    new ClassPathXmlApplicationContext("provider_basic_test.xml");
+    providerA = new ClassPathXmlApplicationContext("provider_test_a.xml");
+    providerB = new ClassPathXmlApplicationContext("provider_test_b.xml");
+    ApplicationContext consumer = new ClassPathXmlApplicationContext("consumer_test.xml");
+    aService = consumer.getBean(AService.class);
+    bService = consumer.getBean(BService.class);
   }
 
   @Test
-  public void test() {
-    SpringAService aService = consumer.getBean(SpringAService.class);
-    String uuid = UUID.randomUUID().toString();
-    String result = aService.echo(uuid);
-    Assert.assertEquals(uuid, result);
-
-    SpringBService bService = consumer.getBean(SpringBService.class);
-    uuid = UUID.randomUUID().toString();
-    result = bService.echo(uuid);
-    Assert.assertEquals(uuid, result);
+  public void basicTest() {
+    String a = "a";
+    String b = "b";
+    for(int i = 0; i < 1000; i++) {
+      String a0 = aService.echo(a);
+      String b0 = bService.echo(b);
+      Assert.assertEquals(a0, a);
+      Assert.assertEquals(b0, b);
+    }
   }
-
 }

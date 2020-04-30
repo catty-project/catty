@@ -28,26 +28,21 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private final Map<InnerClientConfig, Client> clientCache = new ConcurrentHashMap<>();
-  private final Map<InnerServerConfig, Server> serverCache = new ConcurrentHashMap<>();
+  private static final Map<InnerClientConfig, Client> clientCache = new ConcurrentHashMap<>();
+  private static final Map<InnerServerConfig, Server> serverCache = new ConcurrentHashMap<>();
 
   @Override
   public Client createClient(InnerClientConfig clientConfig) {
     Client client = clientCache.get(clientConfig);
-    if(client != null && !client.isAvailable()) {
-      clientCache.remove(clientConfig);
-      client = null;
-    }
-    if(client == null) {
-      if(!clientCache.containsKey(clientConfig)) {
-        synchronized (clientCache) {
-          if(!clientCache.containsKey(clientConfig)) {
-            Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(clientConfig.getCodecType());
-            client = doCreateClient(clientConfig, codec);
-            clientCache.put(clientConfig, client);
-            logger.info("EndpointFactory: a new client has bean created. ip: {}, port: {}.",
-                clientConfig.getServerIp(), clientConfig.getServerPort());
-          }
+    if (client == null) {
+      synchronized (clientCache) {
+        if (!clientCache.containsKey(clientConfig)) {
+          Codec codec = ExtensionFactory.getCodec()
+              .getExtensionSingleton(clientConfig.getCodecType());
+          client = doCreateClient(clientConfig, codec);
+          clientCache.put(clientConfig, client);
+          logger.info("EndpointFactory: a new client has bean created. ip: {}, port: {}.",
+              clientConfig.getServerIp(), clientConfig.getServerPort());
         }
       }
     }
@@ -57,20 +52,15 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
   @Override
   public Server createServer(InnerServerConfig serverConfig) {
     Server server = serverCache.get(serverConfig);
-    if(server != null && !server.isAvailable()) {
-      serverCache.remove(serverConfig);
-      server = null;
-    }
-    if(server == null) {
-      if(!serverCache.containsKey(serverConfig)) {
-        synchronized (serverCache) {
-          if(!serverCache.containsKey(serverConfig)) {
-            Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(serverConfig.getCodecType());
-            server = doCreateServer(serverConfig, codec);
-            serverCache.put(serverConfig, server);
-            logger.info("EndpointFactory: a new server has bean created. ip: {}, port: {}.",
-                serverConfig.getServerAddress().getIp(), serverConfig.getServerAddress().getPort());
-          }
+    if (server == null) {
+      synchronized (serverCache) {
+        if (!serverCache.containsKey(serverConfig)) {
+          Codec codec = ExtensionFactory.getCodec()
+              .getExtensionSingleton(serverConfig.getCodecType());
+          server = doCreateServer(serverConfig, codec);
+          serverCache.put(serverConfig, server);
+          logger.info("EndpointFactory: a new server has bean created. ip: {}, port: {}.",
+              serverConfig.getServerAddress().getIp(), serverConfig.getServerAddress().getPort());
         }
       }
     }
