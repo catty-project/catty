@@ -32,7 +32,7 @@ public class InnerServerConfig {
   private final boolean needOrder;
   private final String codecType;
 
-  private InnerServerConfig(int port, int workerThreadNum, int minWorkerThreadNum,
+  public InnerServerConfig(int port, int workerThreadNum, int minWorkerThreadNum,
       int maxWorkerThreadNum, ServerAddress address, boolean needOrder, String codecType) {
     this.port = port;
     this.workerThreadNum = workerThreadNum;

@@ -36,14 +36,21 @@ See example package or test package.
 mvn clean install -DskipTests -Dmaven.javadoc.skip=true -Dgpg.skip
 ```
 
+**test:**
+```bash
+mvn clean test
+```
+
 ### Sync:
 #### Server:
 ```java
 ServerConfig serverConfig = ServerConfig.builder()
     .port(20550)
     .build();
+ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
 
 Exporter exporter = new Exporter(serverConfig);
+exporter.setProtocolConfig(protocolConfig);
 exporter.registerService(IService.class, new IServiceImpl());
 exporter.export();
 
@@ -53,9 +60,11 @@ exporter.export();
 ClientConfig clientConfig = ClientConfig.builder()
     .addAddress("127.0.0.1:20550")
     .build();
+ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
 
 Reference<IService> reference = new Reference<>();
 reference.setClientConfig(clientConfig);
+reference.setProtocolConfig(protocolConfig);
 reference.setInterfaceClass(IService.class);
 
 IService service = reference.refer();
@@ -69,8 +78,9 @@ System.out.println(service.say1("catty"));
 ServerConfig serverConfig = ServerConfig.builder()
     .port(20550)
     .build();
-
+ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
 Exporter exporter = new Exporter(serverConfig);
+exporter.setProtocolConfig(protocolConfig);
 exporter.registerService(IService.class, new IServiceImpl());
 exporter.export();
 ```
@@ -79,9 +89,11 @@ exporter.export();
 ClientConfig clientConfig = ClientConfig.builder()
     .addAddress("127.0.0.1:20550")
     .build();
+ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
 
 Reference<IService> reference = new Reference<>();
 reference.setClientConfig(clientConfig);
+reference.setProtocolConfig(protocolConfig);
 reference.setInterfaceClass(IService.class);
 
 IService service = reference.refer();

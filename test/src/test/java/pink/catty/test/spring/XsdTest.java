@@ -53,11 +53,17 @@ public class XsdTest {
   @Test
   public void testServerConfig() {
     ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("xsd_test.xml");
-    ServerConfig serverConfig = context.getBean(ServerConfig.class);
-    Assert.assertEquals(serverConfig.getPort(), 25002);
-    Assert.assertEquals(serverConfig.getWorkerThreadNum(), 300);
-    Assert.assertEquals(serverConfig.getMinWorkerThreadNum(), 100);
-    Assert.assertEquals(serverConfig.getMaxWorkerThreadNum(), 500);
+    ServerConfig serverConfig1 = (ServerConfig) context.getBean("server1");
+    Assert.assertEquals(serverConfig1.getPort(), 8080);
+    Assert.assertEquals(serverConfig1.getWorkerThreadNum(), 2);
+    Assert.assertEquals(serverConfig1.getMinWorkerThreadNum(), 1);
+    Assert.assertEquals(serverConfig1.getMaxWorkerThreadNum(), 2);
+
+    ServerConfig serverConfig2 = (ServerConfig) context.getBean("server2");
+    Assert.assertEquals(serverConfig2.getPort(), 8081);
+    Assert.assertEquals(serverConfig2.getWorkerThreadNum(), 2);
+    Assert.assertEquals(serverConfig2.getMinWorkerThreadNum(), 1);
+    Assert.assertEquals(serverConfig2.getMaxWorkerThreadNum(), 2);
   }
 
 }
