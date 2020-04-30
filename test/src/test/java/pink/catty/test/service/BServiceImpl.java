@@ -16,7 +16,7 @@ package pink.catty.test.service;
 
 import org.springframework.stereotype.Component;
 
-@Component("SpringBService")
+@Component("BService")
 public class BServiceImpl implements BService {
 
   @Override

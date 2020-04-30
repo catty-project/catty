@@ -25,12 +25,12 @@
   http://www.springframework.org/schema/context
   http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-  <context:component-scan base-package="pink.catty.test.spring" />
+  <context:component-scan base-package="pink.catty.test.service" />
 
   <catty:protocol id="protocol"/>
-  <catty:server-config id="server" port="25002" worker-num="4"/>
+  <catty:server-config id="server" port="25102" worker-num="4"/>
   <catty:exporter protocol="protocol" server-config="server">
-    <catty:service interface="pink.catty.test.service.AService" ref="SpringAService"/>
-    <catty:service interface="pink.catty.test.service.BService" ref="SpringBService"/>
+    <catty:service interface="pink.catty.test.service.AService" ref="AService"/>
+    <catty:service interface="pink.catty.test.service.BService" ref="BService"/>
   </catty:exporter>
 </beans>

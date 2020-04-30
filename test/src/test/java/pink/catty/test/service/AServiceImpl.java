@@ -16,7 +16,7 @@ package pink.catty.test.service;
 
 import org.springframework.stereotype.Component;
 
-@Component("SpringAService")
+@Component("AService")
 public class AServiceImpl implements AService {
 
   @Override

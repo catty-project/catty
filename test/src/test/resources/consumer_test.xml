@@ -23,7 +23,7 @@
   http://catty.pink/schema/catty.xsd">
 
   <catty:protocol id="protocol"/>
-  <catty:client-config id="client" addresses="127.0.0.1:25001;127.0.0.1:25002"/>
+  <catty:client-config id="client" addresses="127.0.0.1:25101;127.0.0.1:25102"/>
   <catty:reference protocol="protocol" client-config="client" interface="pink.catty.test.service.AService"/>
   <catty:reference protocol="protocol" client-config="client" interface="pink.catty.test.service.BService"/>
 </beans>
