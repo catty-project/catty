@@ -18,20 +18,32 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import pink.catty.core.CattyException;
+import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.DefaultRequest;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.MethodNotFoundException;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
+import pink.catty.core.meta.MetaInfo;
+import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.support.timer.HashedWheelTimer;
+import pink.catty.core.support.timer.Timer;
 import pink.catty.core.utils.RequestIdGenerator;
 
 public class ConsumerInvoker<T> extends AbstractLinkedInvoker implements InvocationHandler {
+
+  private static final String TIMEOUT_MESSAGE = "IP: %s, PORT: %d, INVOKE DETAIL: %s";
+  private static Timer timer;
+
+  static {
+    timer = new HashedWheelTimer();
+  }
 
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
@@ -99,7 +111,17 @@ public class ConsumerInvoker<T> extends AbstractLinkedInvoker implements Invocat
     }
 
     // sync-method
-    response.await(); // wait for method return.
+    int delay = invocation.getInvokedMethod().getTimeout();
+    if (delay <= 0) {
+      delay = invocation.getServiceMeta().getTimeout();
+    }
+
+    if (delay > 0) {
+      response.await(delay, TimeUnit.MILLISECONDS);
+    } else {
+      response.await(30 * 1000, TimeUnit.MILLISECONDS);
+    }
+
     Object returnValue = response.getValue();
     if (returnValue instanceof Throwable
         && !methodMeta.getReturnType().isAssignableFrom(returnValue.getClass())) {
@@ -118,6 +140,15 @@ public class ConsumerInvoker<T> extends AbstractLinkedInvoker implements Invocat
       }
     }
     return false;
+  }
+
+  private String buildTimeoutMessage(Request request, Invocation invocation) {
+    MetaInfo metaInfo = invocation.getMetaInfo();
+    return String.format(TIMEOUT_MESSAGE,
+        metaInfo.getStringDef(MetaInfoEnum.IP, "0.0.0.0"),
+        metaInfo.getIntDef(MetaInfoEnum.PORT, 0),
+        request.toString()
+    );
   }
 
   @SuppressWarnings("unchecked")

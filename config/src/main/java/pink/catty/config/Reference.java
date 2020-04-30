@@ -35,6 +35,8 @@ import pink.catty.invokers.linked.ConsumerInvoker;
 
 public class Reference<T> {
 
+  private static Cluster cluster;
+
   private Class<T> interfaceClass;
 
   private ClientConfig clientConfig;
@@ -42,8 +44,6 @@ public class Reference<T> {
   private RegistryConfig registryConfig;
 
   private ProtocolConfig protocolConfig;
-
-  private Cluster cluster;
 
   private Registry registry;
 
@@ -126,16 +126,22 @@ public class Reference<T> {
   }
 
   private void buildCluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
-    String clusterStrategy = protocolConfig.getClusterType();
-    switch (clusterStrategy) {
-      case ProtocolConfig.AUTO_RECOVERY:
-        cluster = new RecoveryCluster(metaInfo, serviceMeta);
-        break;
-      case ProtocolConfig.FAIL_FAST:
-        cluster = new FailFastCluster(metaInfo, serviceMeta);
-        break;
-      case ProtocolConfig.FAIL_OVER:
-        cluster = new FailOverCluster(metaInfo, serviceMeta);
+    if(cluster == null) {
+      synchronized (Reference.class) {
+        if(cluster == null) {
+          String clusterStrategy = protocolConfig.getClusterType();
+          switch (clusterStrategy) {
+            case ProtocolConfig.AUTO_RECOVERY:
+              cluster = new RecoveryCluster(metaInfo, serviceMeta);
+              break;
+            case ProtocolConfig.FAIL_FAST:
+              cluster = new FailFastCluster(metaInfo, serviceMeta);
+              break;
+            case ProtocolConfig.FAIL_OVER:
+              cluster = new FailOverCluster(metaInfo, serviceMeta);
+          }
+        }
+      }
     }
   }
 

@@ -74,4 +74,14 @@ public class InnerClientConfig {
     return Objects.hash(ip, port, address, timeout, codecType);
   }
 
+  @Override
+  public String toString() {
+    return "InnerClientConfig{" +
+        "ip='" + ip + '\'' +
+        ", port=" + port +
+        ", address='" + address + '\'' +
+        ", timeout=" + timeout +
+        ", codecType='" + codecType + '\'' +
+        '}';
+  }
 }

@@ -71,7 +71,7 @@ public class NettyClient extends AbstractClient {
           .connect(getConfig().getServerIp(), getConfig().getServerPort())
           .sync();
     } catch (InterruptedException i) {
-      destroy();
+      close();
       throw new EndpointInvalidException("NettyClient: connect().sync() interrupted", i);
     }
 
@@ -91,7 +91,6 @@ public class NettyClient extends AbstractClient {
   @Override
   public Response invoke(Request request, Invocation invocation) {
     try {
-      tryInit();
       Response response = new DefaultResponse(request.getRequestId());
       addCurrentTask(request.getRequestId(), response);
       byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
@@ -104,23 +103,9 @@ public class NettyClient extends AbstractClient {
       }
       return response;
     } catch (EndpointInvalidException e) {
-      // todo: need invoke destroy() method
-      status = DISCONNECTED;
       throw e;
     } catch (Exception e) {
-      // todo: need invoke destroy() method
-      status = DISCONNECTED;
       throw new EndpointInvalidException("ClientChannel invalid", e);
-    }
-  }
-
-  private void tryInit() {
-    if (!isAvailable()) {
-      synchronized (this) {
-        if (!isAvailable()) {
-          init();
-        }
-      }
     }
   }
 }

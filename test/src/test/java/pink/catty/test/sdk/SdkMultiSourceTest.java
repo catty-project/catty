@@ -14,9 +14,12 @@
  */
 package pink.catty.test.sdk;
 
+import java.util.concurrent.TimeUnit;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pink.catty.config.ClientConfig;
 import pink.catty.config.Exporter;
 import pink.catty.config.ProtocolConfig;
@@ -29,53 +32,53 @@ import pink.catty.test.service.BServiceImpl;
 
 public class SdkMultiSourceTest {
 
+  private static final Logger logger = LoggerFactory.getLogger(SdkMultiSourceTest.class);
+
   private static AService aService;
   private static BService bService;
 
   private static Exporter exporter0;
   private static Exporter exporter1;
-  private static Exporter exporter2;
+//  private static Exporter exporter2;
+  private static ProtocolConfig providerProtocol;
 
   @BeforeClass
   public static void init() {
-    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
-
+    providerProtocol = ProtocolConfig.defaultConfig();
     ServerConfig serverConfig = ServerConfig.builder()
         .port(20550)
         .build();
     exporter0 = new Exporter(serverConfig);
-    exporter0.setProtocolConfig(protocolConfig);
+    exporter0.setProtocolConfig(providerProtocol);
     exporter0.registerService(AService.class, new AServiceImpl());
     exporter0.registerService(BService.class, new BServiceImpl());
     exporter0.export();
-
     serverConfig = ServerConfig.builder()
         .port(20551)
         .build();
     exporter1 = new Exporter(serverConfig);
-    exporter1.setProtocolConfig(protocolConfig);
+    exporter1.setProtocolConfig(providerProtocol);
     exporter1.registerService(AService.class, new AServiceImpl());
     exporter1.registerService(BService.class, new BServiceImpl());
     exporter1.export();
-
-    serverConfig = ServerConfig.builder()
-        .port(20552)
-        .build();
-    exporter2 = new Exporter(serverConfig);
-    exporter2.setProtocolConfig(protocolConfig);
-    exporter2.registerService(AService.class, new AServiceImpl());
-    exporter2.registerService(BService.class, new BServiceImpl());
-    exporter2.export();
+//    serverConfig = ServerConfig.builder()
+//        .port(20552)
+//        .build();
+//    exporter2 = new Exporter(serverConfig);
+//    exporter2.setProtocolConfig(providerProtocol);
+//    exporter2.registerService(AService.class, new AServiceImpl());
+//    exporter2.registerService(BService.class, new BServiceImpl());
+//    exporter2.export();
 
     ClientConfig clientConfig = ClientConfig.builder()
         .addAddress("127.0.0.1:20550")
         .addAddress("127.0.0.1:20551")
-        .addAddress("127.0.0.1:20552")
+//        .addAddress("127.0.0.1:20552")
         .build();
 
-    protocolConfig = new ProtocolConfig();
+    ProtocolConfig protocolConfig = new ProtocolConfig();
     protocolConfig.setClusterType(ProtocolConfig.AUTO_RECOVERY);
-    protocolConfig.setRecoveryPeriod(3000);
+    protocolConfig.setRecoveryPeriod(400);
 
     Reference<AService> aReference = new Reference<>();
     aReference.setClientConfig(clientConfig);
@@ -94,11 +97,99 @@ public class SdkMultiSourceTest {
   public void test0() {
     String a = "a";
     String b = "b";
-    for(int i = 0; i < 1000; i++) {
+    for(int i = 0; i < 100; i++) {
       String a0 = aService.echo(a);
       String b0 = bService.echo(b);
       Assert.assertEquals(a0, a);
       Assert.assertEquals(b0, b);
+    }
+  }
+
+  @Test
+  public void switchSourceTest() {
+    String a = "a";
+    String b = "b";
+
+
+    int maxRound = 2000;
+    int round = 0;
+
+    while (round++ <= maxRound) {
+      String a0 = aService.echo(a);
+      String b0 = bService.echo(b);
+      Assert.assertEquals(a0, a);
+      Assert.assertEquals(b0, b);
+
+      if(round == 100) {
+        exporter0.unexport();
+        logger.info("Shutdown export0...");
+      }
+
+      if(round == 300) {
+        export0();
+        logger.info("Reopen export0...");
+      }
+
+      if(round == 500) {
+        exporter1.unexport();
+        logger.info("Shutdown export1...");
+      }
+
+      if(round == 700) {
+        export1();
+        logger.info("Reopen export1...");
+      }
+
+      if(round == 900) {
+        exporter0.unexport();
+        logger.info("Shutdown export0...");
+      }
+
+      if(round == 1100) {
+        export0();
+        logger.info("Reopen export0...");
+      }
+
+      if(round == 1300) {
+        exporter1.unexport();
+        logger.info("Shutdown export1...");
+      }
+
+      if(round == 1500) {
+        export1();
+        logger.info("Reopen export1...");
+      }
+      sleep();
+    }
+  }
+
+  private void export0() {
+    ServerConfig serverConfig = ServerConfig.builder()
+        .port(20550)
+        .build();
+    exporter0 = new Exporter(serverConfig);
+    exporter0.setProtocolConfig(providerProtocol);
+    exporter0.registerService(AService.class, new AServiceImpl());
+    exporter0.registerService(BService.class, new BServiceImpl());
+    exporter0.export();
+  }
+
+  private void export1() {
+    ServerConfig serverConfig = ServerConfig.builder()
+        .port(20551)
+        .build();
+    exporter1 = new Exporter(serverConfig);
+    exporter1.setProtocolConfig(providerProtocol);
+    exporter1.registerService(AService.class, new AServiceImpl());
+    exporter1.registerService(BService.class, new BServiceImpl());
+    exporter1.export();
+  }
+
+  private static void sleep() {
+    try {
+      TimeUnit.MILLISECONDS.sleep(10);
+    } catch (Exception e) {
+      // ignore
     }
   }
 }

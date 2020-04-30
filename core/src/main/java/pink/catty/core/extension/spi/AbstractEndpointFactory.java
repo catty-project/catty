@@ -34,12 +34,17 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
   @Override
   public Client createClient(InnerClientConfig clientConfig) {
     Client client = clientCache.get(clientConfig);
+    if(client != null && client.isClosed()) {
+      clientCache.remove(clientConfig);
+      client = null;
+    }
     if (client == null) {
       synchronized (clientCache) {
         if (!clientCache.containsKey(clientConfig)) {
           Codec codec = ExtensionFactory.getCodec()
               .getExtensionSingleton(clientConfig.getCodecType());
           client = doCreateClient(clientConfig, codec);
+          client.open();
           clientCache.put(clientConfig, client);
           logger.info("EndpointFactory: a new client has bean created. ip: {}, port: {}.",
               clientConfig.getServerIp(), clientConfig.getServerPort());
@@ -52,12 +57,17 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
   @Override
   public Server createServer(InnerServerConfig serverConfig) {
     Server server = serverCache.get(serverConfig);
+    if(server != null && server.isClosed()) {
+      serverCache.remove(serverConfig);
+      server = null;
+    }
     if (server == null) {
       synchronized (serverCache) {
         if (!serverCache.containsKey(serverConfig)) {
           Codec codec = ExtensionFactory.getCodec()
               .getExtensionSingleton(serverConfig.getCodecType());
           server = doCreateServer(serverConfig, codec);
+          server.open();
           serverCache.put(serverConfig, server);
           logger.info("EndpointFactory: a new server has bean created. ip: {}, port: {}.",
               serverConfig.getServerAddress().getIp(), serverConfig.getServerAddress().getPort());

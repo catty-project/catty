@@ -16,8 +16,6 @@ package pink.catty.core.invoker;
 
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pink.catty.core.Constants;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
@@ -26,17 +24,11 @@ import pink.catty.core.support.worker.HashableChooserFactory;
 import pink.catty.core.support.worker.HashableExecutor;
 import pink.catty.core.support.worker.StandardThreadExecutor;
 
-public abstract class AbstractServer extends AbstractLinkedInvoker implements Server {
-
-  private static Logger logger = LoggerFactory.getLogger(AbstractServer.class);
-
-  private static final int NEW = 0;
-  private static final int CONNECTED = 1;
-  private static final int DISCONNECTED = 2;
+public abstract class AbstractServer extends AbstractEndpoint implements Server, LinkedInvoker {
 
   private InnerServerConfig config;
-  private volatile int status = NEW;
-  private Codec codec;
+  protected Invoker next;
+
 
   /**
    * HashableExecutor is needed because if every requests just be submitted randomly to a generic
@@ -56,10 +48,20 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
   private ExecutorService executor;
 
   public AbstractServer(InnerServerConfig config, Codec codec, MappedInvoker invoker) {
-    super(invoker);
+    super(codec);
     this.config = config;
-    this.codec = codec;
+    setNext(invoker);
     createExecutor();
+  }
+
+  @Override
+  public void setNext(Invoker next) {
+    this.next = next;
+  }
+
+  @Override
+  public Invoker getNext() {
+    return next;
   }
 
   @Override
@@ -73,11 +75,6 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
   }
 
   @Override
-  public Codec getCodec() {
-    return codec;
-  }
-
-  @Override
   public ExecutorService getExecutor() {
     return executor;
   }
@@ -88,20 +85,8 @@ public abstract class AbstractServer extends AbstractLinkedInvoker implements Se
   }
 
   @Override
-  public boolean isAvailable() {
-    return status == CONNECTED;
-  }
-
-  @Override
-  public void init() {
-    status = CONNECTED;
-    doOpen();
-  }
-
-  @Override
-  public void destroy() {
-    status = DISCONNECTED;
-    doClose();
+  public void close() {
+    super.close();
     if (executor instanceof HashableExecutor) {
       ((HashableExecutor) executor).shutdownGracefully();
     } else {

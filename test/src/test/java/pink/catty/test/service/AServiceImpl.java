@@ -15,7 +15,9 @@
 package pink.catty.test.service;
 
 import org.springframework.stereotype.Component;
+import pink.catty.core.service.RpcService;
 
+@RpcService(timeout = 200)
 @Component("AService")
 public class AServiceImpl implements AService {
 

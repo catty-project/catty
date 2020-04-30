@@ -16,6 +16,9 @@ package pink.catty.config;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pink.catty.core.Constants;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.config.InnerServerConfig.InnerServerConfigBuilder;
 import pink.catty.core.config.RegistryConfig;
@@ -30,12 +33,14 @@ import pink.catty.core.invoker.Server;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
-import pink.catty.core.service.HeartBeatServiceImpl;
 import pink.catty.core.service.HeartBeatService;
+import pink.catty.core.service.HeartBeatServiceImpl;
 import pink.catty.core.service.ServiceMeta;
 
 
 public class Exporter {
+
+  private static final Logger logger = LoggerFactory.getLogger(Exporter.class);
 
   private Map<String, InvokerHolder> serviceHandlers = new HashMap<>();
 
@@ -58,6 +63,7 @@ public class Exporter {
 
   public void setServerConfig(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
+
   }
 
   public void setRegistryConfig(RegistryConfig registryConfig) {
@@ -109,10 +115,9 @@ public class Exporter {
       // todo: more detail about creating server fail.
       throw new NullPointerException("Server is not exist");
     }
-    if (!server.isAvailable()) {
+    if (!serviceHandlers.containsKey(Constants.HEARTBEAT_SERVICE_NAME)) {
       // If first open server, register heartbeat service.
       registerService(HeartBeatService.class, new HeartBeatServiceImpl());
-      server.init();
     }
 
     InvokerRegistry invokerRegistry = server.getInvokerRegistry();
@@ -126,14 +131,18 @@ public class Exporter {
 
   public void unexport() {
     InvokerRegistry invokerRegistry = server.getInvokerRegistry();
-    if (registry != null && registry.isOpen()) {
-      serviceHandlers
-          .forEach((s, invokerHolder) -> {
+    serviceHandlers
+        .forEach((s, invokerHolder) -> {
+          if (registry != null && registry.isOpen()) {
             registry.unregister(invokerHolder.getMetaInfo());
-            invokerRegistry.unregisterInvoker(s);
-          });
+          }
+          invokerRegistry.unregisterInvoker(s);
+        });
+    if (registry != null && registry.isOpen()) {
       registry.close();
     }
+    server.close();
+    logger.info("Unexport, port: {}", serverConfig.getPort());
   }
 
 }

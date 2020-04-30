@@ -49,6 +49,7 @@ public class NettyServer extends AbstractServer {
   protected void doOpen() {
     ServerBootstrap serverBootstrap = new ServerBootstrap();
     serverBootstrap.group(bossGroup, workerGroup)
+
         .channel(NioServerSocketChannel.class)
         .childHandler(new ChannelInitializer<SocketChannel>() {
           @Override

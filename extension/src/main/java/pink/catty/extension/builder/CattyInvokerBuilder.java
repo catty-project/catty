@@ -29,7 +29,6 @@ import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.invokers.linked.ConsumerSerializationInvoker;
 import pink.catty.invokers.linked.HealthCheckInvoker;
 import pink.catty.invokers.linked.ProviderSerializationInvoker;
-import pink.catty.invokers.linked.TimeoutInvoker;
 import pink.catty.invokers.meta.ProviderInvoker;
 
 @Extension(InvokerBuilderType.DIRECT)
@@ -50,11 +49,10 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
     Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
         metaInfo.getString(MetaInfoEnum.SERIALIZATION));
     LinkedInvoker serializationInvoker = new ConsumerSerializationInvoker(client, serialization);
-    LinkedInvoker timeoutInvoker = new TimeoutInvoker(serializationInvoker);
     if(metaInfo.getIntDef(MetaInfoEnum.HEALTH_CHECK_PERIOD, 1) <= 0) {
-      return timeoutInvoker;
+      return serializationInvoker;
     }
-    LinkedInvoker healthCheck = new HealthCheckInvoker(timeoutInvoker, metaInfo);
+    LinkedInvoker healthCheck = new HealthCheckInvoker(serializationInvoker, metaInfo);
     return healthCheck;
   }
 

@@ -14,6 +14,9 @@
  */
 package pink.catty.core.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pink.catty.core.EndpointIllegalStateException;
 import pink.catty.core.invoker.Cluster;
 import pink.catty.core.invoker.Endpoint;
 import pink.catty.core.invoker.Invoker;
@@ -21,17 +24,26 @@ import pink.catty.core.invoker.LinkedInvoker;
 
 public abstract class EndpointUtils {
 
+  private static Logger logger = LoggerFactory.getLogger(EndpointUtils.class);
+
   public static void destroyInvoker(Invoker invoker) {
-    if (invoker instanceof Cluster) {
-      ((Cluster) invoker).destroy();
-      return;
+    try {
+      if (invoker instanceof Cluster) {
+        ((Cluster) invoker).destroy();
+        return;
+      }
+      while (invoker instanceof LinkedInvoker) {
+        invoker = ((LinkedInvoker) invoker).getNext();
+      }
+      if (invoker instanceof Endpoint) {
+        ((Endpoint) invoker).close();
+      }
+    } catch (EndpointIllegalStateException e) {
+      // ignore
+    } catch (Exception e) {
+      logger.error("DestroyInvoker error", e);
     }
-    while (invoker instanceof LinkedInvoker) {
-      invoker = ((LinkedInvoker) invoker).getNext();
-    }
-    if (invoker instanceof Endpoint) {
-      ((Endpoint) invoker).destroy();
-    }
+
   }
 
 }

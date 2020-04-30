@@ -77,12 +77,13 @@ public class RecoveryCluster extends FailOverCluster {
                  * 3. if heartbeat succeed, register this invoker.
                  * 4. cancel this task.
                  */
-                Invoker invoker = getChainBuilder().buildConsumerInvoker(metaInfo);
-                Request heartBeat = HeartBeatUtils.buildHeartBeatRequest();
-                String except = (String) heartBeat.getArgsValue()[0];
-                Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, metaInfo);
+                logger.info("Recovery: begin recovery of endpoint: {}", metaInfo.toString());
+
                 try {
-                  logger.info("Recovery: begin recovery of endpoint: {}", metaInfo.toString());
+                  Invoker invoker = getChainBuilder().buildConsumerInvoker(metaInfo);
+                  Request heartBeat = HeartBeatUtils.buildHeartBeatRequest();
+                  String except = (String) heartBeat.getArgsValue()[0];
+                  Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, metaInfo);
                   Response heartBeatResp = invoker.invoke(heartBeat, inv);
                   heartBeatResp.await(defaultRecoveryDelay, TimeUnit.MILLISECONDS);
                   if (except.equals(heartBeatResp.getValue())) {

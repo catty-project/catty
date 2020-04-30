@@ -19,11 +19,13 @@ import java.util.concurrent.Executor;
 
 public interface Endpoint extends Invoker {
 
-  void init();
+  void open();
 
-  void destroy();
+  void close();
 
   boolean isAvailable();
+
+  boolean isClosed();
 
   Codec getCodec();
 
