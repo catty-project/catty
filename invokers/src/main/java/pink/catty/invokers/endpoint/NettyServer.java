@@ -23,8 +23,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
@@ -32,8 +30,6 @@ import pink.catty.core.invoker.AbstractServer;
 import pink.catty.core.invoker.MappedInvoker;
 
 public class NettyServer extends AbstractServer {
-
-  private static Logger logger = LoggerFactory.getLogger(NettyServer.class);
 
   private io.netty.channel.Channel serverChannel;
   private NioEventLoopGroup bossGroup;
