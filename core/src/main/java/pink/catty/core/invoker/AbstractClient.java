@@ -18,17 +18,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
-import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.meta.ClientMeta;
 
 public abstract class AbstractClient extends AbstractEndpoint implements Client {
 
-  private InnerClientConfig config;
+  private ClientMeta clientMeta;
   private Map<Long, Response> currentTask = new ConcurrentHashMap<>();
 
-  public AbstractClient(InnerClientConfig config, Codec codec) {
+  public AbstractClient(ClientMeta clientMeta, Codec codec) {
     super(codec);
-    this.config = config;
+    this.clientMeta = clientMeta;
   }
 
   public Response getResponseFuture(long requestId) {
@@ -40,8 +40,8 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
   }
 
   @Override
-  public InnerClientConfig getConfig() {
-    return config;
+  public ClientMeta getMeta() {
+    return clientMeta;
   }
 
   @Override
@@ -62,11 +62,11 @@ public abstract class AbstractClient extends AbstractEndpoint implements Client 
       return false;
     }
     AbstractClient that = (AbstractClient) o;
-    return Objects.equals(config, that.config);
+    return Objects.equals(clientMeta, that.clientMeta);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(config);
+    return Objects.hash(clientMeta);
   }
 }

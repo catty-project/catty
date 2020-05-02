@@ -55,10 +55,10 @@ public abstract class AbstractEndpoint implements Endpoint {
   public void open() {
     if (status.compareAndSet(NEW, CONNECTED)) {
       doOpen();
-      logger.info("Opened an endpoint, {}", getConfig().toString());
+      logger.info("Opened an endpoint, {}", getMeta().toString());
     } else {
       throw new EndpointIllegalStateException(
-          "This endpoint's status is illegal, status: " + status + " config: " + getConfig()
+          "This endpoint's status is illegal, status: " + status + " config: " + getMeta()
               .toString());
     }
   }
@@ -67,10 +67,10 @@ public abstract class AbstractEndpoint implements Endpoint {
   public void close() {
     if (status.compareAndSet(CONNECTED, DISCONNECTED)) {
       doClose();
-      logger.info("Closed an endpoint, {}", getConfig().toString());
+      logger.info("Closed an endpoint, {}", getMeta().toString());
     } else {
       throw new EndpointIllegalStateException(
-          "This endpoint's status is illegal, status: " + status + " config: " + getConfig()
+          "This endpoint's status is illegal, status: " + status + " config: " + getMeta()
               .toString());
     }
   }

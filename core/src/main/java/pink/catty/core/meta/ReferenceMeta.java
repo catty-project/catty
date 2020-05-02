@@ -21,7 +21,7 @@ public class ReferenceMeta extends ClientMeta {
   private String version;
   private String group;
   private String serviceName;
-  private ServiceMeta serviceMeta;
+  private transient ServiceMeta serviceMeta;
 
   public String getVersion() {
     return version;

@@ -27,7 +27,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import pink.catty.core.Constants;
 import pink.catty.core.EndpointInvalidException;
-import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
 import pink.catty.core.invoker.AbstractClient;
@@ -35,21 +34,22 @@ import pink.catty.core.invoker.DefaultResponse;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Request;
 import pink.catty.core.invoker.Response;
+import pink.catty.core.meta.ClientMeta;
 
 public class NettyClient extends AbstractClient {
 
   private Channel clientChannel;
   private NioEventLoopGroup nioEventLoopGroup;
 
-  public NettyClient(InnerClientConfig clientConfig, Codec codec) {
-    super(clientConfig, codec);
+  public NettyClient(ClientMeta clientMeta, Codec codec) {
+    super(clientMeta, codec);
     nioEventLoopGroup = new NioEventLoopGroup(Constants.THREAD_NUMBER + 1);
   }
 
   @Override
   protected void doOpen() {
     Bootstrap bootstrap = new Bootstrap();
-    int connectTimeoutMillis = getConfig().getTimeout() > 0 ? getConfig().getTimeout()
+    int connectTimeoutMillis = getMeta().getTimeout() > 0 ? getMeta().getTimeout()
         : Constants.DEFAULT_CLIENT_TIMEOUT;
     bootstrap.option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectTimeoutMillis);
     bootstrap.option(ChannelOption.TCP_NODELAY, true);
@@ -68,7 +68,7 @@ public class NettyClient extends AbstractClient {
     ChannelFuture future;
     try {
       future = bootstrap
-          .connect(getConfig().getServerIp(), getConfig().getServerPort())
+          .connect(getMeta().getIp(), getMeta().getPort())
           .sync();
     } catch (InterruptedException i) {
       close();

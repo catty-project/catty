@@ -17,8 +17,8 @@ package pink.catty.core.invoker;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import pink.catty.core.Constants;
-import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.meta.ServerMeta;
 import pink.catty.core.support.worker.HashLoopGroup;
 import pink.catty.core.support.worker.HashableChooserFactory;
 import pink.catty.core.support.worker.HashableExecutor;
@@ -26,7 +26,7 @@ import pink.catty.core.support.worker.StandardThreadExecutor;
 
 public abstract class AbstractServer extends AbstractEndpoint implements Server, LinkedInvoker {
 
-  private InnerServerConfig config;
+  private ServerMeta serverMeta;
   protected Invoker next;
 
 
@@ -47,11 +47,16 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server,
    */
   private ExecutorService executor;
 
-  public AbstractServer(InnerServerConfig config, Codec codec, MappedInvoker invoker) {
+  public AbstractServer(ServerMeta serverMeta, Codec codec, MappedInvoker invoker) {
     super(codec);
-    this.config = config;
+    this.serverMeta = serverMeta;
     setNext(invoker);
     createExecutor();
+  }
+
+  @Override
+  public ServerMeta getMeta() {
+    return serverMeta;
   }
 
   @Override
@@ -80,11 +85,6 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server,
   }
 
   @Override
-  public InnerServerConfig getConfig() {
-    return config;
-  }
-
-  @Override
   public void close() {
     super.close();
     if (executor instanceof HashableExecutor) {
@@ -99,14 +99,14 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server,
   protected abstract void doClose();
 
   private void createExecutor() {
-    if (config.isNeedOrder()) {
-      int workerNum = config.getWorkerThreadNum() > 0 ? config.getWorkerThreadNum() :
+    if (serverMeta.isNeedOrder()) {
+      int workerNum = serverMeta.getWorkerThreadNum() > 0 ? serverMeta.getWorkerThreadNum() :
           Constants.THREAD_NUMBER * 2;
       executor = new HashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
     } else {
-      int minWorkerNum = config.getMinWorkerThreadNum() > 0 ? config.getMinWorkerThreadNum() :
+      int minWorkerNum = serverMeta.getMinWorkerThreadNum() > 0 ? serverMeta.getMinWorkerThreadNum() :
           Constants.THREAD_NUMBER * 2;
-      int maxWorkerNum = config.getMaxWorkerThreadNum() > 0 ? config.getMaxWorkerThreadNum() :
+      int maxWorkerNum = serverMeta.getMaxWorkerThreadNum() > 0 ? serverMeta.getMaxWorkerThreadNum() :
           Constants.THREAD_NUMBER * 4;
       executor = new StandardThreadExecutor(minWorkerNum, maxWorkerNum);
       ((StandardThreadExecutor) executor).prestartAllCoreThreads();
@@ -122,11 +122,11 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server,
       return false;
     }
     AbstractServer that = (AbstractServer) o;
-    return Objects.equals(config, that.config);
+    return Objects.equals(serverMeta, that.serverMeta);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(config);
+    return Objects.hash(serverMeta);
   }
 }

@@ -24,10 +24,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import pink.catty.core.EndpointInvalidException;
-import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.invoker.AbstractServer;
 import pink.catty.core.invoker.MappedInvoker;
+import pink.catty.core.meta.ServerMeta;
 
 public class NettyServer extends AbstractServer {
 
@@ -35,8 +35,8 @@ public class NettyServer extends AbstractServer {
   private NioEventLoopGroup bossGroup;
   private NioEventLoopGroup workerGroup;
 
-  public NettyServer(InnerServerConfig serverConfig, Codec codec, MappedInvoker invoker) {
-    super(serverConfig, codec, invoker);
+  public NettyServer(ServerMeta serverMeta, Codec codec, MappedInvoker invoker) {
+    super(serverMeta, codec, invoker);
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
   }
@@ -59,10 +59,10 @@ public class NettyServer extends AbstractServer {
     serverBootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
     serverBootstrap.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
     try {
-      ChannelFuture f = serverBootstrap.bind(getConfig().getPort()).sync();
+      ChannelFuture f = serverBootstrap.bind(getMeta().getPort()).sync();
       serverChannel = f.channel();
     } catch (Exception e) {
-      throw new EndpointInvalidException("Server bind error, port: " + getConfig().getPort(), e);
+      throw new EndpointInvalidException("Server bind error, port: " + getMeta().getPort(), e);
     }
   }
 
@@ -80,5 +80,4 @@ public class NettyServer extends AbstractServer {
       workerGroup = null;
     }
   }
-
 }

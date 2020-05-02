@@ -31,6 +31,4 @@ public interface Endpoint extends Invoker {
 
   Executor getExecutor();
 
-  Object getConfig();
-
 }

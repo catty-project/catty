@@ -14,11 +14,10 @@
  */
 package pink.catty.core.invoker;
 
-import pink.catty.core.config.InnerClientConfig;
+import pink.catty.core.meta.ClientMeta;
 
 public interface Client extends Endpoint {
 
   @Override
-  InnerClientConfig getConfig();
-
+  ClientMeta getMeta();
 }
