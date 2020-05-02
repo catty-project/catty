@@ -15,6 +15,7 @@
 package pink.catty.core.invoker;
 
 import pink.catty.core.CattyException;
+import pink.catty.core.meta.EndpointMeta;
 
 /**
  * The most important interface which represent an rpc invocation. Every struct in catty which in
@@ -37,6 +38,8 @@ import pink.catty.core.CattyException;
  * Invocation contains the whole information of the current invocation.
  */
 public interface Invoker {
+
+  EndpointMeta getMeta();
 
   /**
    *

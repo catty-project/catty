@@ -20,7 +20,6 @@ public class EndpointMeta {
   private String codec;
   private String ip;
   private int port;
-  private String address;
 
   public String getSerialization() {
     return serialization;
@@ -52,13 +51,5 @@ public class EndpointMeta {
 
   public void setPort(int port) {
     this.port = port;
-  }
-
-  public String getAddress() {
-    return address;
-  }
-
-  public void setAddress(String address) {
-    this.address = address;
   }
 }

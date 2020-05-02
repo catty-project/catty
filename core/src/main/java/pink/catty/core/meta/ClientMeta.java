@@ -17,11 +17,7 @@ package pink.catty.core.meta;
 public class ClientMeta extends EndpointMeta {
 
   private int timeout;
-  private String loadBalance;
-  private String healthCheckPeriod;
-  private int retryTimes;
   private String endpoint;
-  private int recoveryPeriod;
 
   public int getTimeout() {
     return timeout;
@@ -31,43 +27,11 @@ public class ClientMeta extends EndpointMeta {
     this.timeout = timeout;
   }
 
-  public String getLoadBalance() {
-    return loadBalance;
-  }
-
-  public void setLoadBalance(String loadBalance) {
-    this.loadBalance = loadBalance;
-  }
-
-  public String getHealthCheckPeriod() {
-    return healthCheckPeriod;
-  }
-
-  public void setHealthCheckPeriod(String healthCheckPeriod) {
-    this.healthCheckPeriod = healthCheckPeriod;
-  }
-
-  public int getRetryTimes() {
-    return retryTimes;
-  }
-
-  public void setRetryTimes(int retryTimes) {
-    this.retryTimes = retryTimes;
-  }
-
   public String getEndpoint() {
     return endpoint;
   }
 
   public void setEndpoint(String endpoint) {
     this.endpoint = endpoint;
-  }
-
-  public int getRecoveryPeriod() {
-    return recoveryPeriod;
-  }
-
-  public void setRecoveryPeriod(int recoveryPeriod) {
-    this.recoveryPeriod = recoveryPeriod;
   }
 }
