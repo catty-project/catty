@@ -16,10 +16,10 @@ package pink.catty.core.invoker;
 
 import java.util.Map;
 
-public interface MappedInvoker extends Invoker, InvokerRegistry {
+public interface MappedInvoker<T extends Invoker> extends Invoker, InvokerRegistry<T> {
 
-  void setInvokerMap(Map<String, InvokerHolder> invokerMap);
+  void setInvokerMap(Map<String, T> invokerMap);
 
-  InvokerHolder getInvoker(String invokerIdentify);
+  T getInvoker(String invokerIdentify);
 
 }

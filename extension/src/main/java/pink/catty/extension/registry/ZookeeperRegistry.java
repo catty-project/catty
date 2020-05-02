@@ -176,7 +176,7 @@ public class ZookeeperRegistry implements Registry {
 
 
   /**
-   * zookeeper path: /root: catty/group name/interface name/providers?consumer/meta;
+   * zookeeper path: /root: catty/group name/interface name/providers?consumer/provider;
    *
    * buildPath :     /root: catty/group name/interface name/providers?consumer
    */

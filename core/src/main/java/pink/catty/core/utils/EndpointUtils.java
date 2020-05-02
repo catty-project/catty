@@ -17,8 +17,8 @@ package pink.catty.core.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pink.catty.core.EndpointIllegalStateException;
-import pink.catty.core.invoker.Cluster;
-import pink.catty.core.invoker.Endpoint;
+import pink.catty.core.invoker.cluster.Cluster;
+import pink.catty.core.invoker.endpoint.Endpoint;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.LinkedInvoker;
 

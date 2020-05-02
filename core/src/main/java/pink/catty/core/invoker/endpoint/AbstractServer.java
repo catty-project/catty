@@ -12,46 +12,60 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker;
+package pink.catty.core.invoker.endpoint;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import pink.catty.core.CattyException;
 import pink.catty.core.Constants;
 import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.invoker.Invocation;
+import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
+import pink.catty.core.invoker.MappedInvoker;
+import pink.catty.core.invoker.Provider;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ServerMeta;
+import pink.catty.core.service.MethodMeta;
+import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.support.worker.HashLoopGroup;
 import pink.catty.core.support.worker.HashableChooserFactory;
 import pink.catty.core.support.worker.HashableExecutor;
 import pink.catty.core.support.worker.StandardThreadExecutor;
 
-public abstract class AbstractServer extends AbstractEndpoint implements Server, LinkedInvoker {
+public abstract class AbstractServer extends AbstractEndpoint implements Server {
 
   private ServerMeta serverMeta;
-  protected Invoker next;
-
-
-  /**
-   * HashableExecutor is needed because if every requests just be submitted randomly to a generic
-   * executor such as ThreadPollExecutor, then the a series of requests can't be able to be executed
-   * by the origin order even if they are transformed by the same TCP link. And in some cases, this
-   * will cause severe problem.
-   *
-   * To fix this problem, we introduce HashableExecutor.
-   *
-   * When you need keep order for a series of requests, you can invoke {@link
-   * HashableExecutor#submit(int, Runnable)} and pass a same hash number as the first argument of
-   * those tasks, as result, those requests will be executed by submitting order.
-   *
-   * If you use the hash feature to keep order, the requests will be executed by a same thread. In
-   * some cases, it could cause performance problem.
-   */
   private ExecutorService executor;
+  private volatile Map<String, Provider> invokerMap = new ConcurrentHashMap<>();
+
 
   public AbstractServer(ServerMeta serverMeta, Codec codec, MappedInvoker invoker) {
     super(codec);
     this.serverMeta = serverMeta;
-    setNext(invoker);
     createExecutor();
+  }
+
+  @Override
+  public void setInvokerMap(Map<String, Provider> invokerMap) {
+    this.invokerMap = invokerMap;
+  }
+
+  @Override
+  public void registerInvoker(String serviceIdentify, Provider provider) {
+    invokerMap.put(serviceIdentify, provider);
+  }
+
+  @Override
+  public Provider unregisterInvoker(String serviceIdentify) {
+    return invokerMap.remove(serviceIdentify);
+  }
+
+  @Override
+  public Provider getInvoker(String invokerIdentify) {
+    return invokerMap.get(invokerIdentify);
   }
 
   @Override
@@ -60,23 +74,28 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server,
   }
 
   @Override
-  public void setNext(Invoker next) {
-    this.next = next;
-  }
-
-  @Override
-  public Invoker getNext() {
-    return next;
-  }
-
-  @Override
-  public InvokerRegistry getInvokerRegistry() {
-    return (InvokerRegistry) next;
-  }
-
-  @Override
   public Response invoke(Request request, Invocation invocation) {
-    return next.invoke(request, invocation);
+    String serviceName = request.getInterfaceName();
+    Provider provider = invokerMap.get(serviceName);
+    if (provider == null) {
+      throw new CattyException(
+          "No such provider found! RpcService name: " + request.getInterfaceName());
+    }
+
+    if (invocation == null) {
+      invocation = new Invocation(InvokerLinkTypeEnum.PROVIDER);
+    }
+    ServiceMeta serviceMeta = provider
+        .getMeta()
+        .getServiceMeta();
+    MethodMeta methodMeta = provider
+        .getMeta()
+        .getServiceMeta()
+        .getMethodMetaByName(request.getMethodName());
+    invocation.setTarget(serviceMeta.getTarget());
+    invocation.setServiceMeta(serviceMeta);
+    invocation.setInvokedMethod(methodMeta);
+    return provider.invoke(request, invocation);
   }
 
   @Override

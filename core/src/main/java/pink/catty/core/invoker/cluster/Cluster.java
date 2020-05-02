@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Catty Project
+ * Copyright 2020 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,25 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.extension.spi;
+package pink.catty.core.invoker.cluster;
 
-public class CompletePackage {
+import pink.catty.core.extension.spi.Registry.NotifyListener;
+import pink.catty.core.invoker.Consumer;
+import pink.catty.core.invoker.MappedInvoker;
 
-  private byte[] completePackage;
+public interface Cluster extends MappedInvoker<Consumer>, NotifyListener {
 
-  private byte[] restData;
-
-  public CompletePackage(byte[] completePackage, byte[] restData) {
-    this.completePackage = completePackage;
-    this.restData = restData;
-  }
-
-  public byte[] getCompletePackage() {
-    return completePackage;
-  }
-
-  public byte[] getRestData() {
-    return restData;
-  }
+  void destroy();
 
 }

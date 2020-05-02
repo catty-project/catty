@@ -19,6 +19,14 @@ public class ClientMeta extends EndpointMeta {
   private int timeout;
   private String endpoint;
 
+  public ClientMeta() {
+    super(MetaType.CLIENT);
+  }
+
+  protected ClientMeta(MetaType metaType) {
+    super(metaType);
+  }
+
   public int getTimeout() {
     return timeout;
   }

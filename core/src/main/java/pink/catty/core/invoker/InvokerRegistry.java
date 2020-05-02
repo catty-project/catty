@@ -14,10 +14,10 @@
  */
 package pink.catty.core.invoker;
 
-public interface InvokerRegistry {
+public interface InvokerRegistry<T extends Invoker> {
 
-  void registerInvoker(String serviceIdentify, InvokerHolder invokerHolder);
+  void registerInvoker(String serviceIdentify, T invoker);
 
-  InvokerHolder unregisterInvoker(String serviceIdentify);
+  T unregisterInvoker(String serviceIdentify);
 
 }

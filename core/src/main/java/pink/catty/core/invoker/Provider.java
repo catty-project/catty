@@ -14,10 +14,10 @@
  */
 package pink.catty.core.invoker;
 
-import pink.catty.core.extension.spi.Registry.NotifyListener;
+import pink.catty.core.meta.ProviderMeta;
 
-public interface Cluster extends MappedInvoker, NotifyListener {
+public interface Provider extends Invoker {
 
-  void destroy();
-
+  @Override
+  ProviderMeta getMeta();
 }

@@ -34,7 +34,7 @@ public abstract class MetaInfoUtils {
   }
 
   /**
-   * Get address(ip & port) from meta info.
+   * Get address(ip & port) from provider info.
    *
    * @param metaInfo metaInfo.
    * @return {@link ServerAddress}

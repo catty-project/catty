@@ -14,11 +14,11 @@
  */
 package pink.catty.core.extension.spi;
 
-import pink.catty.core.invoker.InvokerHolder;
 import java.util.List;
+import pink.catty.core.invoker.Invoker;
 
 public interface LoadBalance {
 
-  InvokerHolder select(List<InvokerHolder> invokers);
+  <T extends Invoker> T select(List<? extends Invoker> invokers);
 
 }

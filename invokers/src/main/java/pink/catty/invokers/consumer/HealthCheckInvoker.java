@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.invokers.linked;
+package pink.catty.invokers.consumer;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -21,18 +21,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import pink.catty.core.invoker.AbstractLinkedInvoker;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
+import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.service.HealthCheckException;
 import pink.catty.core.utils.HeartBeatUtils;
 
-public class HealthCheckInvoker extends AbstractLinkedInvoker {
+public class HealthCheckInvoker extends AbstractLinkedInvoker<Consumer> {
 
-  private static final int DEFAULT_HEALTH_CHECK_PERIOD = 10 * 1000;
   private static final String TIMER_NAME = "CATTY_HEARTBEAT";
   private static Timer timer;
 
@@ -41,22 +39,15 @@ public class HealthCheckInvoker extends AbstractLinkedInvoker {
   }
 
   private final int period;
-  private MetaInfo metaInfo;
+  private ConsumerMeta metaInfo;
   private boolean isTimerStart;
   private volatile RuntimeException heartBeatThrowable;
   private AtomicInteger checkErrorRecord;
 
-  public HealthCheckInvoker(MetaInfo metaInfo) {
-    this.metaInfo = metaInfo;
-    this.period = metaInfo.getIntDef(MetaInfoEnum.HEALTH_CHECK_PERIOD, DEFAULT_HEALTH_CHECK_PERIOD);
-    this.isTimerStart = false;
-    this.checkErrorRecord = new AtomicInteger(0);
-  }
-
-  public HealthCheckInvoker(Invoker next, MetaInfo metaInfo) {
+  public HealthCheckInvoker(Consumer next) {
     super(next);
-    this.period = metaInfo.getIntDef(MetaInfoEnum.HEALTH_CHECK_PERIOD, DEFAULT_HEALTH_CHECK_PERIOD);
-    this.metaInfo = metaInfo;
+    this.metaInfo = next.getMeta();
+    this.period = metaInfo.getHealthCheckPeriod();
     this.isTimerStart = false;
     this.checkErrorRecord = new AtomicInteger(0);
   }

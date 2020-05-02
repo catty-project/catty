@@ -16,10 +16,10 @@ package pink.catty.core.utils;
 
 import java.util.UUID;
 import pink.catty.core.Constants;
-import pink.catty.core.invoker.DefaultRequest;
+import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
-import pink.catty.core.invoker.Request;
+import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.service.HeartBeatService;
 import pink.catty.core.service.MethodMeta;

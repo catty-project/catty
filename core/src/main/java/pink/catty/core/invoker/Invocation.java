@@ -20,7 +20,7 @@ import pink.catty.core.service.ServiceMeta;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Invocation {
+public final class Invocation {
 
   public enum InvokerLinkTypeEnum {
     CONSUMER,

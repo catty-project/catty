@@ -29,11 +29,11 @@ import pink.catty.core.Constants;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
-import pink.catty.core.invoker.AbstractClient;
-import pink.catty.core.invoker.DefaultResponse;
+import pink.catty.core.invoker.endpoint.AbstractClient;
+import pink.catty.core.invoker.frame.DefaultResponse;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClientMeta;
 
 public class NettyClient extends AbstractClient {

@@ -12,25 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker;
+package pink.catty.core.invoker.endpoint;
 
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import pink.catty.core.meta.ClientMeta;
 
-public interface Response extends CompletionStage<Object>, Future<Object> {
+public interface Client extends Endpoint {
 
-  long getRequestId();
-
-  Object getValue();
-
-  void setValue(Object value);
-
-  void await() throws InterruptedException, ExecutionException;
-
-  void await(long timeout, TimeUnit unit)
-      throws InterruptedException, ExecutionException, TimeoutException;
-
+  @Override
+  ClientMeta getMeta();
 }

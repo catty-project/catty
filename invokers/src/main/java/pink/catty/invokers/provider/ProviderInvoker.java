@@ -12,20 +12,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.invokers.meta;
+package pink.catty.invokers.provider;
 
-import pink.catty.core.CattyException;
-import pink.catty.core.invoker.DefaultResponse;
-import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
-import pink.catty.core.service.MethodMeta;
-import pink.catty.core.utils.AsyncUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletionStage;
+import pink.catty.core.CattyException;
+import pink.catty.core.invoker.Invocation;
+import pink.catty.core.invoker.Provider;
+import pink.catty.core.invoker.frame.DefaultResponse;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
+import pink.catty.core.meta.ProviderMeta;
+import pink.catty.core.service.MethodMeta;
+import pink.catty.core.utils.AsyncUtils;
 
-public class ProviderInvoker implements Invoker {
+public class ProviderInvoker implements Provider {
+
+  private ProviderMeta meta;
+
+  public ProviderInvoker(ProviderMeta meta) {
+    this.meta = meta;
+  }
+
+  @Override
+  public ProviderMeta getMeta() {
+    return meta;
+  }
 
   @SuppressWarnings("unchecked")
   @Override

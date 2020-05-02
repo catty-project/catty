@@ -14,12 +14,20 @@
  */
 package pink.catty.core.meta;
 
-public class EndpointMeta {
+public class EndpointMeta extends MetaInfo {
 
   private String serialization;
   private String codec;
   private String ip;
   private int port;
+
+  public EndpointMeta() {
+    super(MetaType.CONSUMER);
+  }
+
+  protected EndpointMeta(MetaType metaType) {
+    super(metaType);
+  }
 
   public String getSerialization() {
     return serialization;
@@ -52,4 +60,5 @@ public class EndpointMeta {
   public void setPort(int port) {
     this.port = port;
   }
+
 }

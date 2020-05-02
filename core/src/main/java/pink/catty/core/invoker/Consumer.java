@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Catty Project
+ * Copyright 2020 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,22 +14,10 @@
  */
 package pink.catty.core.invoker;
 
-public interface Request {
+import pink.catty.core.meta.ConsumerMeta;
 
-  long getRequestId();
+public interface Consumer extends Invoker {
 
-  void setRequestId(long requestId);
-
-  String getInterfaceName();
-
-  void setInterfaceName(String interfaceName);
-
-  String getMethodName();
-
-  void setMethodName(String methodName);
-
-  Object[] getArgsValue();
-
-  void setArgsValue(Object[] argsValue);
-
+  @Override
+  ConsumerMeta getMeta();
 }

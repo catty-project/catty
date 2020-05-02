@@ -14,40 +14,45 @@
  */
 package pink.catty.core.invoker;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractMappedInvoker implements Invoker, MappedInvoker {
+public abstract class AbstractMappedInvoker<T extends Invoker> implements MappedInvoker<T> {
 
-  protected Map<String, InvokerHolder> invokerMap;
+  protected Map<String, T> invokerMap;
+  protected List<T> invokerList;
 
   public AbstractMappedInvoker() {
     this(new ConcurrentHashMap<>());
   }
 
-  public AbstractMappedInvoker(Map<String, InvokerHolder> invokerMap) {
+  public AbstractMappedInvoker(Map<String, T> invokerMap) {
     this.invokerMap = invokerMap;
   }
 
   @Override
-  public void setInvokerMap(Map<String, InvokerHolder> invokerMap) {
+  public synchronized void setInvokerMap(Map<String, T> invokerMap) {
     this.invokerMap = invokerMap;
+    this.invokerList = new ArrayList<>(invokerMap.values());
   }
 
   @Override
-  public void registerInvoker(String serviceIdentify, InvokerHolder invokerHolder) {
-    invokerMap.put(serviceIdentify, invokerHolder);
+  public synchronized void registerInvoker(String serviceIdentify, T invoker) {
+    this.invokerMap.put(serviceIdentify, invoker);
+    this.invokerList.add(invoker);
   }
 
   @Override
-  public InvokerHolder unregisterInvoker(String serviceIdentify) {
-    return invokerMap.remove(serviceIdentify);
+  public synchronized T unregisterInvoker(String serviceIdentify) {
+    T invoker = invokerMap.remove(serviceIdentify);
+    this.invokerList.remove(invoker);
+    return invoker;
   }
 
   @Override
-  public InvokerHolder getInvoker(String invokerIdentify) {
+  public synchronized T getInvoker(String invokerIdentify) {
     return invokerMap.get(invokerIdentify);
   }
-
-
 }

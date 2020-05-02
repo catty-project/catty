@@ -21,15 +21,15 @@ import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Serialization;
-import pink.catty.core.invoker.Client;
+import pink.catty.core.invoker.endpoint.Client;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.LinkedInvoker;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
-import pink.catty.invokers.linked.ConsumerSerializationInvoker;
-import pink.catty.invokers.linked.HealthCheckInvoker;
-import pink.catty.invokers.linked.ProviderSerializationInvoker;
-import pink.catty.invokers.meta.ProviderInvoker;
+import pink.catty.invokers.consumer.ConsumerSerializationInvoker;
+import pink.catty.invokers.consumer.HealthCheckInvoker;
+import pink.catty.invokers.provider.ProviderSerializationInvoker;
+import pink.catty.invokers.provider.ProviderInvoker;
 
 @Extension(InvokerBuilderType.DIRECT)
 public class CattyInvokerBuilder implements InvokerChainBuilder {

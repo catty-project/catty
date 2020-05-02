@@ -12,15 +12,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker;
+package pink.catty.core.invoker.endpoint;
 
+import pink.catty.core.invoker.MappedInvoker;
+import pink.catty.core.invoker.Provider;
 import pink.catty.core.meta.ServerMeta;
 
-public interface Server extends Endpoint, LinkedInvoker {
+public interface Server extends Endpoint, MappedInvoker<Provider> {
 
   @Override
   ServerMeta getMeta();
-
-  InvokerRegistry getInvokerRegistry();
-
 }

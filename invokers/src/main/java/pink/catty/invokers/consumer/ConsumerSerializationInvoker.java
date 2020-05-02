@@ -12,27 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.invokers.linked;
+package pink.catty.invokers.consumer;
 
 import java.util.concurrent.CompletionStage;
 import pink.catty.core.CattyException;
 import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.AbstractLinkedInvoker;
-import pink.catty.core.invoker.DefaultRequest;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.DefaultRequest;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
 
-public class ConsumerSerializationInvoker extends AbstractLinkedInvoker {
+public class ConsumerSerializationInvoker extends AbstractLinkedInvoker<Consumer> {
 
   private Serialization serialization;
 
-  public ConsumerSerializationInvoker(Invoker next, Serialization serialization) {
+  public ConsumerSerializationInvoker(Consumer next, Serialization serialization) {
     super(next);
     if (serialization == null) {
       throw new NullPointerException("Serialization is null");

@@ -12,12 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker;
+package pink.catty.core.invoker.endpoint;
 
-import pink.catty.core.meta.ClientMeta;
+import pink.catty.core.extension.spi.Codec;
+import java.util.concurrent.Executor;
+import pink.catty.core.invoker.Invoker;
 
-public interface Client extends Endpoint {
+public interface Endpoint extends Invoker {
 
-  @Override
-  ClientMeta getMeta();
+  void open();
+
+  void close();
+
+  boolean isAvailable();
+
+  boolean isClosed();
+
+  Codec getCodec();
+
+  Executor getExecutor();
+
 }

@@ -14,10 +14,11 @@
  */
 package pink.catty.invokers.cluster;
 
+import pink.catty.core.invoker.cluster.AbstractClusterInvoker;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.service.ServiceMeta;
 

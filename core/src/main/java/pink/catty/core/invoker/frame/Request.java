@@ -12,25 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.meta;
+package pink.catty.core.invoker.frame;
 
-public enum MetaInfoEnum {
+public interface Request {
 
-  IP,
-  PORT,
-  SERVICE_NAME,
-  WORKER_NUMBER,
-  TIMEOUT,
-  GROUP,
-  VERSION,
-  SERIALIZATION,
-  LOAD_BALANCE,
-  CODEC,
-  WEIGHT,
-  ENDPOINT,
-  HEALTH_CHECK_PERIOD,
-  RETRY_TIMES,
-  RECOVERY_PERIOD,
-  ;
+  long getRequestId();
+
+  void setRequestId(long requestId);
+
+  String getInterfaceName();
+
+  void setInterfaceName(String interfaceName);
+
+  String getMethodName();
+
+  void setMethodName(String methodName);
+
+  Object[] getArgsValue();
+
+  void setArgsValue(Object[] argsValue);
 
 }

@@ -12,23 +12,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker;
+package pink.catty.core.invoker.frame;
 
-import pink.catty.core.extension.spi.Codec;
-import java.util.concurrent.Executor;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-public interface Endpoint extends Invoker {
+public interface Response extends CompletionStage<Object>, Future<Object> {
 
-  void open();
+  long getRequestId();
 
-  void close();
+  Object getValue();
 
-  boolean isAvailable();
+  void setValue(Object value);
 
-  boolean isClosed();
+  void await() throws InterruptedException, ExecutionException;
 
-  Codec getCodec();
-
-  Executor getExecutor();
+  void await(long timeout, TimeUnit unit)
+      throws InterruptedException, ExecutionException, TimeoutException;
 
 }

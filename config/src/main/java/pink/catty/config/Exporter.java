@@ -29,7 +29,7 @@ import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.invoker.InvokerRegistry;
-import pink.catty.core.invoker.Server;
+import pink.catty.core.invoker.endpoint.Server;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;

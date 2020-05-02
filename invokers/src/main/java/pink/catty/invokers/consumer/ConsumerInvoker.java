@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.invokers.linked;
+package pink.catty.invokers.consumer;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -21,22 +21,20 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.AbstractLinkedInvoker;
-import pink.catty.core.invoker.DefaultRequest;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
-import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.MethodNotFoundException;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
+import pink.catty.core.invoker.frame.DefaultRequest;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.support.timer.HashedWheelTimer;
 import pink.catty.core.support.timer.Timer;
 import pink.catty.core.utils.RequestIdGenerator;
 
-public class ConsumerInvoker<T> extends AbstractLinkedInvoker implements InvocationHandler {
+public class ConsumerInvoker<T> extends AbstractLinkedInvoker<Consumer> implements InvocationHandler {
 
   private static final String TIMEOUT_MESSAGE = "IP: %s, PORT: %d, INVOKE DETAIL: %s";
   private static Timer timer;
@@ -48,7 +46,7 @@ public class ConsumerInvoker<T> extends AbstractLinkedInvoker implements Invocat
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
 
-  public ConsumerInvoker(ServiceMeta<T> serviceMeta, Invoker invoker) {
+  public ConsumerInvoker(ServiceMeta<T> serviceMeta, Consumer invoker) {
     super(invoker);
     this.interfaceClazz = serviceMeta.getInterfaceClass();
     this.serviceMeta = serviceMeta;
@@ -142,19 +140,10 @@ public class ConsumerInvoker<T> extends AbstractLinkedInvoker implements Invocat
     return false;
   }
 
-  private String buildTimeoutMessage(Request request, Invocation invocation) {
-    MetaInfo metaInfo = invocation.getMetaInfo();
-    return String.format(TIMEOUT_MESSAGE,
-        metaInfo.getStringDef(MetaInfoEnum.IP, "0.0.0.0"),
-        metaInfo.getIntDef(MetaInfoEnum.PORT, 0),
-        request.toString()
-    );
-  }
-
   @SuppressWarnings("unchecked")
-  public static <E> E getProxy(ServiceMeta serviceMeta, Invoker invoker) {
+  public static <E> E getProxy(ServiceMeta serviceMeta, Consumer consumer) {
     Class<E> clazz = serviceMeta.getInterfaceClass();
     return (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
-        new ConsumerInvoker(serviceMeta, invoker));
+        new ConsumerInvoker(serviceMeta, consumer));
   }
 }

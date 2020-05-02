@@ -20,10 +20,11 @@ import java.util.concurrent.TimeoutException;
 import pink.catty.core.CattyException;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.RpcTimeoutException;
+import pink.catty.core.invoker.cluster.AbstractClusterInvoker;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.HealthCheckException;
@@ -59,7 +60,7 @@ public class FailOverCluster extends AbstractClusterInvoker {
         break;
       } catch (HealthCheckException | EndpointInvalidException | RpcTimeoutException e) {
         logger.error(
-            "Cluster: endpoint broken, endpoint meta info: {}, this endpoint will be remove from cluster candidate.",
+            "Cluster: endpoint broken, endpoint provider info: {}, this endpoint will be remove from cluster candidate.",
             invokerHolder.getMetaInfo().toString(), e);
         unregisterInvoker(invokerHolder.getMetaInfo().toString());
         EndpointUtils.destroyInvoker(invokerHolder.getInvoker());

@@ -22,10 +22,10 @@ import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionType.CodecType;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.ProtobufPackageReader;
-import pink.catty.core.invoker.DefaultRequest;
-import pink.catty.core.invoker.DefaultResponse;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.DefaultRequest;
+import pink.catty.core.invoker.frame.DefaultResponse;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.extension.codec.generated.CattyProtocol;
 
 @Extension(CodecType.CATTY)

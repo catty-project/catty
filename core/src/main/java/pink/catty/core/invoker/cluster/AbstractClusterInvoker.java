@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.invokers.cluster;
+package pink.catty.core.invoker.cluster;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,15 +30,15 @@ import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.invoker.AbstractMappedInvoker;
-import pink.catty.core.invoker.Cluster;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
+import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
-import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.utils.EndpointUtils;
 import pink.catty.core.utils.MetaInfoUtils;
 
@@ -47,60 +47,38 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker imple
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
   protected LoadBalance loadBalance;
-  protected ServiceMeta serviceMeta;
-  protected MetaInfo metaInfo;
-  protected List<InvokerHolder> invokerList;
+  protected List<Consumer> invokerList;
+  protected ClusterMeta clusterMeta;
 
-  public AbstractClusterInvoker(MetaInfo metaInfo, ServiceMeta serviceMeta) {
-    this.metaInfo = metaInfo;
-    this.serviceMeta = serviceMeta;
+  public AbstractClusterInvoker(ClusterMeta clusterMeta) {
+    this.clusterMeta = clusterMeta;
     this.loadBalance = ExtensionFactory.getLoadBalance()
-        .getExtensionProtoType(metaInfo.getString(MetaInfoEnum.LOAD_BALANCE));
+        .getExtensionProtoType(clusterMeta.getLoadBalance());
+  }
+
+  @Override
+  public ClusterMeta getMeta() {
+    return clusterMeta;
   }
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    InvokerHolder invokerHolder;
+    Consumer consumer;
     if(invokerList.size() <= 0) {
-      throw new CattyException("No valid endpoint. MetaInfo: " + metaInfo);
+      throw new CattyException("No valid endpoint. MetaInfo: " + clusterMeta.toString());
     }
     if (invokerList.size() == 1) {
-      invokerHolder = invokerList.get(0);
+      consumer = invokerList.get(0);
     } else {
-      invokerHolder = loadBalance.select(invokerList);
+      consumer = loadBalance.select(invokerList);
     }
-    invocation.setMetaInfo(invokerHolder.getMetaInfo());
-    invocation.setServiceMeta(invokerHolder.getServiceMeta());
-    return doInvoke(invokerHolder, request, invocation);
-  }
-
-  @Override
-  public void setInvokerMap(Map<String, InvokerHolder> invokerMap) {
-    super.setInvokerMap(invokerMap);
-    this.invokerList = new ArrayList<>(invokerMap.values());
-  }
-
-  @Override
-  public synchronized InvokerHolder getInvoker(String invokerIdentify) {
-    return super.getInvoker(invokerIdentify);
-  }
-
-  @Override
-  public synchronized void registerInvoker(String serviceIdentify, InvokerHolder invokerHolder) {
-    super.registerInvoker(serviceIdentify, invokerHolder);
-    invokerList.add(invokerHolder);
-  }
-
-  @Override
-  public synchronized InvokerHolder unregisterInvoker(String serviceIdentify) {
-    InvokerHolder holder = super.unregisterInvoker(serviceIdentify);
-    invokerList.remove(holder);
-    return holder;
+    invocation.setServiceMeta(consumer.getMeta().getServiceMeta());
+    return doInvoke(consumer, request, invocation);
   }
 
   @Override
   public synchronized void destroy() {
-    invokerList.forEach(invokerHolder -> EndpointUtils.destroyInvoker(invokerHolder.getInvoker()));
+    invokerList.forEach(EndpointUtils::destroyInvoker);
   }
 
   @Override
@@ -108,8 +86,8 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker imple
       List<MetaInfo> metaInfoCollection) {
     metaInfoCollection = findCandidate(metaInfoCollection);
 
-    List<InvokerHolder> newInvokerList = new ArrayList<>();
-    Map<String, InvokerHolder> newInvokerMap = new HashMap<>();
+    List<Consumer> newInvokerList = new ArrayList<>();
+    Map<String, Consumer> newInvokerMap = new HashMap<>();
 
     // find new server.
     List<MetaInfo> newList = new ArrayList<>();
@@ -171,7 +149,7 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker imple
     return ExtensionFactory.getInvokerBuilder().getExtensionSingleton(InvokerBuilderType.DIRECT);
   }
 
-  protected abstract Response doInvoke(InvokerHolder invokerHolder, Request request,
+  abstract protected Response doInvoke(Consumer invokerHolder, Request request,
       Invocation invocation);
 
 }

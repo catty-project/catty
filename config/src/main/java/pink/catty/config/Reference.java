@@ -22,7 +22,7 @@ import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Registry;
-import pink.catty.core.invoker.Cluster;
+import pink.catty.core.invoker.cluster.Cluster;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.meta.EndpointTypeEnum;
 import pink.catty.core.meta.MetaInfo;
@@ -31,7 +31,7 @@ import pink.catty.core.service.ServiceMeta;
 import pink.catty.invokers.cluster.FailFastCluster;
 import pink.catty.invokers.cluster.FailOverCluster;
 import pink.catty.invokers.cluster.RecoveryCluster;
-import pink.catty.invokers.linked.ConsumerInvoker;
+import pink.catty.invokers.consumer.ConsumerInvoker;
 
 public class Reference<T> {
 

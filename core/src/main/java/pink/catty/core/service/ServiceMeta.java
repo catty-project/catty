@@ -23,7 +23,7 @@ import java.util.Set;
 import pink.catty.core.utils.ReflectUtils;
 
 /**
- * RpcService meta info.
+ * RpcService provider info.
  *
  * Cache service's interface info to mark an easy entry.
  */

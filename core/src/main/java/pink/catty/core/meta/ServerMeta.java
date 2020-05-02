@@ -21,6 +21,14 @@ public class ServerMeta extends EndpointMeta {
   private int maxWorkerThreadNum;
   private boolean needOrder;
 
+  public ServerMeta() {
+    super(MetaType.SERVER);
+  }
+
+  protected ServerMeta(MetaType metaType) {
+    super(metaType);
+  }
+
   public int getWorkerThreadNum() {
     return workerThreadNum;
   }

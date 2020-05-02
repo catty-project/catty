@@ -24,8 +24,8 @@ import pink.catty.core.CattyException;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.support.worker.HashableExecutor;
 
 public class ServerChannelHandler extends ChannelDuplexHandler {
@@ -79,19 +79,14 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
   }
 
   private ChannelFuture sendResponse(ChannelHandlerContext ctx, Response response) {
-    try {
-      byte[] msg = nettyServer.getCodec().encode(response, DataTypeEnum.RESPONSE);
-      ByteBuf byteBuf = ctx.channel().alloc().heapBuffer();
-      byteBuf.writeBytes(msg);
-      if (ctx.channel().isActive()) {
-        return ctx.channel().writeAndFlush(byteBuf);
-      }
-    } catch (Exception e) {
-      // fixme: fix this
-      e.printStackTrace();
+    byte[] msg = nettyServer.getCodec().encode(response, DataTypeEnum.RESPONSE);
+    ByteBuf byteBuf = ctx.channel().alloc().heapBuffer();
+    byteBuf.writeBytes(msg);
+    if (ctx.channel().isActive()) {
+      return ctx.channel().writeAndFlush(byteBuf);
+    } else {
+      return null;
     }
-
-    return null;
   }
 
 }

@@ -19,11 +19,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import pink.catty.core.ServerAddress;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.Request;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.HealthCheckException;
@@ -51,7 +52,7 @@ public class RecoveryCluster extends FailOverCluster {
   }
 
   @Override
-  protected void processError(InvokerHolder invokerHolder, Request request, Invocation invocation,
+  protected void processError(Consumer consumer, Request request, Invocation invocation,
       Throwable e) {
     final MetaInfo metaInfo = invokerHolder.getMetaInfo();
     final ServiceMeta serviceMeta = invokerHolder.getServiceMeta();
@@ -72,7 +73,7 @@ public class RecoveryCluster extends FailOverCluster {
               public void run() {
 
                 /*
-                 * 1. create a new invoker from meta info.
+                 * 1. create a new invoker from provider info.
                  * 2. fire a heartbeat to endpoint, which will attempt to connect to endpoint.
                  * 3. if heartbeat succeed, register this invoker.
                  * 4. cancel this task.

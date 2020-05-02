@@ -25,7 +25,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.extension.spi.Codec;
-import pink.catty.core.invoker.AbstractServer;
+import pink.catty.core.invoker.endpoint.AbstractServer;
 import pink.catty.core.invoker.MappedInvoker;
 import pink.catty.core.meta.ServerMeta;
 

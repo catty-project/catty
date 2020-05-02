@@ -16,12 +16,20 @@ package pink.catty.core.meta;
 
 import pink.catty.core.service.ServiceMeta;
 
-public class ReferenceMeta extends ClientMeta {
+public class ProviderMeta extends ServerMeta {
 
   private String version;
   private String group;
   private String serviceName;
   private transient ServiceMeta serviceMeta;
+
+  public ProviderMeta() {
+    super(MetaType.PROVIDER);
+  }
+
+  protected ProviderMeta(MetaType metaType) {
+    super(metaType);
+  }
 
   public String getVersion() {
     return version;
@@ -54,4 +62,5 @@ public class ReferenceMeta extends ClientMeta {
   public void setServiceMeta(ServiceMeta serviceMeta) {
     this.serviceMeta = serviceMeta;
   }
+
 }

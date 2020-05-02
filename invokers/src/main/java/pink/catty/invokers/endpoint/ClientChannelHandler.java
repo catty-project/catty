@@ -20,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
-import pink.catty.core.invoker.Response;
+import pink.catty.core.invoker.frame.Response;
 
 public class ClientChannelHandler extends ChannelDuplexHandler {
 

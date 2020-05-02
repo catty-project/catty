@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker;
+package pink.catty.core.invoker.endpoint;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;

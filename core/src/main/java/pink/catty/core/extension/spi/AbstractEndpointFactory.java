@@ -21,8 +21,8 @@ import org.slf4j.LoggerFactory;
 import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.invoker.Client;
-import pink.catty.core.invoker.Server;
+import pink.catty.core.invoker.endpoint.Client;
+import pink.catty.core.invoker.endpoint.Server;
 
 public abstract class AbstractEndpointFactory implements EndpointFactory {
 

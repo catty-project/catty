@@ -14,12 +14,12 @@
  */
 package pink.catty.extension.loadbalance;
 
-import pink.catty.core.extension.ExtensionType.LoadBalanceType;
-import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.extension.Extension;
-import pink.catty.core.extension.spi.LoadBalance;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.ExtensionType.LoadBalanceType;
+import pink.catty.core.extension.spi.LoadBalance;
+import pink.catty.core.invoker.Invoker;
 
 /**
  * Simple random load balance.
@@ -28,7 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class RandomLoadBalance implements LoadBalance {
 
   @Override
-  public InvokerHolder select(List<InvokerHolder> invokers) {
+  public Invoker select(List<Invoker> invokers) {
     if(invokers.size() == 1) {
       return invokers.get(0);
     }

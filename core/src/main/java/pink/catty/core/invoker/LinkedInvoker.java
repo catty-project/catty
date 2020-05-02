@@ -14,10 +14,10 @@
  */
 package pink.catty.core.invoker;
 
-public interface LinkedInvoker extends Invoker {
+public interface LinkedInvoker<T extends Invoker> extends Invoker {
 
-  void setNext(Invoker next);
+  void setNext(T next);
 
-  Invoker getNext();
+  T getNext();
 
 }

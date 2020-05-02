@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Catty Project
+ * Copyright 2020 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,234 +14,155 @@
  */
 package pink.catty.core.meta;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MetaInfo {
+public abstract class MetaInfo {
 
-  private Map<String, String> info = new HashMap<>();
+  protected static Logger logger = LoggerFactory.getLogger(MetaInfo.class);
 
-  private EndpointTypeEnum endpointTypeEnum;
+  private static final String CUSTOM_META_MAP = "customMeta";
 
-  public MetaInfo(EndpointTypeEnum endpointTypeEnum) {
-    this.endpointTypeEnum = endpointTypeEnum;
-  }
+  @SuppressWarnings("unchecked")
+  private static String toString(Object meta) {
+    Class<?> clazz = meta.getClass();
+    if (!EndpointMeta.class.isAssignableFrom(clazz)) {
+      throw new IllegalArgumentException(
+          "Except type: <? extent pink.catty.core.provider.EndpointMeta>, but actual: " + meta
+              .getClass().toString());
+    }
 
-  public MetaInfo(Map<String, String> info, EndpointTypeEnum endpointTypeEnum) {
-    this.info = info;
-    this.endpointTypeEnum = endpointTypeEnum;
-  }
-
-  public EndpointTypeEnum getEndpointTypeEnum() {
-    return endpointTypeEnum;
-  }
-
-  /**
-   * System setting style: setting1=a;setting2=b;setting3=c; todo : need more robust
-   */
-  public static MetaInfo parse(String metaInfoStr, EndpointTypeEnum endpointTypeEnum) {
-    Map<String, String> map = new HashMap<>();
-    String[] metaInfoEntryArray = metaInfoStr.split(";");
-    for (String entry : metaInfoEntryArray) {
-      if (entry == null || "".equals(entry)) {
+    StringBuilder sb = new StringBuilder();
+    Field[] fields = clazz.getFields();
+    for (Field field : fields) {
+      if(!field.isAccessible()) {
+        field.setAccessible(true);
+      }
+      if (field.getName().equals(CUSTOM_META_MAP)) {
         continue;
       }
-      map.put(entry.substring(0, entry.indexOf("=")), entry.substring(entry.indexOf("=") + 1));
+      try {
+        sb.append(field.getName()).append("=");
+        if(field.get(meta) != null) {
+          sb.append(field.get(meta));
+        }
+        sb.append(";");
+      } catch (IllegalAccessException e) {
+        logger.error("EndpointMeta toString access control error.", e);
+      }
     }
-    return new MetaInfo(map, endpointTypeEnum);
+    if(sb.length() > 0) {
+      sb.setLength(sb.length() - ";".length());
+    }
+    if(sb.length() <= 0) {
+      return "";
+    } else {
+      return sb.toString();
+    }
+  }
+
+  private MetaType metaType;
+  private Map<String, String> customMeta = new HashMap<>();
+
+  public MetaInfo(MetaType metaType) {
+    this.metaType = metaType;
+  }
+
+  public MetaType getMetaType() {
+    return metaType;
+  }
+
+  public void addCustomMeta(String key, Object value) {
+    customMeta.put(key, String.valueOf(value));
+  }
+
+  public Map<String, String> getCustomMeta() {
+    return customMeta;
+  }
+
+  public byte getByte(String key) {
+    return getByteDef(key, (byte) 0);
+  }
+
+  public short getShort(String key) {
+    return getShortDef(key, (short) 0);
+  }
+
+  public int getInt(String key) {
+    return getIntDef(key, 0);
+  }
+
+  public long getLong(String key) {
+    return getLongDef(key, 0L);
+  }
+
+  public String getString(String key) {
+    return getStringDef(key, "");
+  }
+
+  public boolean getBool(String key) {
+    return getBoolDef(key, false);
+  }
+
+  public double getDouble(String key) {
+    return getDoubleDef(key, 0.0);
+  }
+
+  public byte getByteDef(String key, byte def) {
+    if (customMeta.containsKey(key)) {
+      return Byte.valueOf(customMeta.get(key));
+    }
+    return def;
+  }
+
+  public short getShortDef(String key, short def) {
+    if (customMeta.containsKey(key)) {
+      return Short.valueOf(customMeta.get(key));
+    }
+    return def;
+  }
+
+  public int getIntDef(String key, int def) {
+    if (customMeta.containsKey(key)) {
+      return Integer.valueOf(customMeta.get(key));
+    }
+    return def;
+  }
+
+  public long getLongDef(String key, long def) {
+    if (customMeta.containsKey(key)) {
+      return Long.valueOf(customMeta.get(key));
+    }
+    return def;
+  }
+
+  public String getStringDef(String key, String def) {
+    if (customMeta.containsKey(key)) {
+      return customMeta.get(key);
+    }
+    return def;
+  }
+
+  public boolean getBoolDef(String key, boolean def) {
+    if (customMeta.containsKey(key)) {
+      return Boolean.valueOf(customMeta.get(key));
+    }
+    return def;
+  }
+
+  public double getDoubleDef(String key, double def) {
+    if (customMeta.containsKey(key)) {
+      return Double.valueOf(customMeta.get(key));
+    }
+    return def;
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (Entry<String, String> entry : info.entrySet()) {
-      sb.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
-    }
-    return sb.toString();
+    return toString(this);
   }
 
-  public void addMetaInfo(MetaInfoEnum key, String value) {
-    info.put(key.toString(), value);
-  }
-
-  public void addMetaInfo(MetaInfoEnum key, Object value) {
-    info.put(key.toString(), String.valueOf(value));
-  }
-
-  public byte getByte(MetaInfoEnum key) {
-    return Byte.valueOf(info.get(key.toString()));
-  }
-
-  public short getShort(MetaInfoEnum key) {
-    return Short.valueOf(info.get(key.toString()));
-  }
-
-  public int getInt(MetaInfoEnum key) {
-    return Integer.valueOf(info.get(key.toString()));
-  }
-
-  public long getLong(MetaInfoEnum key) {
-    return Long.valueOf(info.get(key.toString()));
-  }
-
-  public String getString(MetaInfoEnum key) {
-    return info.get(key.toString());
-  }
-
-  public boolean getBool(MetaInfoEnum key) {
-    return Boolean.valueOf(info.get(key.toString()));
-  }
-
-  public double getDouble(MetaInfoEnum key) {
-    return Double.valueOf(info.get(key.toString()));
-  }
-
-  public byte getByteDef(MetaInfoEnum key, byte def) {
-    if (info.containsKey(key.toString())) {
-      return Byte.valueOf(info.get(key.toString()));
-    }
-    return def;
-  }
-
-  public short getShortDef(MetaInfoEnum key, short def) {
-    if (info.containsKey(key.toString())) {
-      return Short.valueOf(info.get(key.toString()));
-    }
-    return def;
-  }
-
-  public int getIntDef(MetaInfoEnum key, int def) {
-    if (info.containsKey(key.toString())) {
-      return Integer.valueOf(info.get(key.toString()));
-    }
-    return def;
-  }
-
-  public long getLongDef(MetaInfoEnum key, long def) {
-    if (info.containsKey(key.toString())) {
-      return Long.valueOf(info.get(key.toString()));
-    }
-    return def;
-  }
-
-  public String getStringDef(MetaInfoEnum key, String def) {
-    if (info.containsKey(key.toString())) {
-      return info.get(key.toString());
-    }
-    return def;
-  }
-
-  public boolean getBoolDef(MetaInfoEnum key, boolean def) {
-    if (info.containsKey(key.toString())) {
-      return Boolean.valueOf(info.get(key.toString()));
-    }
-    return def;
-  }
-
-  public double getDoubleDef(MetaInfoEnum key, double def) {
-    if (info.containsKey(key.toString())) {
-      return Double.valueOf(info.get(key.toString()));
-    }
-    return def;
-  }
-
-  public void addCustomMetaInfo(String key, String value) {
-    info.put(key, value);
-  }
-
-  public byte getCustomByte(String key) {
-    return Byte.valueOf(info.get(key));
-  }
-
-  public short getCustomShort(String key) {
-    return Short.valueOf(info.get(key));
-  }
-
-  public int getCustomInt(String key) {
-    return Integer.valueOf(info.get(key));
-  }
-
-  public long getCustomLong(String key) {
-    return Long.valueOf(info.get(key));
-  }
-
-  public String getCustomString(String key) {
-    return info.get(key);
-  }
-
-  public boolean getCustomBool(String key) {
-    return Boolean.valueOf(info.get(key));
-  }
-
-  public double getCustomDouble(String key) {
-    return Double.valueOf(info.get(key));
-  }
-
-  public byte getCustomByteDef(String key, byte def) {
-    if (info.containsKey(key)) {
-      return Byte.valueOf(info.get(key));
-    }
-    return def;
-  }
-
-  public short getCustomShortDef(String key, short def) {
-    if (info.containsKey(key)) {
-      return Short.valueOf(info.get(key));
-    }
-    return def;
-  }
-
-  public int getCustomIntDef(String key, int def) {
-    if (info.containsKey(key)) {
-      return Integer.valueOf(info.get(key));
-    }
-    return def;
-  }
-
-  public long getCustomLongDef(String key, long def) {
-    if (info.containsKey(key)) {
-      return Long.valueOf(info.get(key));
-    }
-    return def;
-  }
-
-  public String getCustomStringDef(String key, String def) {
-    if (info.containsKey(key)) {
-      return info.get(key);
-    }
-    return def;
-  }
-
-  public boolean getCustomBoolDef(String key, boolean def) {
-    if (info.containsKey(key)) {
-      return Boolean.valueOf(info.get(key));
-    }
-    return def;
-  }
-
-  public double getCustomDoubleDef(String key, double def) {
-    if (info.containsKey(key)) {
-      return Double.valueOf(info.get(key));
-    }
-    return def;
-  }
-
-  @Override
-  public int hashCode() {
-    return info.hashCode();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (!(o instanceof MetaInfo)) {
-      return false;
-    }
-    return info.equals(((MetaInfo) o).info);
-  }
-
-  @Override
-  public MetaInfo clone() {
-    return new MetaInfo(new HashMap<>(info), endpointTypeEnum);
-  }
 }

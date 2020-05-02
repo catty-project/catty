@@ -565,7 +565,7 @@ public class HashedWheelTimer implements Timer {
         long remainingRounds;
 
         /**
-         * This will be used to chain timeouts in HashedWheelTimerBucket via a double-linked-list.
+         * This will be used to chain timeouts in HashedWheelTimerBucket via a double-consumer-list.
          * As only the workerThread will act on it there is no need for synchronization / volatile.
          */
         HashedWheelTimeout next;
@@ -678,14 +678,14 @@ public class HashedWheelTimer implements Timer {
     }
 
     /**
-     * Bucket that stores HashedWheelTimeouts. These are stored in a linked-list like datastructure to allow easy
+     * Bucket that stores HashedWheelTimeouts. These are stored in a consumer-list like datastructure to allow easy
      * removal of HashedWheelTimeouts in the middle. Also the HashedWheelTimeout act as nodes themself and so no
      * extra object creation is needed.
      */
     private static final class HashedWheelBucket {
 
         /**
-         * Used for the linked-list datastructure
+         * Used for the consumer-list datastructure
          */
         private HashedWheelTimeout head;
         private HashedWheelTimeout tail;
@@ -734,7 +734,7 @@ public class HashedWheelTimer implements Timer {
 
         public HashedWheelTimeout remove(HashedWheelTimeout timeout) {
             HashedWheelTimeout next = timeout.next;
-            // remove timeout that was either processed or cancelled by updating the linked-list
+            // remove timeout that was either processed or cancelled by updating the consumer-list
             if (timeout.prev != null) {
                 timeout.prev.next = next;
             }

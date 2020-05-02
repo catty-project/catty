@@ -14,17 +14,16 @@
  */
 package pink.catty.extension.loadbalance;
 
-import pink.catty.core.extension.ExtensionType.LoadBalanceType;
-import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.extension.Extension;
-import pink.catty.core.extension.spi.LoadBalance;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.ExtensionType.LoadBalanceType;
+import pink.catty.core.extension.spi.LoadBalance;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.meta.EndpointMeta;
 
 /**
- * Weight will be obtained from meta info of invoker. Weight should be set when it is exposing. The
+ * Weight will be obtained from provider info of invoker. Weight should be set when it is exposing. The
  * weight scope is supposed to be 0-100 (defaulted by 100). If you do not set weight for each
  * service provider, they will be treated as the same weight 100. Weight set to 0 provider will
  * never be reached.
@@ -32,8 +31,10 @@ import java.util.concurrent.ThreadLocalRandom;
 @Extension(LoadBalanceType.WEIGHTED_RANDOM)
 public class WeightedRandomLoadBalance implements LoadBalance {
 
+  private static final String WEIGHT_KEY = "LB_WEIGHT";
+
   @Override
-  public InvokerHolder select(List<InvokerHolder> invokers) {
+  public Invoker select(List<Invoker> invokers) {
     if(invokers.size() == 1) {
       return invokers.get(0);
     }
@@ -55,8 +56,8 @@ public class WeightedRandomLoadBalance implements LoadBalance {
     return invokers.get(ThreadLocalRandom.current().nextInt(invokerSize));
   }
 
-  private int getWeight(InvokerHolder invokerHolder) {
-    MetaInfo metaInfo = invokerHolder.getMetaInfo();
-    return metaInfo.getIntDef(MetaInfoEnum.WEIGHT, 100);
+  private int getWeight(Invoker invoker) {
+    EndpointMeta metaInfo = invoker.getMeta();
+    return metaInfo.getIntDef(WEIGHT_KEY, 100);
   }
 }

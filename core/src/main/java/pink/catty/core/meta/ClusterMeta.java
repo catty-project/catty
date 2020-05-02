@@ -14,12 +14,20 @@
  */
 package pink.catty.core.meta;
 
-public class ClusterMeta extends ClientMeta {
+public class ClusterMeta extends ConsumerMeta {
 
   private String loadBalance;
   private String healthCheckPeriod;
   private int retryTimes;
   private int recoveryPeriod;
+
+  public ClusterMeta() {
+    super(MetaType.CLUSTER);
+  }
+
+  protected ClusterMeta(MetaType metaType) {
+    super(metaType);
+  }
 
   public String getLoadBalance() {
     return loadBalance;

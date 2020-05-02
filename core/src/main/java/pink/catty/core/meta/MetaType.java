@@ -12,10 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker;
+package pink.catty.core.meta;
 
-public interface InvokerInterceptor {
+public enum MetaType {
 
-
+  ENDPOINT,
+  CLIENT,
+  SERVER,
+  CONSUMER,
+  PROVIDER,
+  CLUSTER,
+  ;
 
 }
