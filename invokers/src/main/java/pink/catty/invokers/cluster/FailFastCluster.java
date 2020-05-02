@@ -14,22 +14,21 @@
  */
 package pink.catty.invokers.cluster;
 
-import pink.catty.core.invoker.cluster.AbstractClusterInvoker;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.InvokerHolder;
+import pink.catty.core.invoker.cluster.AbstractClusterInvoker;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.meta.ClusterMeta;
 
 public class FailFastCluster extends AbstractClusterInvoker {
 
-  public FailFastCluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
-    super(metaInfo, serviceMeta);
+  public FailFastCluster(ClusterMeta clusterMeta) {
+    super(clusterMeta);
   }
 
   @Override
-  protected Response doInvoke(InvokerHolder invokerHolder, Request request, Invocation invocation) {
-    return invokerHolder.getInvoker().invoke(request, invocation);
+  protected Response doInvoke(Consumer consumer, Request request, Invocation invocation) {
+    return consumer.invoke(request, invocation);
   }
 }

@@ -25,6 +25,8 @@ import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
+import pink.catty.core.meta.ClusterMeta;
+import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.HealthCheckException;
@@ -46,17 +48,18 @@ public class RecoveryCluster extends FailOverCluster {
 
   private int defaultRecoveryDelay;
 
-  public RecoveryCluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
-    super(metaInfo, serviceMeta);
-    this.defaultRecoveryDelay = metaInfo.getIntDef(MetaInfoEnum.RECOVERY_PERIOD, 3 * 1000);
+  public RecoveryCluster(ClusterMeta clusterMeta) {
+    super(clusterMeta);
+    this.defaultRecoveryDelay = clusterMeta.getRecoveryPeriod();
   }
 
   @Override
   protected void processError(Consumer consumer, Request request, Invocation invocation,
       Throwable e) {
-    final MetaInfo metaInfo = invokerHolder.getMetaInfo();
-    final ServiceMeta serviceMeta = invokerHolder.getServiceMeta();
-    final ServerAddress address = MetaInfoUtils.getAddressFromMeta(metaInfo);
+    final ConsumerMeta consumerMeta = consumer.getMeta();
+    final String metaString = consumerMeta.toString();
+    final ServiceMeta serviceMeta = consumerMeta.getServiceMeta();
+    final ServerAddress address = MetaInfoUtils.getAddressFromMeta(consumerMeta);
 
     /*
      * Avoid duplicate recovery job.
@@ -78,21 +81,21 @@ public class RecoveryCluster extends FailOverCluster {
                  * 3. if heartbeat succeed, register this invoker.
                  * 4. cancel this task.
                  */
-                logger.info("Recovery: begin recovery of endpoint: {}", metaInfo.toString());
+                logger.info("Recovery: begin recovery of endpoint: {}", metaString);
 
                 try {
-                  Invoker invoker = getChainBuilder().buildConsumerInvoker(metaInfo);
+                  Invoker invoker = getChainBuilder().buildConsumerInvoker(consumerMeta);
                   Request heartBeat = HeartBeatUtils.buildHeartBeatRequest();
                   String except = (String) heartBeat.getArgsValue()[0];
-                  Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, metaInfo);
+                  Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, consumerMeta);
                   Response heartBeatResp = invoker.invoke(heartBeat, inv);
                   heartBeatResp.await(defaultRecoveryDelay, TimeUnit.MILLISECONDS);
                   if (except.equals(heartBeatResp.getValue())) {
                     InvokerHolder newHolder = new InvokerHolder(metaInfo, serviceMeta, invoker);
-                    registerInvoker(metaInfo.toString(), newHolder);
+                    registerInvoker(metaString, newHolder);
                     logger
                         .info("Recovery: endpoint recovery succeed! endpoint: {}",
-                            metaInfo.toString());
+                            metaString);
                     ON_RECOVERY.remove(address);
                     cancel();
                   } else {
@@ -102,7 +105,7 @@ public class RecoveryCluster extends FailOverCluster {
                 } catch (Exception e0) {
                   logger.info(
                       "Recovery: endpoint recovery failed, another try is going to begin, endpoint: {}",
-                      metaInfo.toString(), e0);
+                      metaString, e0);
                 }
               }
             }, defaultRecoveryDelay, defaultRecoveryDelay);

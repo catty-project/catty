@@ -20,27 +20,24 @@ import java.util.concurrent.TimeoutException;
 import pink.catty.core.CattyException;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.RpcTimeoutException;
-import pink.catty.core.invoker.cluster.AbstractClusterInvoker;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.InvokerHolder;
+import pink.catty.core.invoker.cluster.AbstractClusterInvoker;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
+import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.service.HealthCheckException;
-import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.utils.EndpointUtils;
 
 public class FailOverCluster extends AbstractClusterInvoker {
 
-  public FailOverCluster(MetaInfo metaInfo,
-      ServiceMeta serviceMeta) {
-    super(metaInfo, serviceMeta);
+  public FailOverCluster(ClusterMeta clusterMeta) {
+    super(clusterMeta);
   }
 
   @Override
-  protected Response doInvoke(InvokerHolder invokerHolder, Request request, Invocation invocation) {
-    int retryTimes = metaInfo.getIntDef(MetaInfoEnum.RETRY_TIMES, 1);
+  protected Response doInvoke(Consumer consumer, Request request, Invocation invocation) {
+    int retryTimes = clusterMeta.getRetryTimes();
     int delay = invocation.getInvokedMethod().getTimeout();
     if (delay <= 0) {
       delay = invocation.getServiceMeta().getTimeout();
@@ -49,7 +46,7 @@ public class FailOverCluster extends AbstractClusterInvoker {
     Response response = null;
     for (int i = 0; i <= Math.max(retryTimes, invokerList.size()); i++) {
       try {
-        response = invokerHolder.getInvoker().invoke(request, invocation);
+        response = consumer.invoke(request, invocation);
         if (delay >= 0) {
           try {
             response.await(delay, TimeUnit.MILLISECONDS);
@@ -59,14 +56,15 @@ public class FailOverCluster extends AbstractClusterInvoker {
         }
         break;
       } catch (HealthCheckException | EndpointInvalidException | RpcTimeoutException e) {
+        String metaString = consumer.getMeta().toString();
         logger.error(
             "Cluster: endpoint broken, endpoint provider info: {}, this endpoint will be remove from cluster candidate.",
-            invokerHolder.getMetaInfo().toString(), e);
-        unregisterInvoker(invokerHolder.getMetaInfo().toString());
-        EndpointUtils.destroyInvoker(invokerHolder.getInvoker());
-        processError(invokerHolder, request, invocation, e);
+            metaString, e);
+        unregisterInvoker(metaString);
+        EndpointUtils.destroyInvoker(consumer);
+        processError(consumer, request, invocation, e);
         if (invokerList.size() > 0) {
-          invokerHolder = loadBalance.select(invokerList);
+          consumer = loadBalance.select(invokerList);
         }
       }
     }
@@ -78,7 +76,7 @@ public class FailOverCluster extends AbstractClusterInvoker {
         "RecoveryCluster, after retry: " + retryTimes + ", not found valid endpoint.");
   }
 
-  protected void processError(InvokerHolder invokerHolder, Request request, Invocation invocation,
+  protected void processError(Consumer consumer, Request request, Invocation invocation,
       Throwable e) {
 
   }

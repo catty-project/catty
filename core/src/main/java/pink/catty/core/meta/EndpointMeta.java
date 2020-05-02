@@ -22,7 +22,7 @@ public class EndpointMeta extends MetaInfo {
   private int port;
 
   public EndpointMeta() {
-    super(MetaType.CONSUMER);
+    super(MetaType.ENDPOINT);
   }
 
   protected EndpointMeta(MetaType metaType) {

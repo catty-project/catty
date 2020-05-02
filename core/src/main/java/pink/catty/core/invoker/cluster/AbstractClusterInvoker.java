@@ -149,7 +149,7 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker imple
     return ExtensionFactory.getInvokerBuilder().getExtensionSingleton(InvokerBuilderType.DIRECT);
   }
 
-  abstract protected Response doInvoke(Consumer invokerHolder, Request request,
+  abstract protected Response doInvoke(Consumer consumer, Request request,
       Invocation invocation);
 
 }
