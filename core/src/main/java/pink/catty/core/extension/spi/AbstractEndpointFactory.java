@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pink.catty.core.ServerAddress;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.invoker.endpoint.Client;
 import pink.catty.core.invoker.endpoint.Server;
@@ -28,24 +29,25 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
-  private static final Map<ClientMeta, Client> clientCache = new ConcurrentHashMap<>();
-  private static final Map<ServerMeta, Server> serverCache = new ConcurrentHashMap<>();
+  private static final Map<ServerAddress, Client> clientCache = new ConcurrentHashMap<>();
+  private static final Map<Integer, Server> serverCache = new ConcurrentHashMap<>();
 
   @Override
   public Client createClient(ClientMeta clientMeta) {
-    Client client = clientCache.get(clientMeta);
+    ServerAddress address = new ServerAddress(clientMeta.getRemoteIp(), clientMeta.getRemotePort());
+    Client client = clientCache.get(address);
     if(client != null && client.isClosed()) {
-      clientCache.remove(clientMeta);
+      clientCache.remove(address);
       client = null;
     }
     if (client == null) {
       synchronized (clientCache) {
-        if (!clientCache.containsKey(clientMeta)) {
+        if (!clientCache.containsKey(address)) {
           Codec codec = ExtensionFactory.getCodec()
               .getExtensionSingleton(clientMeta.getCodec());
           client = doCreateClient(clientMeta, codec);
           client.open();
-          clientCache.put(clientMeta, client);
+          clientCache.put(address, client);
           logger.info("EndpointFactory: a new client has bean created. ip: {}, port: {}.",
               clientMeta.getRemoteIp(), clientMeta.getRemotePort());
         }
@@ -56,19 +58,20 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
 
   @Override
   public Server createServer(ServerMeta serverMeta) {
-    Server server = serverCache.get(serverMeta);
+    int port = serverMeta.getLocalPort();
+    Server server = serverCache.get(port);
     if(server != null && server.isClosed()) {
-      serverCache.remove(serverMeta);
+      serverCache.remove(port);
       server = null;
     }
     if (server == null) {
       synchronized (serverCache) {
-        if (!serverCache.containsKey(serverMeta)) {
+        if (!serverCache.containsKey(port)) {
           Codec codec = ExtensionFactory.getCodec()
               .getExtensionSingleton(serverMeta.getCodec());
           server = doCreateServer(serverMeta, codec);
           server.open();
-          serverCache.put(serverMeta, server);
+          serverCache.put(port, server);
           logger.info("EndpointFactory: a new server has bean created. ip: {}, port: {}.",
               serverMeta.getLocalIp(), serverMeta.getLocalPort());
         }
