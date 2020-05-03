@@ -20,19 +20,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pink.catty.core.Constants;
 import pink.catty.core.ServerAddress;
-import pink.catty.core.config.InnerServerConfig.InnerServerConfigBuilder;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Registry;
-import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.invoker.InvokerRegistry;
+import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.endpoint.Server;
-import pink.catty.core.meta.EndpointTypeEnum;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
+import pink.catty.core.meta.ProviderMeta;
+import pink.catty.core.meta.ServerMeta;
 import pink.catty.core.service.HeartBeatService;
 import pink.catty.core.service.HeartBeatServiceImpl;
 import pink.catty.core.service.ServiceMeta;
@@ -42,7 +39,7 @@ public class Exporter {
 
   private static final Logger logger = LoggerFactory.getLogger(Exporter.class);
 
-  private Map<String, InvokerHolder> serviceHandlers = new HashMap<>();
+  private Map<String, Provider> serviceHandlers = new HashMap<>();
 
   private Server server;
 
@@ -80,23 +77,19 @@ public class Exporter {
     ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
     serviceMeta.setTarget(serviceObject);
 
-    MetaInfo metaInfo = new MetaInfo(EndpointTypeEnum.SERVER);
-    metaInfo.addMetaInfo(MetaInfoEnum.PORT, address.getPort());
-    metaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());
-    metaInfo.addMetaInfo(MetaInfoEnum.GROUP, serviceMeta.getGroup());
-    metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
-    metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
-    metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, protocolConfig.getSerializationType());
-    metaInfo.addMetaInfo(MetaInfoEnum.CODEC, protocolConfig.getCodecType());
-    metaInfo.addMetaInfo(MetaInfoEnum.WORKER_NUMBER, serverConfig.getWorkerThreadNum());
-    metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, protocolConfig.getEndpointType());
+    ProviderMeta metaInfo = new ProviderMeta();
+    metaInfo.setLocalIp(address.getIp());
+    metaInfo.setLocalPort(address.getPort());
+    metaInfo.setSerialization(protocolConfig.getSerializationType());
+    metaInfo.setCodec(protocolConfig.getCodecType());
+    metaInfo.setEndpoint(protocolConfig.getEndpointType());
+    metaInfo.setServiceMeta(serviceMeta);
+    metaInfo.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
-    // todo: make InvokerChainBuilder configurable
     InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
         .getExtensionSingleton(InvokerBuilderType.DIRECT);
-    InvokerHolder invokerHolder = InvokerHolder
-        .Of(metaInfo, serviceMeta, chainBuilder.buildProviderInvoker(metaInfo));
-    serviceHandlers.put(serviceMeta.getServiceName(), invokerHolder);
+    Provider provider = chainBuilder.buildProvider(metaInfo);
+    serviceHandlers.put(serviceMeta.getServiceName(), provider);
   }
 
   public void export() {
@@ -105,42 +98,34 @@ public class Exporter {
           .getExtensionSingleton(registryConfig.getRegistryType(), registryConfig);
       registry.open();
     }
+    ServerAddress address = serverConfig.getServerAddress();
+    ServerMeta serverMeta = new ServerMeta();
+    serverMeta.setLocalIp(address.getIp());
+    serverMeta.setLocalPort(address.getPort());
+    serverMeta.setSerialization(protocolConfig.getSerializationType());
+    serverMeta.setCodec(protocolConfig.getCodecType());
+    serverMeta.setEndpoint(protocolConfig.getEndpointType());
+    serverMeta.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
     EndpointFactory factory = ExtensionFactory.getEndpointFactory()
         .getExtensionSingleton(protocolConfig.getEndpointType());
-    InnerServerConfigBuilder builder = serverConfig.toInnerConfigBuilder();
-    builder.codecType(protocolConfig.getCodecType());
-    server = factory.createServer(builder.build());
+    server = factory.createServer(serverMeta);
     if (server == null) {
-      // todo: more detail about creating server fail.
       throw new NullPointerException("Server is not exist");
     }
+
+    /*
+     * If first open server, register heartbeat service.
+     */
     if (!serviceHandlers.containsKey(Constants.HEARTBEAT_SERVICE_NAME)) {
-      // If first open server, register heartbeat service.
       registerService(HeartBeatService.class, new HeartBeatServiceImpl());
     }
 
-    InvokerRegistry invokerRegistry = server.getInvokerRegistry();
-    serviceHandlers.forEach((s, invokerHolder) -> {
-      invokerRegistry.registerInvoker(s, invokerHolder);
-      if (registry != null) {
-        registry.register(invokerHolder.getMetaInfo());
-      }
-    });
+    serviceHandlers.forEach((s, invokerHolder) -> server.registerInvoker(s, invokerHolder));
   }
 
   public void unexport() {
-    InvokerRegistry invokerRegistry = server.getInvokerRegistry();
-    serviceHandlers
-        .forEach((s, invokerHolder) -> {
-          if (registry != null && registry.isOpen()) {
-            registry.unregister(invokerHolder.getMetaInfo());
-          }
-          invokerRegistry.unregisterInvoker(s);
-        });
-    if (registry != null && registry.isOpen()) {
-      registry.close();
-    }
+    serviceHandlers.forEach((s, invokerHolder) -> server.unregisterInvoker(s));
     server.close();
     logger.info("Unexport, port: {}", serverConfig.getPort());
   }

@@ -18,7 +18,7 @@ import pink.catty.core.invoker.MappedInvoker;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.meta.ServerMeta;
 
-public interface Server extends Endpoint, MappedInvoker<Provider> {
+public interface Server extends Endpoint, MappedInvoker<Provider, ServerMeta> {
 
   @Override
   ServerMeta getMeta();

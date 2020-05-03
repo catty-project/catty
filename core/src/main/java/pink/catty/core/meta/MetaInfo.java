@@ -14,11 +14,23 @@
  */
 package pink.catty.core.meta;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pink.catty.core.utils.ReflectUtils;
 
 public abstract class MetaInfo {
 
@@ -27,7 +39,52 @@ public abstract class MetaInfo {
   private static final String CUSTOM_META_MAP = "customMeta";
 
   public static <T extends MetaInfo> T parseOf(String metaString, Class<T> model) {
-    return null;
+    Map<String, String> map = new HashMap<>();
+    String[] metaInfoEntryArray = metaString.split(";");
+    for (String entry : metaInfoEntryArray) {
+      if (entry == null || "".equals(entry)) {
+        continue;
+      }
+      map.put(entry.substring(0, entry.indexOf("=")), entry.substring(entry.indexOf("=") + 1));
+    }
+
+    T metaInfo = ReflectUtils.getInstanceFromClass(model);
+    BeanInfo beanInfo;
+    try {
+      beanInfo = Introspector.getBeanInfo(model);
+    } catch (IntrospectionException e) {
+      throw new MetaFormatException(e);
+    }
+    PropertyDescriptor[] descriptors = beanInfo.getPropertyDescriptors();
+    Map<String, PropertyDescriptor> descriptorMap = new HashMap<>();
+    for (PropertyDescriptor descriptor : descriptors) {
+      descriptorMap.put(descriptor.getName(), descriptor);
+    }
+
+    for (Entry<String, String> entry : map.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      PropertyDescriptor descriptor = descriptorMap.get(key);
+      if (descriptor == null) {
+        metaInfo.addCustomMeta(key, value);
+        continue;
+      }
+      if(value == null || "".equals(value)) {
+        continue;
+      }
+      Object typedValue = ReflectUtils.convertFromString(descriptor.getPropertyType(), value);
+      if(typedValue == null) {
+        continue;
+      }
+      Method method = descriptor.getWriteMethod();
+      try {
+        method.invoke(metaInfo, typedValue);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+        throw new MetaFormatException(e);
+      }
+    }
+
+    return metaInfo;
   }
 
   @SuppressWarnings("unchecked")
@@ -40,8 +97,17 @@ public abstract class MetaInfo {
     }
 
     StringBuilder sb = new StringBuilder();
-    Field[] fields = clazz.getFields();
-    for (Field field : fields) {
+    List<Field> fieldList = new LinkedList<>();
+    while (clazz != null && clazz != Object.class) {
+      Field[] fields = clazz.getDeclaredFields();
+      fieldList.addAll(Arrays.asList(fields));
+      clazz = clazz.getSuperclass();
+    }
+
+    for (Field field : fieldList) {
+      if (Modifier.isStatic(field.getModifiers())) {
+        continue;
+      }
       if (!field.isAccessible()) {
         field.setAccessible(true);
       }

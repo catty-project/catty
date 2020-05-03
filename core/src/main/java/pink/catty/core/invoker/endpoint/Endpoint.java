@@ -14,11 +14,13 @@
  */
 package pink.catty.core.invoker.endpoint;
 
-import pink.catty.core.extension.spi.Codec;
 import java.util.concurrent.Executor;
-import pink.catty.core.invoker.Invoker;
+import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.meta.MetaInfo;
 
-public interface Endpoint extends Invoker {
+public interface Endpoint {
+
+  MetaInfo getMeta();
 
   void open();
 

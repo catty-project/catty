@@ -24,7 +24,7 @@ public class MyLoadBalance implements LoadBalance {
   private RandomLoadBalance loadBalance = new RandomLoadBalance();
 
   @Override
-  public Invoker select(List<Invoker> invokers) {
+  public <T extends Invoker> T select(List<T> invokers) {
     System.out.println("my sl");
     return loadBalance.select(invokers);
   }

@@ -15,12 +15,15 @@
 package pink.catty.core.utils;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import pink.catty.core.CattyException;
 
 public abstract class ReflectUtils {
 
@@ -107,6 +110,45 @@ public abstract class ReflectUtils {
     } else {
       return methodName + "(" + paramDesc + ")";
     }
+  }
+
+  public static <T> T getInstanceFromClass(Class<T> tClass) {
+    try {
+      Constructor<? extends T> constructor = tClass.getConstructor();
+      return constructor.newInstance();
+    } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new CattyException(e);
+    }
+  }
+
+  public static Object convertFromString(Class<?> required, String value) {
+    if(required == String.class) {
+      return value;
+    }
+    if(required == byte.class || required == Byte.class) {
+      return Byte.valueOf(value);
+    }
+    if(required == char.class || required == Character.class) {
+      if(value.length() == 1) {
+        return value.charAt(0);
+      }
+    }
+    if(required == short.class || required == Short.class) {
+      return Short.valueOf(value);
+    }
+    if(required == int.class || required == Integer.class) {
+      return Integer.valueOf(value);
+    }
+    if(required == long.class || required == Long.class) {
+      return Long.valueOf(value);
+    }
+    if(required == float.class || required == Float.class) {
+      return Float.valueOf(value);
+    }
+    if(required == double.class || required == Double.class) {
+      return Double.valueOf(value);
+    }
+    return null;
   }
 
   private static Class<?> forNameWithoutCache(String className) throws ClassNotFoundException {

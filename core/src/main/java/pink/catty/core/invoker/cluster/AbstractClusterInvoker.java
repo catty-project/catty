@@ -14,7 +14,6 @@
  */
 package pink.catty.core.invoker.cluster;
 
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
@@ -35,7 +34,6 @@ public abstract class AbstractClusterInvoker extends AbstractMappedInvoker<Consu
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
   protected LoadBalance loadBalance;
-  protected List<Consumer> invokerList;
   protected ClusterMeta clusterMeta;
 
   public AbstractClusterInvoker(ClusterMeta clusterMeta) {

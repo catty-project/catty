@@ -14,23 +14,25 @@
  */
 package pink.catty.core.meta;
 
-public class ClientMeta extends EndpointMeta {
+public class MetaFormatException extends RuntimeException {
 
-  private int timeout;
-
-  public ClientMeta() {
-    super(MetaType.CLIENT);
+  public MetaFormatException() {
   }
 
-  protected ClientMeta(MetaType metaType) {
-    super(metaType);
+  public MetaFormatException(String message) {
+    super(message);
   }
 
-  public int getTimeout() {
-    return timeout;
+  public MetaFormatException(String message, Throwable cause) {
+    super(message, cause);
   }
 
-  public void setTimeout(int timeout) {
-    this.timeout = timeout;
+  public MetaFormatException(Throwable cause) {
+    super(cause);
+  }
+
+  public MetaFormatException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
   }
 }

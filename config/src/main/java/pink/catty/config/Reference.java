@@ -98,6 +98,7 @@ public class Reference<T> {
             ConsumerMeta newMetaInfo = MetaInfo.parseOf(metaString, ConsumerMeta.class);
             newMetaInfo.setRemoteIp(address.getIp());
             newMetaInfo.setRemotePort(address.getPort());
+            newMetaInfo.setServiceMeta(serviceMeta);
 
             InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
                 .getExtensionSingleton(InvokerBuilderType.DIRECT);
