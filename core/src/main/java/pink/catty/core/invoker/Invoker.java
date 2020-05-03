@@ -39,9 +39,9 @@ import pink.catty.core.meta.MetaInfo;
  *
  * Invocation contains the whole information of the current invocation.
  */
-public interface Invoker {
+public interface Invoker<Meta extends MetaInfo> {
 
-  MetaInfo getMeta();
+  Meta getMeta();
 
   /**
    *

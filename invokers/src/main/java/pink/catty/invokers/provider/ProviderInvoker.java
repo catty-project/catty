@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletionStage;
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.Invocation;
+import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.frame.DefaultResponse;
 import pink.catty.core.invoker.frame.Request;
@@ -37,6 +38,11 @@ public class ProviderInvoker implements Provider {
   @Override
   public ProviderMeta getMeta() {
     return meta;
+  }
+
+  @Override
+  public Invoker getNext() {
+    return null;
   }
 
   @SuppressWarnings("unchecked")

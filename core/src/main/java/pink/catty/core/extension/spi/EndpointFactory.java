@@ -14,15 +14,15 @@
  */
 package pink.catty.core.extension.spi;
 
-import pink.catty.core.config.InnerClientConfig;
-import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.invoker.endpoint.Client;
 import pink.catty.core.invoker.endpoint.Server;
+import pink.catty.core.meta.ClientMeta;
+import pink.catty.core.meta.ServerMeta;
 
 public interface EndpointFactory {
 
-  Client createClient(InnerClientConfig clientConfig);
+  Client createClient(ClientMeta clientMeta);
 
-  Server createServer(InnerServerConfig serverConfig);
+  Server createServer(ServerMeta serverMeta);
 
 }

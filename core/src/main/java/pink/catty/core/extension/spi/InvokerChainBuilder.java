@@ -14,13 +14,15 @@
  */
 package pink.catty.core.extension.spi;
 
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.meta.MetaInfo;
+import pink.catty.core.invoker.Consumer;
+import pink.catty.core.invoker.Provider;
+import pink.catty.core.meta.ConsumerMeta;
+import pink.catty.core.meta.ProviderMeta;
 
 public interface InvokerChainBuilder {
 
-  Invoker buildConsumerInvoker(MetaInfo metaInfo);
+  Consumer buildConsumer(ConsumerMeta metaInfo);
 
-  Invoker buildProviderInvoker(MetaInfo metaInfo);
+  Provider buildProvider(ProviderMeta metaInfo);
 
 }

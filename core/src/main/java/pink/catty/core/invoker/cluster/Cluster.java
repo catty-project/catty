@@ -14,12 +14,19 @@
  */
 package pink.catty.core.invoker.cluster;
 
+import java.util.List;
+import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.spi.Registry.NotifyListener;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.MappedInvoker;
+import pink.catty.core.meta.ProviderMeta;
 
 public interface Cluster extends MappedInvoker<Consumer>, NotifyListener {
 
   void destroy();
 
+  @Override
+  default void notify(RegistryConfig registryConfig, List<ProviderMeta> metas) {
+
+  }
 }

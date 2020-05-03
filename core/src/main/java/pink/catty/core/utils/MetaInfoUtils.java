@@ -14,10 +14,6 @@
  */
 package pink.catty.core.utils;
 
-import pink.catty.core.ServerAddress;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
-
 public abstract class MetaInfoUtils {
 
   // todo: complete. add test.
@@ -32,16 +28,4 @@ public abstract class MetaInfoUtils {
     }
     return true;
   }
-
-  /**
-   * Get address(ip & port) from provider info.
-   *
-   * @param metaInfo metaInfo.
-   * @return {@link ServerAddress}
-   */
-  public static ServerAddress getAddressFromMeta(MetaInfo metaInfo) {
-    return new ServerAddress(metaInfo.getString(MetaInfoEnum.IP),
-        metaInfo.getInt(MetaInfoEnum.PORT));
-  }
-
 }

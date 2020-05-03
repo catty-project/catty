@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 The Catty Project
+ * Copyright 2020 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,9 +14,13 @@
  */
 package pink.catty.core.invoker;
 
-import pink.catty.core.meta.MetaInfo;
+import pink.catty.core.meta.ProviderMeta;
 
-public interface LinkedInvoker<Meta extends MetaInfo> extends Invoker<Meta> {
+public abstract class AbstractProvider
+    extends AbstractLinkedInvoker<ProviderMeta>
+    implements Provider {
 
-  Invoker getNext();
+  public AbstractProvider(Invoker<ProviderMeta> next) {
+    super(next);
+  }
 }

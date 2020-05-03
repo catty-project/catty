@@ -19,6 +19,6 @@ import pink.catty.core.invoker.Invoker;
 
 public interface LoadBalance {
 
-  <T extends Invoker> T select(List<? extends Invoker> invokers);
+  <T extends Invoker> T select(List<T> invokers);
 
 }

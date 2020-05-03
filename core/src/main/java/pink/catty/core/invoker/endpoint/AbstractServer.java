@@ -23,7 +23,6 @@ import pink.catty.core.Constants;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
-import pink.catty.core.invoker.MappedInvoker;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -41,8 +40,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
   private ExecutorService executor;
   private volatile Map<String, Provider> invokerMap = new ConcurrentHashMap<>();
 
-
-  public AbstractServer(ServerMeta serverMeta, Codec codec, MappedInvoker invoker) {
+  public AbstractServer(ServerMeta serverMeta, Codec codec) {
     super(codec);
     this.serverMeta = serverMeta;
     createExecutor();
@@ -76,7 +74,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
   @Override
   public Response invoke(Request request, Invocation invocation) {
     String serviceName = request.getInterfaceName();
-    Provider provider = invokerMap.get(serviceName);
+    Provider provider = getInvoker(serviceName);
     if (provider == null) {
       throw new CattyException(
           "No such provider found! RpcService name: " + request.getInterfaceName());

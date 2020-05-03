@@ -14,28 +14,27 @@
  */
 package pink.catty.extension.factory;
 
-import pink.catty.core.config.InnerClientConfig;
-import pink.catty.core.config.InnerServerConfig;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.spi.AbstractEndpointFactory;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.invoker.endpoint.Client;
 import pink.catty.core.invoker.endpoint.Server;
+import pink.catty.core.meta.ClientMeta;
+import pink.catty.core.meta.ServerMeta;
 import pink.catty.invokers.endpoint.NettyClient;
 import pink.catty.invokers.endpoint.NettyServer;
-import pink.catty.invokers.mapped.ServerRouterInvoker;
 
 @Extension(EndpointFactoryType.NETTY)
 public class NettyEndpointFactory extends AbstractEndpointFactory {
 
   @Override
-  protected Client doCreateClient(InnerClientConfig clientConfig, Codec codec) {
-    return new NettyClient(clientConfig, codec);
+  protected Client doCreateClient(ClientMeta clientMeta, Codec codec) {
+    return new NettyClient(clientMeta, codec);
   }
 
   @Override
-  protected Server doCreateServer(InnerServerConfig serverConfig, Codec codec) {
-    return new NettyServer(serverConfig, codec, new ServerRouterInvoker());
+  protected Server doCreateServer(ServerMeta serverMeta, Codec codec) {
+    return new NettyServer(serverMeta, codec);
   }
 }

@@ -16,29 +16,21 @@ package pink.catty.core.invoker;
 
 import pink.catty.core.meta.MetaInfo;
 
-public abstract class AbstractLinkedInvoker<T extends Invoker> implements LinkedInvoker<T> {
+public abstract class AbstractLinkedInvoker<Meta extends MetaInfo> implements LinkedInvoker<Meta> {
 
-  protected T next;
+  protected Invoker<Meta> next;
 
-  public AbstractLinkedInvoker() {
-  }
-
-  public AbstractLinkedInvoker(T next) {
+  public AbstractLinkedInvoker(Invoker<Meta> next) {
     this.next = next;
   }
 
   @Override
-  public void setNext(T next) {
-    this.next = next;
-  }
-
-  @Override
-  public T getNext() {
+  public Invoker<Meta> getNext() {
     return next;
   }
 
   @Override
-  public MetaInfo getMeta() {
+  public Meta getMeta() {
     return next.getMeta();
   }
 }

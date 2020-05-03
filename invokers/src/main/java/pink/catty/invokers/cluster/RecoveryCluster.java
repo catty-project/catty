@@ -18,27 +18,20 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
-import pink.catty.core.ServerAddress;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.InvokerHolder;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.meta.ConsumerMeta;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.HealthCheckException;
-import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.support.ConcurrentHashSet;
 import pink.catty.core.utils.HeartBeatUtils;
-import pink.catty.core.utils.MetaInfoUtils;
 
 public class RecoveryCluster extends FailOverCluster {
 
   private static final String TIMER_NAME = "CATTY_RECOVERY";
-  private static final Set<ServerAddress> ON_RECOVERY;
+  private static final Set<ConsumerMeta> ON_RECOVERY;
   private static Timer TIMER;
 
   static {
@@ -58,17 +51,15 @@ public class RecoveryCluster extends FailOverCluster {
       Throwable e) {
     final ConsumerMeta consumerMeta = consumer.getMeta();
     final String metaString = consumerMeta.toString();
-    final ServiceMeta serviceMeta = consumerMeta.getServiceMeta();
-    final ServerAddress address = MetaInfoUtils.getAddressFromMeta(consumerMeta);
 
     /*
      * Avoid duplicate recovery job.
      */
     synchronized (ON_RECOVERY) {
-      if (ON_RECOVERY.contains(address)) {
+      if (ON_RECOVERY.contains(consumerMeta)) {
         logger.info(
             "Recovery job on this address was going on, new recovery job on this address would not be created again. address: {}",
-            address);
+            consumerMeta);
       } else {
         TIMER.schedule(
             new TimerTask() {
@@ -84,19 +75,17 @@ public class RecoveryCluster extends FailOverCluster {
                 logger.info("Recovery: begin recovery of endpoint: {}", metaString);
 
                 try {
-                  Invoker invoker = getChainBuilder().buildConsumerInvoker(consumerMeta);
+                  Consumer newConsumer = getChainBuilder().buildConsumer(consumerMeta);
                   Request heartBeat = HeartBeatUtils.buildHeartBeatRequest();
                   String except = (String) heartBeat.getArgsValue()[0];
                   Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, consumerMeta);
-                  Response heartBeatResp = invoker.invoke(heartBeat, inv);
+                  Response heartBeatResp = newConsumer.invoke(heartBeat, inv);
                   heartBeatResp.await(defaultRecoveryDelay, TimeUnit.MILLISECONDS);
                   if (except.equals(heartBeatResp.getValue())) {
-                    InvokerHolder newHolder = new InvokerHolder(metaInfo, serviceMeta, invoker);
-                    registerInvoker(metaString, newHolder);
+                    registerInvoker(metaString, newConsumer);
                     logger
-                        .info("Recovery: endpoint recovery succeed! endpoint: {}",
-                            metaString);
-                    ON_RECOVERY.remove(address);
+                        .info("Recovery: endpoint recovery succeed! endpoint: {}", metaString);
+                    ON_RECOVERY.remove(consumerMeta);
                     cancel();
                   } else {
                     throw new HealthCheckException(
@@ -110,7 +99,7 @@ public class RecoveryCluster extends FailOverCluster {
               }
             }, defaultRecoveryDelay, defaultRecoveryDelay);
 
-        ON_RECOVERY.add(address);
+        ON_RECOVERY.add(consumerMeta);
       }
     }
   }

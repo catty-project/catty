@@ -17,7 +17,7 @@ package pink.catty.invokers.consumer;
 import java.util.concurrent.CompletionStage;
 import pink.catty.core.CattyException;
 import pink.catty.core.extension.spi.Serialization;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
+import pink.catty.core.invoker.AbstractConsumer;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
@@ -28,7 +28,7 @@ import pink.catty.core.service.MethodMeta;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
 
-public class ConsumerSerializationInvoker extends AbstractLinkedInvoker<Consumer> {
+public class ConsumerSerializationInvoker extends AbstractConsumer {
 
   private Serialization serialization;
 

@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
+import pink.catty.core.invoker.AbstractConsumer;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.frame.Request;
@@ -29,7 +29,7 @@ import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.service.HealthCheckException;
 import pink.catty.core.utils.HeartBeatUtils;
 
-public class HealthCheckInvoker extends AbstractLinkedInvoker<Consumer> {
+public class HealthCheckInvoker extends AbstractConsumer {
 
   private static final String TIMER_NAME = "CATTY_HEARTBEAT";
   private static Timer timer;

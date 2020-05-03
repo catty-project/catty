@@ -16,7 +16,7 @@ package pink.catty.core.invoker;
 
 import pink.catty.core.meta.ProviderMeta;
 
-public interface Provider extends Invoker {
+public interface Provider extends LinkedInvoker<ProviderMeta> {
 
   @Override
   ProviderMeta getMeta();

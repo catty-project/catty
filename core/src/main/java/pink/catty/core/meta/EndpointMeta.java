@@ -18,8 +18,10 @@ public class EndpointMeta extends MetaInfo {
 
   private String serialization;
   private String codec;
-  private String ip;
-  private int port;
+  private String remoteIp;
+  private int remotePort;
+  private String localIp;
+  private int localPort;
 
   public EndpointMeta() {
     super(MetaType.ENDPOINT);
@@ -45,20 +47,35 @@ public class EndpointMeta extends MetaInfo {
     this.codec = codec;
   }
 
-  public String getIp() {
-    return ip;
+  public String getRemoteIp() {
+    return remoteIp;
   }
 
-  public void setIp(String ip) {
-    this.ip = ip;
+  public void setRemoteIp(String remoteIp) {
+    this.remoteIp = remoteIp;
   }
 
-  public int getPort() {
-    return port;
+  public int getRemotePort() {
+    return remotePort;
   }
 
-  public void setPort(int port) {
-    this.port = port;
+  public void setRemotePort(int remotePort) {
+    this.remotePort = remotePort;
   }
 
+  public String getLocalIp() {
+    return localIp;
+  }
+
+  public void setLocalIp(String localIp) {
+    this.localIp = localIp;
+  }
+
+  public int getLocalPort() {
+    return localPort;
+  }
+
+  public void setLocalPort(int localPort) {
+    this.localPort = localPort;
+  }
 }

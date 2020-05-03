@@ -16,7 +16,7 @@ package pink.catty.core.invoker;
 
 import pink.catty.core.meta.ConsumerMeta;
 
-public interface Consumer extends Invoker {
+public interface Consumer extends LinkedInvoker<ConsumerMeta> {
 
   @Override
   ConsumerMeta getMeta();

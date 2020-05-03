@@ -20,7 +20,7 @@ import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import pink.catty.core.CattyException;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
+import pink.catty.core.invoker.AbstractConsumer;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
@@ -34,7 +34,9 @@ import pink.catty.core.support.timer.HashedWheelTimer;
 import pink.catty.core.support.timer.Timer;
 import pink.catty.core.utils.RequestIdGenerator;
 
-public class ConsumerInvoker<T> extends AbstractLinkedInvoker<Consumer> implements InvocationHandler {
+public class ConsumerInvoker<T>
+    extends AbstractConsumer
+    implements InvocationHandler {
 
   private static final String TIMEOUT_MESSAGE = "IP: %s, PORT: %d, INVOKE DETAIL: %s";
   private static Timer timer;

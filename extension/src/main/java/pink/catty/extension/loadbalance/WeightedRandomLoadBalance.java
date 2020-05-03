@@ -20,7 +20,7 @@ import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionType.LoadBalanceType;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.meta.EndpointMeta;
+import pink.catty.core.meta.MetaInfo;
 
 /**
  * Weight will be obtained from provider info of invoker. Weight should be set when it is exposing. The
@@ -34,7 +34,7 @@ public class WeightedRandomLoadBalance implements LoadBalance {
   private static final String WEIGHT_KEY = "LB_WEIGHT";
 
   @Override
-  public Invoker select(List<Invoker> invokers) {
+  public <T extends Invoker> T select(List<T> invokers) {
     if(invokers.size() == 1) {
       return invokers.get(0);
     }
@@ -57,7 +57,7 @@ public class WeightedRandomLoadBalance implements LoadBalance {
   }
 
   private int getWeight(Invoker invoker) {
-    EndpointMeta metaInfo = invoker.getMeta();
+    MetaInfo metaInfo = invoker.getMeta();
     return metaInfo.getIntDef(WEIGHT_KEY, 100);
   }
 }

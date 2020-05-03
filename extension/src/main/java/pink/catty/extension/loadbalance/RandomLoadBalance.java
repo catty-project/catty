@@ -28,7 +28,7 @@ import pink.catty.core.invoker.Invoker;
 public class RandomLoadBalance implements LoadBalance {
 
   @Override
-  public Invoker select(List<Invoker> invokers) {
+  public <T extends Invoker> T select(List<T> invokers) {
     if(invokers.size() == 1) {
       return invokers.get(0);
     }

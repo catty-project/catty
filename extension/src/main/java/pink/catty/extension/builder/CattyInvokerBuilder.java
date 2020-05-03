@@ -14,60 +14,49 @@
  */
 package pink.catty.extension.builder;
 
-import pink.catty.core.config.InnerClientConfig;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Serialization;
+import pink.catty.core.invoker.Consumer;
+import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.endpoint.Client;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.LinkedInvoker;
-import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
+import pink.catty.core.invoker.endpoint.ConsumerClient;
+import pink.catty.core.meta.ConsumerMeta;
+import pink.catty.core.meta.ProviderMeta;
 import pink.catty.invokers.consumer.ConsumerSerializationInvoker;
 import pink.catty.invokers.consumer.HealthCheckInvoker;
-import pink.catty.invokers.provider.ProviderSerializationInvoker;
 import pink.catty.invokers.provider.ProviderInvoker;
+import pink.catty.invokers.provider.ProviderSerializationInvoker;
 
 @Extension(InvokerBuilderType.DIRECT)
 public class CattyInvokerBuilder implements InvokerChainBuilder {
 
   @Override
-  public Invoker buildConsumerInvoker(MetaInfo metaInfo) {
-    String ip = metaInfo.getString(MetaInfoEnum.IP);
-    int port = metaInfo.getInt(MetaInfoEnum.PORT);
-    String codecType = metaInfo.getString(MetaInfoEnum.CODEC);
-    InnerClientConfig clientConfig = new InnerClientConfig(ip, port, buildAddress(metaInfo), 0,
-        codecType);
-
-    EndpointFactory factory = ExtensionFactory.getEndpointFactory().getExtensionSingleton(
-        metaInfo.getString(MetaInfoEnum.ENDPOINT));
-
-    Client client = factory.createClient(clientConfig);
-    Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
-        metaInfo.getString(MetaInfoEnum.SERIALIZATION));
-    LinkedInvoker serializationInvoker = new ConsumerSerializationInvoker(client, serialization);
-    if(metaInfo.getIntDef(MetaInfoEnum.HEALTH_CHECK_PERIOD, 1) <= 0) {
+  public Consumer buildConsumer(ConsumerMeta meta) {
+    EndpointFactory factory = ExtensionFactory.getEndpointFactory()
+        .getExtensionSingleton(meta.getEndpoint());
+    Client client = factory.createClient(meta);
+    Serialization serialization = ExtensionFactory
+        .getSerialization()
+        .getExtensionSingleton(meta.getSerialization());
+    ConsumerClient consumerClient = new ConsumerClient(client, meta);
+    Consumer serializationInvoker = new ConsumerSerializationInvoker(consumerClient, serialization);
+    if (meta.getHealthCheckPeriod() <= 0) {
       return serializationInvoker;
+    } else {
+      return new HealthCheckInvoker(serializationInvoker);
     }
-    LinkedInvoker healthCheck = new HealthCheckInvoker(serializationInvoker, metaInfo);
-    return healthCheck;
   }
 
   @Override
-  public Invoker buildProviderInvoker(MetaInfo metaInfo) {
-    Serialization serialization = ExtensionFactory.getSerialization().getExtensionSingleton(
-        metaInfo.getString(MetaInfoEnum.SERIALIZATION));
-
-    ProviderInvoker providerInvoker = new ProviderInvoker();
-    LinkedInvoker serializationInvoker = new ProviderSerializationInvoker(providerInvoker,
-        serialization);
-    return serializationInvoker;
-  }
-
-  private String buildAddress(MetaInfo metaInfo) {
-    return metaInfo.getString(MetaInfoEnum.IP) + ":" + metaInfo.getString(MetaInfoEnum.PORT);
+  public Provider buildProvider(ProviderMeta meta) {
+    Serialization serialization = ExtensionFactory
+        .getSerialization()
+        .getExtensionSingleton(meta.getSerialization());
+    ProviderInvoker providerInvoker = new ProviderInvoker(meta);
+    return new ProviderSerializationInvoker(providerInvoker, serialization);
   }
 }

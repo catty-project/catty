@@ -16,21 +16,22 @@ package pink.catty.invokers.provider;
 
 import java.util.concurrent.CompletionStage;
 import pink.catty.core.extension.spi.Serialization;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
+import pink.catty.core.invoker.AbstractProvider;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
-import pink.catty.core.invoker.Provider;
+import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
+import pink.catty.core.meta.ProviderMeta;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
 
-public class ProviderSerializationInvoker extends AbstractLinkedInvoker<Provider> {
+public class ProviderSerializationInvoker extends AbstractProvider {
 
   private Serialization serialization;
 
-  public ProviderSerializationInvoker(Provider next, Serialization serialization) {
+  public ProviderSerializationInvoker(Invoker<ProviderMeta> next, Serialization serialization) {
     super(next);
     if (serialization == null) {
       throw new NullPointerException("Serialization is null");

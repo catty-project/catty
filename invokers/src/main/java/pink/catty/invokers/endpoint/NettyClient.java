@@ -68,14 +68,13 @@ public class NettyClient extends AbstractClient {
     ChannelFuture future;
     try {
       future = bootstrap
-          .connect(getMeta().getIp(), getMeta().getPort())
+          .connect(getMeta().getRemoteIp(), getMeta().getRemotePort())
           .sync();
+      clientChannel = future.channel();
     } catch (InterruptedException i) {
       close();
       throw new EndpointInvalidException("NettyClient: connect().sync() interrupted", i);
     }
-
-    clientChannel = future.channel();
   }
 
   @Override
