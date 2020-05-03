@@ -15,8 +15,10 @@
 package pink.catty.core.invoker;
 
 import java.util.Map;
+import pink.catty.core.meta.MetaInfo;
 
-public interface MappedInvoker<T extends Invoker> extends Invoker, InvokerRegistry<T> {
+public interface MappedInvoker<T extends Invoker, Meta extends MetaInfo>
+    extends Invoker<Meta>, InvokerRegistry<T> {
 
   void setInvokerMap(Map<String, T> invokerMap);
 

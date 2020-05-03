@@ -72,5 +72,8 @@ public class ConsumerMeta extends ClientMeta {
 
   public void setServiceMeta(ServiceMeta serviceMeta) {
     this.serviceMeta = serviceMeta;
+    this.version = serviceMeta.getVersion();
+    this.group = serviceMeta.getGroup();
+    this.serviceName = serviceMeta.getServiceName();
   }
 }

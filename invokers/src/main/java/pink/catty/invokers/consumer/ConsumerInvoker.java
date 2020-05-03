@@ -20,14 +20,15 @@ import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import pink.catty.core.CattyException;
-import pink.catty.core.invoker.AbstractConsumer;
-import pink.catty.core.invoker.Consumer;
+import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.MethodNotFoundException;
+import pink.catty.core.invoker.cluster.Cluster;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
+import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.support.timer.HashedWheelTimer;
@@ -35,7 +36,7 @@ import pink.catty.core.support.timer.Timer;
 import pink.catty.core.utils.RequestIdGenerator;
 
 public class ConsumerInvoker<T>
-    extends AbstractConsumer
+    extends AbstractLinkedInvoker<ClusterMeta>
     implements InvocationHandler {
 
   private static final String TIMEOUT_MESSAGE = "IP: %s, PORT: %d, INVOKE DETAIL: %s";
@@ -48,8 +49,8 @@ public class ConsumerInvoker<T>
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
 
-  public ConsumerInvoker(ServiceMeta<T> serviceMeta, Consumer invoker) {
-    super(invoker);
+  public ConsumerInvoker(ServiceMeta<T> serviceMeta, Cluster cluster) {
+    super(cluster);
     this.interfaceClazz = serviceMeta.getInterfaceClass();
     this.serviceMeta = serviceMeta;
   }
@@ -143,9 +144,9 @@ public class ConsumerInvoker<T>
   }
 
   @SuppressWarnings("unchecked")
-  public static <E> E getProxy(ServiceMeta serviceMeta, Consumer consumer) {
+  public static <E> E getProxy(ServiceMeta serviceMeta, Cluster cluster) {
     Class<E> clazz = serviceMeta.getInterfaceClass();
     return (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
-        new ConsumerInvoker(serviceMeta, consumer));
+        new ConsumerInvoker(serviceMeta, cluster));
   }
 }

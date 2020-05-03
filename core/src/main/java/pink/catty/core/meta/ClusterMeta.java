@@ -16,6 +16,7 @@ package pink.catty.core.meta;
 
 public class ClusterMeta extends ConsumerMeta {
 
+  private String cluster;
   private String loadBalance;
   private int retryTimes;
   private int recoveryPeriod = 3 * 1000;
@@ -26,6 +27,14 @@ public class ClusterMeta extends ConsumerMeta {
 
   protected ClusterMeta(MetaType metaType) {
     super(metaType);
+  }
+
+  public String getCluster() {
+    return cluster;
+  }
+
+  public void setCluster(String cluster) {
+    this.cluster = cluster;
   }
 
   public String getLoadBalance() {

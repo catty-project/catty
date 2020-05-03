@@ -22,11 +22,11 @@ import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.InvokerChainBuilder;
 import pink.catty.core.extension.spi.Registry;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.cluster.Cluster;
-import pink.catty.core.invoker.InvokerHolder;
-import pink.catty.core.meta.EndpointTypeEnum;
+import pink.catty.core.meta.ClusterMeta;
+import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.meta.MetaInfoEnum;
 import pink.catty.core.service.ServiceMeta;
 import pink.catty.invokers.cluster.FailFastCluster;
 import pink.catty.invokers.cluster.FailOverCluster;
@@ -80,44 +80,34 @@ public class Reference<T> {
       synchronized (this) {
         if (ref == null) {
           ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
-          MetaInfo metaInfo = new MetaInfo(EndpointTypeEnum.CLIENT);
-          metaInfo.addMetaInfo(MetaInfoEnum.GROUP, serviceMeta.getGroup());
-          metaInfo.addMetaInfo(MetaInfoEnum.VERSION, serviceMeta.getVersion());
-          metaInfo.addMetaInfo(MetaInfoEnum.SERVICE_NAME, serviceMeta.getServiceName());
-          metaInfo.addMetaInfo(MetaInfoEnum.SERIALIZATION, protocolConfig.getSerializationType());
-          metaInfo.addMetaInfo(MetaInfoEnum.CODEC, protocolConfig.getCodecType());
-          metaInfo.addMetaInfo(MetaInfoEnum.LOAD_BALANCE, protocolConfig.getLoadBalanceType());
-          metaInfo.addMetaInfo(MetaInfoEnum.ENDPOINT, protocolConfig.getEndpointType());
-          metaInfo.addMetaInfo(MetaInfoEnum.RETRY_TIMES, protocolConfig.getRetryTimes());
-          metaInfo.addMetaInfo(MetaInfoEnum.RECOVERY_PERIOD, protocolConfig.getRecoveryPeriod());
-          metaInfo
-              .addMetaInfo(MetaInfoEnum.HEALTH_CHECK_PERIOD, protocolConfig.getHeartbeatPeriod());
 
-          buildCluster(metaInfo, serviceMeta);
-          if (useRegistry()) {
-            registry = ExtensionFactory.getRegistry()
-                .getExtensionSingleton(registryConfig.getRegistryType(), registryConfig);
-            registry.open();
-            registry.subscribe(metaInfo, cluster);
-            ref = ConsumerInvoker.getProxy(serviceMeta, cluster);
-          } else {
-            Map<String, InvokerHolder> invokerHolderMap = new ConcurrentHashMap<>();
-            for (ServerAddress address : clientConfig.getAddresses()) {
-              MetaInfo newMetaInfo = metaInfo.clone();
-              newMetaInfo.addMetaInfo(MetaInfoEnum.IP, address.getIp());
-              newMetaInfo.addMetaInfo(MetaInfoEnum.PORT, address.getPort());
+          ClusterMeta clusterMeta = new ClusterMeta();
+          clusterMeta.setServiceMeta(serviceMeta);
+          clusterMeta.setSerialization(protocolConfig.getSerializationType());
+          clusterMeta.setCodec(protocolConfig.getCodecType());
+          clusterMeta.setEndpoint(protocolConfig.getEndpointType());
+          clusterMeta.setHealthCheckPeriod(protocolConfig.getHeartbeatPeriod());
+          clusterMeta.setLoadBalance(protocolConfig.getLoadBalanceType());
+          clusterMeta.setRetryTimes(protocolConfig.getRetryTimes());
+          clusterMeta.setRecoveryPeriod(protocolConfig.getRecoveryPeriod());
+          String metaString = clusterMeta.toString();
 
-              // todo: make InvokerChainBuilder configurable
-              InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
-                  .getExtensionSingleton(InvokerBuilderType.DIRECT);
-              InvokerHolder invokerHolder = InvokerHolder
-                  .Of(newMetaInfo, serviceMeta, chainBuilder.buildConsumerInvoker(newMetaInfo));
-              invokerHolderMap.put(newMetaInfo.toString(), invokerHolder);
-            }
-            cluster.setInvokerMap(invokerHolderMap);
+          buildCluster(clusterMeta);
+          Map<String, Consumer> invokerHolderMap = new ConcurrentHashMap<>();
+          for (ServerAddress address : clientConfig.getAddresses()) {
+            ConsumerMeta newMetaInfo = MetaInfo.parseOf(metaString, ConsumerMeta.class);
+            newMetaInfo.setRemoteIp(address.getIp());
+            newMetaInfo.setRemotePort(address.getPort());
 
-            ref = ConsumerInvoker.getProxy(serviceMeta, cluster);
+            InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
+                .getExtensionSingleton(InvokerBuilderType.DIRECT);
+            Consumer consumer = chainBuilder.buildConsumer(newMetaInfo);
+            invokerHolderMap.put(newMetaInfo.toString(), consumer);
           }
+          cluster.setInvokerMap(invokerHolderMap);
+
+          ref = ConsumerInvoker.getProxy(serviceMeta, cluster);
+
           serviceMeta.setTarget(ref);
         }
       }
@@ -125,20 +115,20 @@ public class Reference<T> {
     return ref;
   }
 
-  private void buildCluster(MetaInfo metaInfo, ServiceMeta serviceMeta) {
-    if(cluster == null) {
+  private void buildCluster(ClusterMeta metaInfo) {
+    if (cluster == null) {
       synchronized (Reference.class) {
-        if(cluster == null) {
+        if (cluster == null) {
           String clusterStrategy = protocolConfig.getClusterType();
           switch (clusterStrategy) {
             case ProtocolConfig.AUTO_RECOVERY:
-              cluster = new RecoveryCluster(metaInfo, serviceMeta);
+              cluster = new RecoveryCluster(metaInfo);
               break;
             case ProtocolConfig.FAIL_FAST:
-              cluster = new FailFastCluster(metaInfo, serviceMeta);
+              cluster = new FailFastCluster(metaInfo);
               break;
             case ProtocolConfig.FAIL_OVER:
-              cluster = new FailOverCluster(metaInfo, serviceMeta);
+              cluster = new FailOverCluster(metaInfo);
           }
         }
       }
@@ -164,5 +154,4 @@ public class Reference<T> {
       cluster.destroy();
     }
   }
-
 }

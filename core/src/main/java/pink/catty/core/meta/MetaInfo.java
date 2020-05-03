@@ -26,6 +26,10 @@ public abstract class MetaInfo {
 
   private static final String CUSTOM_META_MAP = "customMeta";
 
+  public static <T extends MetaInfo> T parseOf(String metaString, Class<T> model) {
+    return null;
+  }
+
   @SuppressWarnings("unchecked")
   private static String toString(Object meta) {
     Class<?> clazz = meta.getClass();
@@ -38,7 +42,7 @@ public abstract class MetaInfo {
     StringBuilder sb = new StringBuilder();
     Field[] fields = clazz.getFields();
     for (Field field : fields) {
-      if(!field.isAccessible()) {
+      if (!field.isAccessible()) {
         field.setAccessible(true);
       }
       if (field.getName().equals(CUSTOM_META_MAP)) {
@@ -46,7 +50,7 @@ public abstract class MetaInfo {
       }
       try {
         sb.append(field.getName()).append("=");
-        if(field.get(meta) != null) {
+        if (field.get(meta) != null) {
           sb.append(field.get(meta));
         }
         sb.append(";");
@@ -54,10 +58,10 @@ public abstract class MetaInfo {
         logger.error("EndpointMeta toString access control error.", e);
       }
     }
-    if(sb.length() > 0) {
+    if (sb.length() > 0) {
       sb.setLength(sb.length() - ";".length());
     }
-    if(sb.length() <= 0) {
+    if (sb.length() <= 0) {
       return "";
     } else {
       return sb.toString();

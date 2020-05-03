@@ -19,14 +19,15 @@ import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.spi.Registry.NotifyListener;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.MappedInvoker;
-import pink.catty.core.meta.ProviderMeta;
+import pink.catty.core.meta.ClusterMeta;
+import pink.catty.core.meta.MetaInfo;
 
-public interface Cluster extends MappedInvoker<Consumer>, NotifyListener {
+public interface Cluster extends MappedInvoker<Consumer, ClusterMeta>, NotifyListener {
 
   void destroy();
 
   @Override
-  default void notify(RegistryConfig registryConfig, List<ProviderMeta> metas) {
+  default void notify(RegistryConfig registryConfig, List<MetaInfo> metaInfoCollection) {
 
   }
 }

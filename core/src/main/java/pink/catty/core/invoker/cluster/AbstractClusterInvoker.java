@@ -30,7 +30,7 @@ import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.utils.EndpointUtils;
 
-public abstract class AbstractClusterInvoker extends AbstractMappedInvoker<Consumer> implements Cluster {
+public abstract class AbstractClusterInvoker extends AbstractMappedInvoker<Consumer, ClusterMeta> implements Cluster {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
