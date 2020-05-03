@@ -83,8 +83,7 @@ public class RecoveryCluster extends FailOverCluster {
                   heartBeatResp.await(defaultRecoveryDelay, TimeUnit.MILLISECONDS);
                   if (except.equals(heartBeatResp.getValue())) {
                     registerInvoker(metaString, newConsumer);
-                    logger
-                        .info("Recovery: endpoint recovery succeed! endpoint: {}", metaString);
+                    logger.info("Recovery: endpoint recovery succeed! endpoint: {}", metaString);
                     ON_RECOVERY.remove(consumerMeta);
                     cancel();
                   } else {

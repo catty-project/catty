@@ -43,6 +43,6 @@ public class ConsumerClient implements Consumer {
 
   @Override
   public Invoker getNext() {
-    return null;
+    return client;
   }
 }

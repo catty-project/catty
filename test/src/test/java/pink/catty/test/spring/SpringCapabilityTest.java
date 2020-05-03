@@ -29,8 +29,9 @@ public class SpringCapabilityTest {
 
   @BeforeClass
   public static void init() {
-    consumer = new ClassPathXmlApplicationContext("consumer_test.xml");
     new ClassPathXmlApplicationContext("provider_test_a.xml");
+    new ClassPathXmlApplicationContext("provider_test_b.xml");
+    consumer = new ClassPathXmlApplicationContext("consumer_test.xml");
   }
 
   @Test

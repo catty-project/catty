@@ -105,7 +105,7 @@ public abstract class MetaInfo {
     }
 
     for (Field field : fieldList) {
-      if (Modifier.isStatic(field.getModifiers())) {
+      if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
         continue;
       }
       if (!field.isAccessible()) {
