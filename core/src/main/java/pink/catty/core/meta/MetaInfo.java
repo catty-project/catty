@@ -69,15 +69,18 @@ public abstract class MetaInfo {
         metaInfo.addCustomMeta(key, value);
         continue;
       }
-      if(value == null || "".equals(value)) {
+      if (value == null || "".equals(value)) {
         continue;
       }
       Object typedValue = ReflectUtils.convertFromString(descriptor.getPropertyType(), value);
-      if(typedValue == null) {
+      if (typedValue == null) {
         continue;
       }
       Method method = descriptor.getWriteMethod();
       try {
+        if(!method.isAccessible()) {
+          method.setAccessible(true);
+        }
         method.invoke(metaInfo, typedValue);
       } catch (IllegalAccessException | InvocationTargetException e) {
         throw new MetaFormatException(e);
@@ -189,24 +192,33 @@ public abstract class MetaInfo {
   }
 
   @SuppressWarnings("unchecked")
-  private static String toString(Object meta) {
+  private static String toString(MetaInfo meta) {
     Class<?> clazz = meta.getClass();
-    if (!EndpointMeta.class.isAssignableFrom(clazz)) {
+    if (!MetaInfo.class.isAssignableFrom(clazz)) {
       throw new IllegalArgumentException(
-          "Except type: <? extent pink.catty.core.provider.EndpointMeta>, but actual: " + meta
+          "Except type: <? extent pink.catty.core.meta.MetaInfo>, but actual: " + meta
               .getClass().toString());
     }
 
+    /*
+     * get all parent's fields.
+     */
     StringBuilder sb = new StringBuilder();
     List<Field> fieldList = new LinkedList<>();
-    while (clazz != null && clazz != Object.class) {
-      Field[] fields = clazz.getDeclaredFields();
+    Class<?> parent = clazz;
+    while (parent != null && parent != Object.class) {
+      Field[] fields = parent.getDeclaredFields();
       fieldList.addAll(Arrays.asList(fields));
-      clazz = clazz.getSuperclass();
+      parent = parent.getSuperclass();
     }
 
+    /*
+     * ignore static, transient, synthetic(this).
+     */
     for (Field field : fieldList) {
-      if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+      if (Modifier.isStatic(field.getModifiers())
+          || Modifier.isTransient(field.getModifiers())
+          || field.isSynthetic()) {
         continue;
       }
       if (!field.isAccessible()) {
@@ -222,12 +234,17 @@ public abstract class MetaInfo {
         }
         sb.append(";");
       } catch (IllegalAccessException e) {
-        logger.error("EndpointMeta toString access control error.", e);
+        logger.error("MetaInfo toString access control error.", e);
       }
     }
-    if (sb.length() > 0) {
-      sb.setLength(sb.length() - ";".length());
+
+    /*
+     * append custom meta.
+     */
+    for (Entry<String, String> entry : meta.getCustomMeta().entrySet()) {
+      sb.append(entry.getKey()).append("=").append(entry.getValue()).append(";");
     }
+
     if (sb.length() <= 0) {
       return "";
     } else {

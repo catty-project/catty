@@ -115,6 +115,9 @@ public abstract class ReflectUtils {
   public static <T> T getInstanceFromClass(Class<T> tClass) {
     try {
       Constructor<? extends T> constructor = tClass.getConstructor();
+      if(!constructor.isAccessible()) {
+        constructor.setAccessible(true);
+      }
       return constructor.newInstance();
     } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
       throw new CattyException(e);
@@ -124,6 +127,9 @@ public abstract class ReflectUtils {
   public static Object convertFromString(Class<?> required, String value) {
     if(required == String.class) {
       return value;
+    }
+    if(required == boolean.class || required == Boolean.class) {
+      return Boolean.valueOf(value);
     }
     if(required == byte.class || required == Byte.class) {
       return Byte.valueOf(value);
