@@ -87,53 +87,6 @@ public abstract class MetaInfo {
     return metaInfo;
   }
 
-  @SuppressWarnings("unchecked")
-  private static String toString(Object meta) {
-    Class<?> clazz = meta.getClass();
-    if (!EndpointMeta.class.isAssignableFrom(clazz)) {
-      throw new IllegalArgumentException(
-          "Except type: <? extent pink.catty.core.provider.EndpointMeta>, but actual: " + meta
-              .getClass().toString());
-    }
-
-    StringBuilder sb = new StringBuilder();
-    List<Field> fieldList = new LinkedList<>();
-    while (clazz != null && clazz != Object.class) {
-      Field[] fields = clazz.getDeclaredFields();
-      fieldList.addAll(Arrays.asList(fields));
-      clazz = clazz.getSuperclass();
-    }
-
-    for (Field field : fieldList) {
-      if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
-        continue;
-      }
-      if (!field.isAccessible()) {
-        field.setAccessible(true);
-      }
-      if (field.getName().equals(CUSTOM_META_MAP)) {
-        continue;
-      }
-      try {
-        sb.append(field.getName()).append("=");
-        if (field.get(meta) != null) {
-          sb.append(field.get(meta));
-        }
-        sb.append(";");
-      } catch (IllegalAccessException e) {
-        logger.error("EndpointMeta toString access control error.", e);
-      }
-    }
-    if (sb.length() > 0) {
-      sb.setLength(sb.length() - ";".length());
-    }
-    if (sb.length() <= 0) {
-      return "";
-    } else {
-      return sb.toString();
-    }
-  }
-
   private MetaType metaType;
   private Map<String, String> customMeta = new HashMap<>();
 
@@ -235,4 +188,50 @@ public abstract class MetaInfo {
     return toString(this);
   }
 
+  @SuppressWarnings("unchecked")
+  private static String toString(Object meta) {
+    Class<?> clazz = meta.getClass();
+    if (!EndpointMeta.class.isAssignableFrom(clazz)) {
+      throw new IllegalArgumentException(
+          "Except type: <? extent pink.catty.core.provider.EndpointMeta>, but actual: " + meta
+              .getClass().toString());
+    }
+
+    StringBuilder sb = new StringBuilder();
+    List<Field> fieldList = new LinkedList<>();
+    while (clazz != null && clazz != Object.class) {
+      Field[] fields = clazz.getDeclaredFields();
+      fieldList.addAll(Arrays.asList(fields));
+      clazz = clazz.getSuperclass();
+    }
+
+    for (Field field : fieldList) {
+      if (Modifier.isStatic(field.getModifiers()) || Modifier.isTransient(field.getModifiers())) {
+        continue;
+      }
+      if (!field.isAccessible()) {
+        field.setAccessible(true);
+      }
+      if (field.getName().equals(CUSTOM_META_MAP)) {
+        continue;
+      }
+      try {
+        sb.append(field.getName()).append("=");
+        if (field.get(meta) != null) {
+          sb.append(field.get(meta));
+        }
+        sb.append(";");
+      } catch (IllegalAccessException e) {
+        logger.error("EndpointMeta toString access control error.", e);
+      }
+    }
+    if (sb.length() > 0) {
+      sb.setLength(sb.length() - ";".length());
+    }
+    if (sb.length() <= 0) {
+      return "";
+    } else {
+      return sb.toString();
+    }
+  }
 }
