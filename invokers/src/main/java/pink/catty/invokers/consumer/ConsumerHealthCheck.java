@@ -29,7 +29,7 @@ import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.service.HealthCheckException;
 import pink.catty.core.utils.HeartBeatUtils;
 
-public class HealthCheckInvoker extends AbstractConsumer {
+public class ConsumerHealthCheck extends AbstractConsumer {
 
   private static final String TIMER_NAME = "CATTY_HEARTBEAT";
   private static Timer timer;
@@ -44,7 +44,7 @@ public class HealthCheckInvoker extends AbstractConsumer {
   private volatile RuntimeException heartBeatThrowable;
   private AtomicInteger checkErrorRecord;
 
-  public HealthCheckInvoker(Consumer next) {
+  public ConsumerHealthCheck(Consumer next) {
     super(next);
     this.metaInfo = next.getMeta();
     this.period = metaInfo.getHealthCheckPeriod();
@@ -86,7 +86,7 @@ public class HealthCheckInvoker extends AbstractConsumer {
         Request request = HeartBeatUtils.buildHeartBeatRequest();
         String except = (String) request.getArgsValue()[0];
         Invocation invocation = HeartBeatUtils
-            .buildHeartBeatInvocation(HealthCheckInvoker.this, metaInfo);
+            .buildHeartBeatInvocation(ConsumerHealthCheck.this, metaInfo);
         Response response = invoke(request, invocation);
         try {
           response.await(period, TimeUnit.MILLISECONDS);
@@ -94,25 +94,25 @@ public class HealthCheckInvoker extends AbstractConsumer {
           // ignore
           return;
         } catch (ExecutionException | TimeoutException e) {
-          throw new HealthCheckException("Invoke error", e, HealthCheckInvoker.this);
+          throw new HealthCheckException("Invoke error", e, ConsumerHealthCheck.this);
         }
         Object returnValue = response.getValue();
         if (returnValue instanceof Throwable) {
           throw new HealthCheckException("Health check error", (Throwable) returnValue,
-              HealthCheckInvoker.this);
+              ConsumerHealthCheck.this);
         }
         if (!except.equals(returnValue)) {
           throw new HealthCheckException(
               "Health check error, except: " + except + " actually: " + returnValue,
-              HealthCheckInvoker.this);
+              ConsumerHealthCheck.this);
         }
         checkErrorRecord.set(0);
       } catch (HealthCheckException e) {
-        HealthCheckInvoker.this.heartBeatThrowable = e;
+        ConsumerHealthCheck.this.heartBeatThrowable = e;
         checkErrorRecord.incrementAndGet();
       } catch (Throwable t) {
-        HealthCheckInvoker.this.heartBeatThrowable = new HealthCheckException(
-            "Health check error", t, HealthCheckInvoker.this);
+        ConsumerHealthCheck.this.heartBeatThrowable = new HealthCheckException(
+            "Health check error", t, ConsumerHealthCheck.this);
         checkErrorRecord.incrementAndGet();
       }
     }

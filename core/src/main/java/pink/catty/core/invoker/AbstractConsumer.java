@@ -17,10 +17,15 @@ package pink.catty.core.invoker;
 import pink.catty.core.meta.ConsumerMeta;
 
 public abstract class AbstractConsumer
-    extends AbstractLinkedInvoker<ConsumerMeta>
+    extends AbstractInvoker
     implements Consumer {
 
-  public AbstractConsumer(Invoker<ConsumerMeta> next) {
+  public AbstractConsumer(Consumer next) {
     super(next);
+  }
+
+  @Override
+  public ConsumerMeta getMeta() {
+    return (ConsumerMeta) next.getMeta();
   }
 }

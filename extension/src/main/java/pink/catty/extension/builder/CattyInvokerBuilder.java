@@ -23,11 +23,11 @@ import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.endpoint.Client;
-import pink.catty.core.invoker.endpoint.ConsumerClient;
+import pink.catty.invokers.consumer.ConsumerClient;
 import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.meta.ProviderMeta;
-import pink.catty.invokers.consumer.ConsumerSerializationInvoker;
-import pink.catty.invokers.consumer.HealthCheckInvoker;
+import pink.catty.invokers.consumer.ConsumerSerialization;
+import pink.catty.invokers.consumer.ConsumerHealthCheck;
 import pink.catty.invokers.provider.ProviderInvoker;
 import pink.catty.invokers.provider.ProviderSerializationInvoker;
 
@@ -43,11 +43,11 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
         .getSerialization()
         .getExtensionSingleton(meta.getSerialization());
     ConsumerClient consumerClient = new ConsumerClient(client, meta);
-    Consumer serializationInvoker = new ConsumerSerializationInvoker(consumerClient, serialization);
+    Consumer serializationInvoker = new ConsumerSerialization(consumerClient, serialization);
     if (meta.getHealthCheckPeriod() <= 0) {
       return serializationInvoker;
     } else {
-      return new HealthCheckInvoker(serializationInvoker);
+      return new ConsumerHealthCheck(serializationInvoker);
     }
   }
 

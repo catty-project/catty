@@ -18,10 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import pink.catty.core.meta.MetaInfo;
 
-public abstract class AbstractMappedInvoker<T extends Invoker, Meta extends MetaInfo>
-    implements MappedInvoker<T, Meta> {
+public abstract class AbstractMappedInvoker<T extends Invoker>
+    implements MappedInvoker<T> {
 
   protected Map<String, T> invokerMap;
   protected List<T> invokerList;

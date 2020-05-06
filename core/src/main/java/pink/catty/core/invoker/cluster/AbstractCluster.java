@@ -29,14 +29,14 @@ import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.utils.EndpointUtils;
 
-public abstract class AbstractClusterInvoker extends AbstractMappedInvoker<Consumer, ClusterMeta> implements Cluster {
+public abstract class AbstractCluster extends AbstractMappedInvoker<Consumer> implements Cluster {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
 
   protected LoadBalance loadBalance;
   protected ClusterMeta clusterMeta;
 
-  public AbstractClusterInvoker(ClusterMeta clusterMeta) {
+  public AbstractCluster(ClusterMeta clusterMeta) {
     this.clusterMeta = clusterMeta;
     this.loadBalance = ExtensionFactory.getLoadBalance()
         .getExtensionProtoType(clusterMeta.getLoadBalance());

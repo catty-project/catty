@@ -16,12 +16,12 @@ package pink.catty.invokers.cluster;
 
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.cluster.AbstractClusterInvoker;
+import pink.catty.core.invoker.cluster.AbstractCluster;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClusterMeta;
 
-public class FailFastCluster extends AbstractClusterInvoker {
+public class FailFastCluster extends AbstractCluster {
 
   public FailFastCluster(ClusterMeta clusterMeta) {
     super(clusterMeta);

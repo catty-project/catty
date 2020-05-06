@@ -17,7 +17,7 @@ package pink.catty.core.invoker.endpoint;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.meta.ClientMeta;
 
-public interface Client extends Endpoint, Invoker<ClientMeta> {
+public interface Client extends Endpoint, Invoker {
 
   @Override
   ClientMeta getMeta();

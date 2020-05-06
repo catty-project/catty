@@ -28,11 +28,11 @@ import pink.catty.core.service.MethodMeta;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
 
-public class ConsumerSerializationInvoker extends AbstractConsumer {
+public class ConsumerSerialization extends AbstractConsumer {
 
   private Serialization serialization;
 
-  public ConsumerSerializationInvoker(Consumer next, Serialization serialization) {
+  public ConsumerSerialization(Consumer next, Serialization serialization) {
     super(next);
     if (serialization == null) {
       throw new NullPointerException("Serialization is null");

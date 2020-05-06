@@ -22,14 +22,14 @@ import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.RpcTimeoutException;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.cluster.AbstractClusterInvoker;
+import pink.catty.core.invoker.cluster.AbstractCluster;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.service.HealthCheckException;
 import pink.catty.core.utils.EndpointUtils;
 
-public class FailOverCluster extends AbstractClusterInvoker {
+public class FailOverCluster extends AbstractCluster {
 
   public FailOverCluster(ClusterMeta clusterMeta) {
     super(clusterMeta);

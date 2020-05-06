@@ -31,7 +31,7 @@ import pink.catty.core.service.ServiceMeta;
 import pink.catty.invokers.cluster.FailFastCluster;
 import pink.catty.invokers.cluster.FailOverCluster;
 import pink.catty.invokers.cluster.RecoveryCluster;
-import pink.catty.invokers.consumer.ConsumerInvoker;
+import pink.catty.invokers.consumer.ConsumerHandler;
 
 public class Reference<T> {
 
@@ -107,7 +107,7 @@ public class Reference<T> {
           }
           cluster.setInvokerMap(invokerHolderMap);
 
-          ref = ConsumerInvoker.getProxy(serviceMeta, cluster);
+          ref = ConsumerHandler.getProxy(serviceMeta, cluster);
 
           serviceMeta.setTarget(ref);
         }

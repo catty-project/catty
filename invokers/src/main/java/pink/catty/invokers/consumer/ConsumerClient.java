@@ -12,11 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker.endpoint;
+package pink.catty.invokers.consumer;
 
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
+import pink.catty.core.invoker.endpoint.Client;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ConsumerMeta;

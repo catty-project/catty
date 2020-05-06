@@ -17,10 +17,15 @@ package pink.catty.core.invoker;
 import pink.catty.core.meta.ProviderMeta;
 
 public abstract class AbstractProvider
-    extends AbstractLinkedInvoker<ProviderMeta>
+    extends AbstractInvoker
     implements Provider {
 
-  public AbstractProvider(Invoker<ProviderMeta> next) {
+  public AbstractProvider(Provider next) {
     super(next);
+  }
+
+  @Override
+  public ProviderMeta getMeta() {
+    return (ProviderMeta) next.getMeta();
   }
 }

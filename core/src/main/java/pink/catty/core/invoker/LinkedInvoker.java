@@ -14,9 +14,7 @@
  */
 package pink.catty.core.invoker;
 
-import pink.catty.core.meta.MetaInfo;
-
-public interface LinkedInvoker<Meta extends MetaInfo> extends Invoker<Meta> {
+public interface LinkedInvoker extends Invoker {
 
   Invoker getNext();
 }

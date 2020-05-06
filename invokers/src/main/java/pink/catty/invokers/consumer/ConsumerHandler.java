@@ -20,7 +20,6 @@ import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import pink.catty.core.CattyException;
-import pink.catty.core.invoker.AbstractLinkedInvoker;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.MethodNotFoundException;
@@ -28,36 +27,21 @@ import pink.catty.core.invoker.cluster.Cluster;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
-import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.service.MethodMeta;
 import pink.catty.core.service.ServiceMeta;
-import pink.catty.core.support.timer.HashedWheelTimer;
-import pink.catty.core.support.timer.Timer;
 import pink.catty.core.utils.RequestIdGenerator;
 
-public class ConsumerInvoker<T>
-    extends AbstractLinkedInvoker<ClusterMeta>
+public class ConsumerHandler<T>
     implements InvocationHandler {
 
-  private static final String TIMEOUT_MESSAGE = "IP: %s, PORT: %d, INVOKE DETAIL: %s";
-  private static Timer timer;
-
-  static {
-    timer = new HashedWheelTimer();
-  }
-
+  private Cluster cluster;
   private Class<T> interfaceClazz;
   private ServiceMeta serviceMeta;
 
-  public ConsumerInvoker(ServiceMeta<T> serviceMeta, Cluster cluster) {
-    super(cluster);
+  public ConsumerHandler(ServiceMeta<T> serviceMeta, Cluster cluster) {
+    this.cluster = cluster;
     this.interfaceClazz = serviceMeta.getInterfaceClass();
     this.serviceMeta = serviceMeta;
-  }
-
-  @Override
-  public Response invoke(Request request, Invocation invocation) {
-    return next.invoke(request, invocation);
   }
 
   @SuppressWarnings("unchecked")
@@ -131,6 +115,10 @@ public class ConsumerInvoker<T>
     return response.getValue();
   }
 
+  private Response invoke(Request request, Invocation invocation) {
+    return cluster.invoke(request, invocation);
+  }
+
   private boolean isLocalMethod(Method method) {
     if (method.getDeclaringClass().equals(Object.class)) {
       try {
@@ -147,6 +135,6 @@ public class ConsumerInvoker<T>
   public static <E> E getProxy(ServiceMeta serviceMeta, Cluster cluster) {
     Class<E> clazz = serviceMeta.getInterfaceClass();
     return (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
-        new ConsumerInvoker(serviceMeta, cluster));
+        new ConsumerHandler(serviceMeta, cluster));
   }
 }
