@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.ServiceModel;
 import pink.catty.core.utils.ReflectUtils;
 
 public abstract class MetaInfo {
@@ -44,7 +44,7 @@ public abstract class MetaInfo {
   }
 
   public static <T extends MetaInfo> T parseOf(String metaString, Class<T> model,
-      ServiceMeta serviceMeta) {
+      ServiceModel serviceModel) {
     Map<String, String> map = new HashMap<>();
     String[] metaInfoEntryArray = metaString.split(";");
     for (String entry : metaInfoEntryArray) {
@@ -94,14 +94,14 @@ public abstract class MetaInfo {
     }
 
     if (metaInfo instanceof ProviderMeta || metaInfo instanceof ConsumerMeta) {
-      if(serviceMeta == null) {
+      if(serviceModel == null) {
         return metaInfo;
       }
       if(metaInfo instanceof ProviderMeta) {
-        ((ProviderMeta) metaInfo).setServiceMeta(serviceMeta);
+        ((ProviderMeta) metaInfo).setServiceModel(serviceModel);
       }
       if(metaInfo instanceof ConsumerMeta) {
-        ((ConsumerMeta) metaInfo).setServiceMeta(serviceMeta);
+        ((ConsumerMeta) metaInfo).setServiceModel(serviceModel);
       }
     }
 

@@ -20,85 +20,85 @@ import java.util.concurrent.CompletionStage;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import pink.catty.core.service.MethodMeta;
+import pink.catty.core.service.MethodModel;
 import pink.catty.core.service.NotSupportedMethodException;
 import pink.catty.core.service.RpcMethod;
-import pink.catty.core.service.ServiceMeta;
-import pink.catty.test.MethodMetaTest.MockMethod.MockObject;
+import pink.catty.core.service.ServiceModel;
+import pink.catty.test.MethodModelTest.MockMethod.MockObject;
 
-public class MethodMetaTest {
+public class MethodModelTest {
 
-  private static ServiceMeta<MockMethod> serviceMeta;
+  private static ServiceModel<MockMethod> serviceModel;
 
   @BeforeClass
   public static void init() {
-    serviceMeta = ServiceMeta.parse(MockMethod.class);
+    serviceModel = ServiceModel.parse(MockMethod.class);
   }
 
   @Test
   public void voidReturnTest() {
-    MethodMeta methodMeta = serviceMeta.getMethodMetaByName("voidReturn");
-    Assert.assertEquals(methodMeta.getReturnType(), Void.TYPE);
-    Assert.assertEquals(methodMeta.getGenericReturnType(), Void.TYPE);
+    MethodModel methodModel = serviceModel.getMethodMetaByName("voidReturn");
+    Assert.assertEquals(methodModel.getReturnType(), Void.TYPE);
+    Assert.assertEquals(methodModel.getGenericReturnType(), Void.TYPE);
   }
 
   @Test
   public void primaryReturnTest() {
-    MethodMeta methodMeta = serviceMeta.getMethodMetaByName("primaryReturn");
-    Assert.assertEquals(methodMeta.getReturnType(), Integer.TYPE);
-    Assert.assertEquals(methodMeta.getGenericReturnType(), Integer.TYPE);
+    MethodModel methodModel = serviceModel.getMethodMetaByName("primaryReturn");
+    Assert.assertEquals(methodModel.getReturnType(), Integer.TYPE);
+    Assert.assertEquals(methodModel.getGenericReturnType(), Integer.TYPE);
   }
 
   @Test
   public void normalReturnTest() {
-    MethodMeta methodMeta = serviceMeta.getMethodMetaByName("normalReturn");
-    Assert.assertEquals(methodMeta.getReturnType(), MockObject.class);
-    Assert.assertEquals(methodMeta.getGenericReturnType(), MockObject.class);
+    MethodModel methodModel = serviceModel.getMethodMetaByName("normalReturn");
+    Assert.assertEquals(methodModel.getReturnType(), MockObject.class);
+    Assert.assertEquals(methodModel.getGenericReturnType(), MockObject.class);
   }
 
   @Test
   public void listReturnTest() {
-    MethodMeta methodMeta = serviceMeta.getMethodMetaByName("listReturn");
-    Assert.assertEquals(methodMeta.getReturnType(), List.class);
-    Assert.assertEquals(methodMeta.getGenericReturnType(), List.class);
+    MethodModel methodModel = serviceModel.getMethodMetaByName("listReturn");
+    Assert.assertEquals(methodModel.getReturnType(), List.class);
+    Assert.assertEquals(methodModel.getGenericReturnType(), List.class);
   }
 
   @Test
   public void mapReturnTest() {
-    MethodMeta methodMeta = serviceMeta.getMethodMetaByName("mapReturn");
-    Assert.assertEquals(methodMeta.getReturnType(), Map.class);
-    Assert.assertEquals(methodMeta.getGenericReturnType(), Map.class);
+    MethodModel methodModel = serviceModel.getMethodMetaByName("mapReturn");
+    Assert.assertEquals(methodModel.getReturnType(), Map.class);
+    Assert.assertEquals(methodModel.getGenericReturnType(), Map.class);
   }
 
   @Test
   public void futureReturn1Test() {
-    MethodMeta methodMeta = serviceMeta.getMethodMetaByName("futureReturn1");
-    Assert.assertEquals(methodMeta.getReturnType(), CompletionStage.class);
-    Assert.assertEquals(methodMeta.getGenericReturnType(), List.class);
+    MethodModel methodModel = serviceModel.getMethodMetaByName("futureReturn1");
+    Assert.assertEquals(methodModel.getReturnType(), CompletionStage.class);
+    Assert.assertEquals(methodModel.getGenericReturnType(), List.class);
   }
 
   @Test
   public void futureReturn2Test() {
-    MethodMeta methodMeta = serviceMeta.getMethodMetaByName("futureReturn2");
-    Assert.assertEquals(methodMeta.getReturnType(), CompletionStage.class);
-    Assert.assertEquals(methodMeta.getGenericReturnType(), MockObject[].class);
+    MethodModel methodModel = serviceModel.getMethodMetaByName("futureReturn2");
+    Assert.assertEquals(methodModel.getReturnType(), CompletionStage.class);
+    Assert.assertEquals(methodModel.getGenericReturnType(), MockObject[].class);
   }
 
   @Test
   public void genericReturnTest() {
-    MethodMeta methodMeta = serviceMeta.getMethodMetaByName("genericReturn");
-    Assert.assertEquals(methodMeta.getReturnType(), List.class);
-    Assert.assertEquals(methodMeta.getGenericReturnType(), List.class);
+    MethodModel methodModel = serviceModel.getMethodMetaByName("genericReturn");
+    Assert.assertEquals(methodModel.getReturnType(), List.class);
+    Assert.assertEquals(methodModel.getGenericReturnType(), List.class);
   }
 
   @Test(expected = NotSupportedMethodException.class)
   public void invalidMethod0Test() {
-    ServiceMeta.parse(InvalidMethod0.class);
+    ServiceModel.parse(InvalidMethod0.class);
   }
 
   @Test(expected = NotSupportedMethodException.class)
   public void invalidMethod1Test() {
-    ServiceMeta.parse(InvalidMethod1.class);
+    ServiceModel.parse(InvalidMethod1.class);
   }
 
   public interface MockMethod<T> {

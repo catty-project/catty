@@ -27,7 +27,7 @@ import pink.catty.core.invoker.cluster.Cluster;
 import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.ServiceModel;
 import pink.catty.invokers.cluster.FailFastCluster;
 import pink.catty.invokers.cluster.FailOverCluster;
 import pink.catty.invokers.cluster.RecoveryCluster;
@@ -79,10 +79,10 @@ public class Reference<T> {
     if (ref == null) {
       synchronized (this) {
         if (ref == null) {
-          ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
+          ServiceModel serviceModel = ServiceModel.parse(interfaceClass);
 
           ClusterMeta clusterMeta = new ClusterMeta();
-          clusterMeta.setServiceMeta(serviceMeta);
+          clusterMeta.setServiceModel(serviceModel);
           clusterMeta.setSerialization(protocolConfig.getSerializationType());
           clusterMeta.setCodec(protocolConfig.getCodecType());
           clusterMeta.setEndpoint(protocolConfig.getEndpointType());
@@ -95,7 +95,8 @@ public class Reference<T> {
           buildCluster(clusterMeta);
           Map<String, Consumer> invokerHolderMap = new ConcurrentHashMap<>();
           for (ServerAddress address : clientConfig.getAddresses()) {
-            ConsumerMeta newMetaInfo = MetaInfo.parseOf(metaString, ConsumerMeta.class, serviceMeta);
+            ConsumerMeta newMetaInfo = MetaInfo.parseOf(metaString, ConsumerMeta.class,
+                serviceModel);
             newMetaInfo.setRemoteIp(address.getIp());
             newMetaInfo.setRemotePort(address.getPort());
 
@@ -106,9 +107,9 @@ public class Reference<T> {
           }
           cluster.setInvokerMap(invokerHolderMap);
 
-          ref = ConsumerHandler.getProxy(serviceMeta, cluster);
+          ref = ConsumerHandler.getProxy(serviceModel, cluster);
 
-          serviceMeta.setTarget(ref);
+          serviceModel.setTarget(ref);
         }
       }
     }

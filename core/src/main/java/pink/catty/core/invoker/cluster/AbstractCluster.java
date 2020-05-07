@@ -58,7 +58,7 @@ public abstract class AbstractCluster extends AbstractMappedInvoker<Consumer> im
     } else {
       consumer = loadBalance.select(invokerList);
     }
-    invocation.setServiceMeta(consumer.getMeta().getServiceMeta());
+    invocation.setServiceModel(consumer.getMeta().getServiceModel());
     return doInvoke(consumer, request, invocation);
   }
 

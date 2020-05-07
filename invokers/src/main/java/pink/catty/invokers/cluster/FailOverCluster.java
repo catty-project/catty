@@ -40,7 +40,7 @@ public class FailOverCluster extends AbstractCluster {
     int retryTimes = clusterMeta.getRetryTimes();
     int delay = invocation.getInvokedMethod().getTimeout();
     if (delay <= 0) {
-      delay = invocation.getServiceMeta().getTimeout();
+      delay = invocation.getServiceModel().getTimeout();
     }
 
     Response response = null;

@@ -26,8 +26,8 @@ import pink.catty.core.invoker.cluster.Cluster;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
-import pink.catty.core.service.MethodMeta;
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.MethodModel;
+import pink.catty.core.service.ServiceModel;
 import pink.catty.core.utils.RequestIdGenerator;
 
 public class ConsumerHandler<T>
@@ -35,12 +35,12 @@ public class ConsumerHandler<T>
 
   private Cluster cluster;
   private Class<T> interfaceClazz;
-  private ServiceMeta serviceMeta;
+  private ServiceModel serviceModel;
 
-  public ConsumerHandler(ServiceMeta<T> serviceMeta, Cluster cluster) {
+  public ConsumerHandler(ServiceModel<T> serviceModel, Cluster cluster) {
     this.cluster = cluster;
-    this.interfaceClazz = serviceMeta.getInterfaceClass();
-    this.serviceMeta = serviceMeta;
+    this.interfaceClazz = serviceModel.getInterfaceClass();
+    this.serviceModel = serviceModel;
   }
 
   @SuppressWarnings("unchecked")
@@ -52,23 +52,23 @@ public class ConsumerHandler<T>
       throw new CattyException("Can not invoke local method: " + method.getName());
     }
 
-    MethodMeta methodMeta = serviceMeta.getMethodMeta(method);
-    if (methodMeta == null) {
-      throw new MethodNotFoundException("Method is invalid, method: " + methodMeta.getName());
+    MethodModel methodModel = serviceModel.getMethodMeta(method);
+    if (methodModel == null) {
+      throw new MethodNotFoundException("Method is invalid, method: " + methodModel.getName());
     }
 
     Request request = new DefaultRequest();
     request.setRequestId(RequestIdGenerator.next());
-    request.setInterfaceName(serviceMeta.getServiceName());
-    request.setMethodName(methodMeta.getName());
+    request.setInterfaceName(serviceModel.getServiceName());
+    request.setMethodName(methodModel.getName());
     request.setArgsValue(args);
 
     Class<?> returnType = method.getReturnType();
 
     Invocation invocation = new Invocation();
-    invocation.setInvokedMethod(methodMeta);
+    invocation.setInvokedMethod(methodModel);
     invocation.setTarget(proxy);
-    invocation.setServiceMeta(serviceMeta);
+    invocation.setServiceModel(serviceModel);
 
     Response response = invoke(request, invocation);
 
@@ -77,14 +77,14 @@ public class ConsumerHandler<T>
       return null;
     }
     // async-method
-    if (methodMeta.isAsync()) {
+    if (methodModel.isAsync()) {
       CompletableFuture future = new CompletableFuture();
       response.whenComplete((v, t) -> {
         if (t != null) {
           future.completeExceptionally(t);
         } else {
           if (v instanceof Throwable
-              && !v.getClass().isAssignableFrom(methodMeta.getGenericReturnType())) {
+              && !v.getClass().isAssignableFrom(methodModel.getGenericReturnType())) {
             future.completeExceptionally((Throwable) v);
           } else {
             future.complete(v);
@@ -97,7 +97,7 @@ public class ConsumerHandler<T>
     // sync-method
     int delay = invocation.getInvokedMethod().getTimeout();
     if (delay <= 0) {
-      delay = invocation.getServiceMeta().getTimeout();
+      delay = invocation.getServiceModel().getTimeout();
     }
 
     if (delay > 0) {
@@ -108,7 +108,7 @@ public class ConsumerHandler<T>
 
     Object returnValue = response.getValue();
     if (returnValue instanceof Throwable
-        && !methodMeta.getReturnType().isAssignableFrom(returnValue.getClass())) {
+        && !methodModel.getReturnType().isAssignableFrom(returnValue.getClass())) {
       throw (Throwable) returnValue;
     }
     return response.getValue();
@@ -131,9 +131,9 @@ public class ConsumerHandler<T>
   }
 
   @SuppressWarnings("unchecked")
-  public static <E> E getProxy(ServiceMeta serviceMeta, Cluster cluster) {
-    Class<E> clazz = serviceMeta.getInterfaceClass();
+  public static <E> E getProxy(ServiceModel serviceModel, Cluster cluster) {
+    Class<E> clazz = serviceModel.getInterfaceClass();
     return (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
-        new ConsumerHandler(serviceMeta, cluster));
+        new ConsumerHandler(serviceModel, cluster));
   }
 }

@@ -21,7 +21,7 @@ import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
-import pink.catty.core.service.MethodMeta;
+import pink.catty.core.service.MethodModel;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
 
@@ -41,8 +41,8 @@ public class ProviderSerialization extends AbstractProvider {
   public Response invoke(Request request, Invocation invocation) {
     Object[] args = request.getArgsValue();
     if (args != null) {
-      MethodMeta methodMeta = invocation.getInvokedMethod();
-      Class<?>[] parameterTypes = methodMeta.getMethod().getParameterTypes();
+      MethodModel methodModel = invocation.getInvokedMethod();
+      Class<?>[] parameterTypes = methodModel.getMethod().getParameterTypes();
       Object[] afterDeserialize = new Object[args.length];
       for (int i = 0; i < args.length; i++) {
         if (args[i] instanceof byte[]) {
@@ -55,9 +55,9 @@ public class ProviderSerialization extends AbstractProvider {
     }
 
     Response response = next.invoke(request, invocation);
-    MethodMeta methodMeta = invocation.getInvokedMethod();
+    MethodModel methodModel = invocation.getInvokedMethod();
     Class<?> returnType =
-        methodMeta.isAsync() ? methodMeta.getGenericReturnType() : methodMeta.getReturnType();
+        methodModel.isAsync() ? methodModel.getGenericReturnType() : methodModel.getReturnType();
 
     CompletionStage<Object> newResponse = response.thenApply(returnValue -> {
       byte[] serialized;

@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import pink.catty.core.utils.ReflectUtils;
 
-public class MethodMeta {
+public class MethodModel {
 
   private String name;
 
@@ -69,11 +69,11 @@ public class MethodMeta {
 
   private int timeout = -1; /* -1 means no timeout */
 
-  public static MethodMeta parse(Method method) {
-    return new MethodMeta(method);
+  public static MethodModel parse(Method method) {
+    return new MethodModel(method);
   }
 
-  private MethodMeta(Method method) {
+  private MethodModel(Method method) {
     this.method = method;
     this.name = ReflectUtils.getMethodSign(method);
     this.checkedExceptions = new HashMap<>();

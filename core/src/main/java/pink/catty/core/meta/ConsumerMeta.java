@@ -14,7 +14,7 @@
  */
 package pink.catty.core.meta;
 
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.ServiceModel;
 
 public class ConsumerMeta extends ClientMeta {
 
@@ -24,7 +24,7 @@ public class ConsumerMeta extends ClientMeta {
   private String group;
   private String serviceName;
   private int healthCheckPeriod = DEFAULT_HEALTH_CHECK_PERIOD;
-  private transient ServiceMeta serviceMeta;
+  private transient ServiceModel serviceModel;
 
   public ConsumerMeta() {
     super(MetaType.CONSUMER);
@@ -66,14 +66,14 @@ public class ConsumerMeta extends ClientMeta {
     this.healthCheckPeriod = healthCheckPeriod;
   }
 
-  public ServiceMeta getServiceMeta() {
-    return serviceMeta;
+  public ServiceModel getServiceModel() {
+    return serviceModel;
   }
 
-  public void setServiceMeta(ServiceMeta serviceMeta) {
-    this.serviceMeta = serviceMeta;
-    this.version = serviceMeta.getVersion();
-    this.group = serviceMeta.getGroup();
-    this.serviceName = serviceMeta.getServiceName();
+  public void setServiceModel(ServiceModel serviceModel) {
+    this.serviceModel = serviceModel;
+    this.version = serviceModel.getVersion();
+    this.group = serviceModel.getGroup();
+    this.serviceName = serviceModel.getServiceName();
   }
 }

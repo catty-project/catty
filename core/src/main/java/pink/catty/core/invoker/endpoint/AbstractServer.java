@@ -26,8 +26,8 @@ import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ServerMeta;
-import pink.catty.core.service.MethodMeta;
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.MethodModel;
+import pink.catty.core.service.ServiceModel;
 import pink.catty.core.support.worker.HashLoopGroup;
 import pink.catty.core.support.worker.HashableChooserFactory;
 import pink.catty.core.support.worker.HashableExecutor;
@@ -82,16 +82,16 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
     if (invocation == null) {
       invocation = new Invocation();
     }
-    ServiceMeta serviceMeta = provider
+    ServiceModel serviceModel = provider
         .getMeta()
-        .getServiceMeta();
-    MethodMeta methodMeta = provider
+        .getServiceModel();
+    MethodModel methodModel = provider
         .getMeta()
-        .getServiceMeta()
+        .getServiceModel()
         .getMethodMetaByName(request.getMethodName());
-    invocation.setTarget(serviceMeta.getTarget());
-    invocation.setServiceMeta(serviceMeta);
-    invocation.setInvokedMethod(methodMeta);
+    invocation.setTarget(serviceModel.getTarget());
+    invocation.setServiceModel(serviceModel);
+    invocation.setInvokedMethod(methodModel);
     return provider.invoke(request, invocation);
   }
 

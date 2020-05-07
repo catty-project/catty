@@ -14,14 +14,14 @@
  */
 package pink.catty.core.meta;
 
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.ServiceModel;
 
 public class ProviderMeta extends ServerMeta {
 
   private String version;
   private String group;
   private String serviceName;
-  private transient ServiceMeta serviceMeta;
+  private transient ServiceModel serviceModel;
 
   public ProviderMeta() {
     super(MetaType.PROVIDER);
@@ -55,12 +55,12 @@ public class ProviderMeta extends ServerMeta {
     this.serviceName = serviceName;
   }
 
-  public ServiceMeta getServiceMeta() {
-    return serviceMeta;
+  public ServiceModel getServiceModel() {
+    return serviceModel;
   }
 
-  public void setServiceMeta(ServiceMeta serviceMeta) {
-    this.serviceMeta = serviceMeta;
+  public void setServiceModel(ServiceModel serviceModel) {
+    this.serviceModel = serviceModel;
   }
 
 }

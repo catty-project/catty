@@ -27,7 +27,7 @@ import pink.catty.core.utils.ReflectUtils;
  *
  * Cache service's interface info to mark an easy entry.
  */
-public class ServiceMeta<T> {
+public class ServiceModel<T> {
 
   private Class<T> interfaceClass;
 
@@ -37,7 +37,7 @@ public class ServiceMeta<T> {
 
   private Set<Method> validMethod;
 
-  private Map<Method, MethodMeta> methodMetaMap;
+  private Map<Method, MethodModel> methodMetaMap;
 
   private String version = "";
 
@@ -47,11 +47,11 @@ public class ServiceMeta<T> {
 
   private int timeout = -1;
 
-  public static <T> ServiceMeta<T> parse(Class<T> interfaceClass) {
-    return new ServiceMeta<>(interfaceClass);
+  public static <T> ServiceModel<T> parse(Class<T> interfaceClass) {
+    return new ServiceModel<>(interfaceClass);
   }
 
-  private ServiceMeta(Class<T> interfaceClass) {
+  private ServiceModel(Class<T> interfaceClass) {
     this.interfaceClass = interfaceClass;
     this.serviceName = interfaceClass.getName();
     this.methodMap = new HashMap<>();
@@ -60,10 +60,10 @@ public class ServiceMeta<T> {
 
     List<Method> methods = ReflectUtils.getPublicMethod(interfaceClass);
     for (Method method : methods) {
-      MethodMeta methodMeta = MethodMeta.parse(method);
+      MethodModel methodModel = MethodModel.parse(method);
 
       // method's name
-      String methodName = methodMeta.getName();
+      String methodName = methodModel.getName();
       if (methodMap.containsKey(methodName)) {
         throw new DuplicatedMethodNameException(
             "Duplicated method name: " + methodName + "#" + method
@@ -72,7 +72,7 @@ public class ServiceMeta<T> {
       methodMap.put(methodName, method);
 
       // method's alias
-      List<String> methodAlias = methodMeta.getAlias();
+      List<String> methodAlias = methodModel.getAlias();
       if(methodAlias != null && methodAlias.size() > 0) {
         for(String alias : methodAlias) {
           if (methodMap.containsKey(alias)) {
@@ -85,7 +85,7 @@ public class ServiceMeta<T> {
       }
 
       validMethod.add(method);
-      methodMetaMap.put(method, methodMeta);
+      methodMetaMap.put(method, methodModel);
     }
 
     if (interfaceClass.isAnnotationPresent(RpcService.class)) {
@@ -107,7 +107,7 @@ public class ServiceMeta<T> {
     return validMethod;
   }
 
-  public MethodMeta getMethodMeta(Method method) {
+  public MethodModel getMethodMeta(Method method) {
     return methodMetaMap.get(method);
   }
 
@@ -135,7 +135,7 @@ public class ServiceMeta<T> {
     return timeout;
   }
 
-  public MethodMeta getMethodMetaByName(String methodName) {
+  public MethodModel getMethodMetaByName(String methodName) {
     Method method = methodMap.get(methodName);
     if (method == null) {
       return null;

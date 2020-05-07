@@ -32,7 +32,7 @@ import pink.catty.core.meta.ProviderMeta;
 import pink.catty.core.meta.ServerMeta;
 import pink.catty.core.service.HeartBeatService;
 import pink.catty.core.service.HeartBeatServiceImpl;
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.ServiceModel;
 
 
 public class Exporter {
@@ -74,8 +74,8 @@ public class Exporter {
   public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
     ServerAddress address = serverConfig.getServerAddress();
 
-    ServiceMeta serviceMeta = ServiceMeta.parse(interfaceClass);
-    serviceMeta.setTarget(serviceObject);
+    ServiceModel serviceModel = ServiceModel.parse(interfaceClass);
+    serviceModel.setTarget(serviceObject);
 
     ProviderMeta metaInfo = new ProviderMeta();
     metaInfo.setLocalIp(address.getIp());
@@ -83,13 +83,13 @@ public class Exporter {
     metaInfo.setSerialization(protocolConfig.getSerializationType());
     metaInfo.setCodec(protocolConfig.getCodecType());
     metaInfo.setEndpoint(protocolConfig.getEndpointType());
-    metaInfo.setServiceMeta(serviceMeta);
+    metaInfo.setServiceModel(serviceModel);
     metaInfo.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
     InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
         .getExtensionSingleton(InvokerBuilderType.DIRECT);
     Provider provider = chainBuilder.buildProvider(metaInfo);
-    serviceHandlers.put(serviceMeta.getServiceName(), provider);
+    serviceHandlers.put(serviceModel.getServiceName(), provider);
   }
 
   public void export() {

@@ -15,8 +15,8 @@
 package pink.catty.core.invoker;
 
 import pink.catty.core.meta.MetaInfo;
-import pink.catty.core.service.MethodMeta;
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.MethodModel;
+import pink.catty.core.service.ServiceModel;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,9 +26,9 @@ public final class Invocation {
 
   private MetaInfo metaInfo;
 
-  private ServiceMeta serviceMeta;
+  private ServiceModel serviceModel;
 
-  private MethodMeta invokedMethod;
+  private MethodModel invokedMethod;
 
   private Object target;
 
@@ -40,11 +40,11 @@ public final class Invocation {
     this.target = target;
   }
 
-  public MethodMeta getInvokedMethod() {
+  public MethodModel getInvokedMethod() {
     return invokedMethod;
   }
 
-  public void setInvokedMethod(MethodMeta invokedMethod) {
+  public void setInvokedMethod(MethodModel invokedMethod) {
     this.invokedMethod = invokedMethod;
   }
 
@@ -52,16 +52,16 @@ public final class Invocation {
     return metaInfo;
   }
 
-  public ServiceMeta getServiceMeta() {
-    return serviceMeta;
+  public ServiceModel getServiceModel() {
+    return serviceModel;
   }
 
   public void setMetaInfo(MetaInfo metaInfo) {
     this.metaInfo = metaInfo;
   }
 
-  public void setServiceMeta(ServiceMeta serviceMeta) {
-    this.serviceMeta = serviceMeta;
+  public void setServiceModel(ServiceModel serviceModel) {
+    this.serviceModel = serviceModel;
   }
 
   @Override

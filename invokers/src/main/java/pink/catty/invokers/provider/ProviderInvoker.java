@@ -24,7 +24,7 @@ import pink.catty.core.invoker.frame.DefaultResponse;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ProviderMeta;
-import pink.catty.core.service.MethodMeta;
+import pink.catty.core.service.MethodModel;
 import pink.catty.core.utils.AsyncUtils;
 
 public class ProviderInvoker implements Provider {
@@ -50,17 +50,17 @@ public class ProviderInvoker implements Provider {
   public Response invoke(Request request, Invocation invocation) {
     Response response = new DefaultResponse(request.getRequestId());
     String methodName = request.getMethodName();
-    MethodMeta methodMeta = invocation.getInvokedMethod();
+    MethodModel methodModel = invocation.getInvokedMethod();
 
-    if (methodMeta == null) {
+    if (methodModel == null) {
       response.setValue(new CattyException("ServiceInvoker: can't find method: " + methodName));
       return response;
     }
 
     try {
       Object[] argsValue = request.getArgsValue();
-      Object value = methodMeta.getMethod().invoke(invocation.getTarget(), argsValue);
-      if (methodMeta.isAsync()) {
+      Object value = methodModel.getMethod().invoke(invocation.getTarget(), argsValue);
+      if (methodModel.isAsync()) {
         CompletionStage<Object> future = (CompletionStage<Object>) value;
         response = AsyncUtils.newResponse(future, request.getRequestId());
       } else {
@@ -70,7 +70,7 @@ public class ProviderInvoker implements Provider {
       // todo: deal runtime exception.
       if (e instanceof InvocationTargetException) {
         Throwable targetException = e.getCause();
-        if (methodMeta.containsCheckedException(targetException.getClass())) {
+        if (methodModel.containsCheckedException(targetException.getClass())) {
           response.setValue(targetException);
         } else {
           response.setValue(e);

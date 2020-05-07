@@ -21,25 +21,25 @@ import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.service.HeartBeatService;
-import pink.catty.core.service.MethodMeta;
-import pink.catty.core.service.ServiceMeta;
+import pink.catty.core.service.MethodModel;
+import pink.catty.core.service.ServiceModel;
 
 public abstract class HeartBeatUtils {
 
-  private static final ServiceMeta<HeartBeatService> heartBeatServiceMeta;
-  private static final MethodMeta methodMeta;
+  private static final ServiceModel<HeartBeatService> HEART_BEAT_SERVICE_MODEL;
+  private static final MethodModel METHOD_MODEL;
 
   static {
-    heartBeatServiceMeta = ServiceMeta.parse(HeartBeatService.class);
-    methodMeta = heartBeatServiceMeta.getMethodMetaByName(Constants.HEARTBEAT_METHOD_NAME);
+    HEART_BEAT_SERVICE_MODEL = ServiceModel.parse(HeartBeatService.class);
+    METHOD_MODEL = HEART_BEAT_SERVICE_MODEL.getMethodMetaByName(Constants.HEARTBEAT_METHOD_NAME);
   }
 
   public static Invocation buildHeartBeatInvocation(Object target, MetaInfo metaInfo) {
     Invocation invocation = new Invocation();
     invocation.setMetaInfo(metaInfo);
     invocation.setTarget(target);
-    invocation.setServiceMeta(heartBeatServiceMeta);
-    invocation.setInvokedMethod(methodMeta);
+    invocation.setServiceModel(HEART_BEAT_SERVICE_MODEL);
+    invocation.setInvokedMethod(METHOD_MODEL);
     return invocation;
   }
 
@@ -47,6 +47,6 @@ public abstract class HeartBeatUtils {
     String arg = UUID.randomUUID().toString();
     Object[] args = {arg};
     return new DefaultRequest(RequestIdGenerator.next(),
-        heartBeatServiceMeta.getServiceName(), methodMeta.getName(), args);
+        HEART_BEAT_SERVICE_MODEL.getServiceName(), METHOD_MODEL.getName(), args);
   }
 }

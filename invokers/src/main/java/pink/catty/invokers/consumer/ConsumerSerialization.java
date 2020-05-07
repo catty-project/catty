@@ -23,7 +23,7 @@ import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
-import pink.catty.core.service.MethodMeta;
+import pink.catty.core.service.MethodModel;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
 
@@ -44,7 +44,7 @@ public class ConsumerSerialization extends AbstractConsumer {
     request = new DefaultRequest(request.getRequestId(), request.getInterfaceName(),
         request.getMethodName(), request.getArgsValue());
 
-    MethodMeta methodMeta = invocation.getInvokedMethod();
+    MethodModel methodModel = invocation.getInvokedMethod();
     Object[] args = request.getArgsValue();
     if (args != null) {
       Object[] afterSerialize = new Object[args.length];
@@ -68,8 +68,8 @@ public class ConsumerSerialization extends AbstractConsumer {
         String[] exceptionInfo = ExceptionUtils.parseExceptionString(exceptionString);
         String exceptionClassName = exceptionInfo[0];
         String exceptionFullStack = exceptionInfo[1];
-        if (methodMeta.containsCheckedException(exceptionClassName)) {
-          Class<?> exceptionClass = methodMeta.getCheckedExceptionByName(exceptionClassName);
+        if (methodModel.containsCheckedException(exceptionClassName)) {
+          Class<?> exceptionClass = methodModel.getCheckedExceptionByName(exceptionClassName);
           return ExceptionUtils.getInstance(exceptionClass, exceptionFullStack);
         } else {
           try {
@@ -80,10 +80,10 @@ public class ConsumerSerialization extends AbstractConsumer {
           }
         }
       } else if (bytes[0] == 0) {
-        if (methodMeta.isAsync()) {
-          return serialization.deserialize(data, methodMeta.getGenericReturnType());
+        if (methodModel.isAsync()) {
+          return serialization.deserialize(data, methodModel.getGenericReturnType());
         } else {
-          return serialization.deserialize(data, methodMeta.getReturnType());
+          return serialization.deserialize(data, methodModel.getReturnType());
         }
       } else {
         return new Error("Unknown serialization head byte:" + bytes[0] + " except 0 or 1");
