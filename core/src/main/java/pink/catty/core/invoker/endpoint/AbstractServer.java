@@ -22,7 +22,6 @@ import pink.catty.core.CattyException;
 import pink.catty.core.Constants;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -81,7 +80,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
     }
 
     if (invocation == null) {
-      invocation = new Invocation(InvokerLinkTypeEnum.PROVIDER);
+      invocation = new Invocation();
     }
     ServiceMeta serviceMeta = provider
         .getMeta()

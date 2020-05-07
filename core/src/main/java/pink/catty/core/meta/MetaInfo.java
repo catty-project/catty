@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pink.catty.core.service.ServiceMeta;
 import pink.catty.core.utils.ReflectUtils;
 
 public abstract class MetaInfo {
@@ -39,6 +40,11 @@ public abstract class MetaInfo {
   private static final String CUSTOM_META_MAP = "customMeta";
 
   public static <T extends MetaInfo> T parseOf(String metaString, Class<T> model) {
+    return parseOf(metaString, model, null);
+  }
+
+  public static <T extends MetaInfo> T parseOf(String metaString, Class<T> model,
+      ServiceMeta serviceMeta) {
     Map<String, String> map = new HashMap<>();
     String[] metaInfoEntryArray = metaString.split(";");
     for (String entry : metaInfoEntryArray) {
@@ -78,12 +84,24 @@ public abstract class MetaInfo {
       }
       Method method = descriptor.getWriteMethod();
       try {
-        if(!method.isAccessible()) {
+        if (!method.isAccessible()) {
           method.setAccessible(true);
         }
         method.invoke(metaInfo, typedValue);
       } catch (IllegalAccessException | InvocationTargetException e) {
         throw new MetaFormatException(e);
+      }
+    }
+
+    if (metaInfo instanceof ProviderMeta || metaInfo instanceof ConsumerMeta) {
+      if(serviceMeta == null) {
+        return metaInfo;
+      }
+      if(metaInfo instanceof ProviderMeta) {
+        ((ProviderMeta) metaInfo).setServiceMeta(serviceMeta);
+      }
+      if(metaInfo instanceof ConsumerMeta) {
+        ((ConsumerMeta) metaInfo).setServiceMeta(serviceMeta);
       }
     }
 

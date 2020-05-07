@@ -21,7 +21,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import pink.catty.core.CattyException;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.MethodNotFoundException;
 import pink.catty.core.invoker.cluster.Cluster;
 import pink.catty.core.invoker.frame.DefaultRequest;
@@ -66,7 +65,7 @@ public class ConsumerHandler<T>
 
     Class<?> returnType = method.getReturnType();
 
-    Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
+    Invocation invocation = new Invocation();
     invocation.setInvokedMethod(methodMeta);
     invocation.setTarget(proxy);
     invocation.setServiceMeta(serviceMeta);

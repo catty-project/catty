@@ -29,7 +29,7 @@ import pink.catty.core.meta.ProviderMeta;
 import pink.catty.invokers.consumer.ConsumerSerialization;
 import pink.catty.invokers.consumer.ConsumerHealthCheck;
 import pink.catty.invokers.provider.ProviderInvoker;
-import pink.catty.invokers.provider.ProviderSerializationInvoker;
+import pink.catty.invokers.provider.ProviderSerialization;
 
 @Extension(InvokerBuilderType.DIRECT)
 public class CattyInvokerBuilder implements InvokerChainBuilder {
@@ -57,6 +57,6 @@ public class CattyInvokerBuilder implements InvokerChainBuilder {
         .getSerialization()
         .getExtensionSingleton(meta.getSerialization());
     ProviderInvoker providerInvoker = new ProviderInvoker(meta);
-    return new ProviderSerializationInvoker(providerInvoker, serialization);
+    return new ProviderSerialization(providerInvoker, serialization);
   }
 }

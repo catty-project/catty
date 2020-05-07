@@ -18,7 +18,6 @@ import java.util.concurrent.CompletionStage;
 import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.AbstractProvider;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -26,11 +25,11 @@ import pink.catty.core.service.MethodMeta;
 import pink.catty.core.utils.AsyncUtils;
 import pink.catty.core.utils.ExceptionUtils;
 
-public class ProviderSerializationInvoker extends AbstractProvider {
+public class ProviderSerialization extends AbstractProvider {
 
   private Serialization serialization;
 
-  public ProviderSerializationInvoker(Provider next, Serialization serialization) {
+  public ProviderSerialization(Provider next, Serialization serialization) {
     super(next);
     if (serialization == null) {
       throw new NullPointerException("Serialization is null");
@@ -40,8 +39,6 @@ public class ProviderSerializationInvoker extends AbstractProvider {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    assert invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.PROVIDER;
-
     Object[] args = request.getArgsValue();
     if (args != null) {
       MethodMeta methodMeta = invocation.getInvokedMethod();

@@ -16,9 +16,8 @@ package pink.catty.core.utils;
 
 import java.util.UUID;
 import pink.catty.core.Constants;
-import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
+import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.service.HeartBeatService;
@@ -36,7 +35,7 @@ public abstract class HeartBeatUtils {
   }
 
   public static Invocation buildHeartBeatInvocation(Object target, MetaInfo metaInfo) {
-    Invocation invocation = new Invocation(InvokerLinkTypeEnum.CONSUMER);
+    Invocation invocation = new Invocation();
     invocation.setMetaInfo(metaInfo);
     invocation.setTarget(target);
     invocation.setServiceMeta(heartBeatServiceMeta);
@@ -50,6 +49,4 @@ public abstract class HeartBeatUtils {
     return new DefaultRequest(RequestIdGenerator.next(),
         heartBeatServiceMeta.getServiceName(), methodMeta.getName(), args);
   }
-
-
 }

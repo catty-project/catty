@@ -95,10 +95,9 @@ public class Reference<T> {
           buildCluster(clusterMeta);
           Map<String, Consumer> invokerHolderMap = new ConcurrentHashMap<>();
           for (ServerAddress address : clientConfig.getAddresses()) {
-            ConsumerMeta newMetaInfo = MetaInfo.parseOf(metaString, ConsumerMeta.class);
+            ConsumerMeta newMetaInfo = MetaInfo.parseOf(metaString, ConsumerMeta.class, serviceMeta);
             newMetaInfo.setRemoteIp(address.getIp());
             newMetaInfo.setRemotePort(address.getPort());
-            newMetaInfo.setServiceMeta(serviceMeta);
 
             InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
                 .getExtensionSingleton(InvokerBuilderType.DIRECT);

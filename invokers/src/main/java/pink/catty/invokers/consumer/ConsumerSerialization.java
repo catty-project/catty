@@ -20,7 +20,6 @@ import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.AbstractConsumer;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
-import pink.catty.core.invoker.Invocation.InvokerLinkTypeEnum;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -42,7 +41,6 @@ public class ConsumerSerialization extends AbstractConsumer {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
-    assert invocation.getLinkTypeEnum() == InvokerLinkTypeEnum.CONSUMER;
     request = new DefaultRequest(request.getRequestId(), request.getInterfaceName(),
         request.getMethodName(), request.getArgsValue());
 

@@ -22,12 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class Invocation {
 
-  public enum InvokerLinkTypeEnum {
-    CONSUMER,
-    PROVIDER,
-    ;
-  }
-
   private Map<String, Object> attribute = new ConcurrentHashMap<>();
 
   private MetaInfo metaInfo;
@@ -35,8 +29,6 @@ public final class Invocation {
   private ServiceMeta serviceMeta;
 
   private MethodMeta invokedMethod;
-
-  private InvokerLinkTypeEnum linkTypeEnum;
 
   private Object target;
 
@@ -52,16 +44,8 @@ public final class Invocation {
     return invokedMethod;
   }
 
-  public Invocation(InvokerLinkTypeEnum linkTypeEnum) {
-    this.linkTypeEnum = linkTypeEnum;
-  }
-
   public void setInvokedMethod(MethodMeta invokedMethod) {
     this.invokedMethod = invokedMethod;
-  }
-
-  public InvokerLinkTypeEnum getLinkTypeEnum() {
-    return linkTypeEnum;
   }
 
   public MetaInfo getMetaInfo() {
