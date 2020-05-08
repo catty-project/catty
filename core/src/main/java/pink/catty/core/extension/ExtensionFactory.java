@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.Invoker;
+import pink.catty.core.utils.ReflectUtils;
 
 /**
  * Catty has some build-in extension interface for customizing, such as: {@link Serialization}
@@ -53,6 +55,13 @@ import pink.catty.core.invoker.Invoker;
  *
  * {@link Extension} annotation is for inner using to config extension's name, so your own extension
  * implements has no need to use this annotation.
+ *
+ * @see Serialization
+ * @see Codec
+ * @see LoadBalance
+ * @see EndpointFactory
+ * @see Registry
+ * @see Invoker
  */
 public final class ExtensionFactory<T> {
 
@@ -217,7 +226,7 @@ public final class ExtensionFactory<T> {
 
   /* static over */
 
-  private Class<T> supportedExtension;
+  private final Class<T> supportedExtension;
   private Map<String, T> extensionMap;
   private Map<String, Class<? extends T>> extensionClassMap;
 
@@ -233,7 +242,7 @@ public final class ExtensionFactory<T> {
 
   @SuppressWarnings("unchecked")
   public void register(String name, T extension) {
-    checkName(name);
+    Objects.requireNonNull(name, "null name");
     if (extensionMap.containsKey(name)) {
       throw new DuplicatedExtensionException();
     }
@@ -242,57 +251,60 @@ public final class ExtensionFactory<T> {
   }
 
   public void register(String name, Class<? extends T> extensionClass) {
-    checkName(name);
+    Objects.requireNonNull(name, "null name");
     if (extensionClassMap.containsKey(name)) {
       throw new DuplicatedExtensionException();
     }
     extensionClassMap.put(name, extensionClass);
   }
 
-  public T getExtensionProtoType(String name, Object... args) {
-    checkName(name);
-    Class<? extends T> extensionClass = extensionClassMap.get(name);
-    if (extensionClass == null) {
-      throw new ExtensionNotFoundException(
-          "Extension type: " + supportedExtension.getName() + " name: " + name);
-    }
-    Class[] argTypes;
-    if (args == null || args.length == 0) {
-      argTypes = null;
-    } else {
-      argTypes = new Class[args.length];
-      for (int i = 0; i < args.length; i++) {
-        argTypes[i] = args[i].getClass();
-      }
-    }
-    try {
-      Constructor<? extends T> constructor = extensionClass.getConstructor(argTypes);
-      return constructor.newInstance(args);
-    } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new ExtensionNotFoundException();
-    }
-  }
-
+  /**
+   * Get an singleton instance of an extension.
+   *
+   * @param name extension name.
+   * @param args extension's constructor's arguments.
+   * @return an instance of extension.
+   */
   public T getExtensionSingleton(String name, Object... args) {
-    checkName(name);
+    Objects.requireNonNull(name, "null name");
     T extension = extensionMap.get(name);
     if (extension == null) {
-      Class<? extends T> extensionClass = extensionClassMap.get(name);
-      if (extensionClass == null) {
-        throw new ExtensionNotFoundException(
-            "Extension type: " + supportedExtension.getName() + " name: " + name);
-      } else {
-        extension = getExtensionProtoType(name, args);
-        register(name, extension);
+      synchronized (supportedExtension) {
+        extension = extensionMap.get(name);
+        if (extension == null) {
+          Class<? extends T> extensionClass = extensionClassMap.get(name);
+          if (extensionClass == null) {
+            throw new ExtensionNotFoundException(
+                "Extension type: " + supportedExtension.getName() + " name: " + name);
+          } else {
+            extension = getExtensionProtoType(name, args);
+            register(name, extension);
+          }
+        }
       }
     }
     return extension;
   }
 
-  private void checkName(Object name) {
-    if (name == null) {
-      throw new NullPointerException("null name");
+  /**
+   * Generate an extension prototype instance.
+   *
+   * @param name extension name.
+   * @param args extension's constructor's arguments.
+   * @return an instance of extension.
+   */
+  public T getExtensionProtoType(String name, Object... args) {
+    Objects.requireNonNull(name, "null name");
+    Class<? extends T> extensionClass = extensionClassMap.get(name);
+    if (extensionClass == null) {
+      throw new ExtensionNotFoundException(
+          "Extension type: " + supportedExtension.getName() + " name: " + name);
+    }
+    try {
+      Constructor<? extends T> constructor = ReflectUtils.resolveConstructor(extensionClass, args);
+      return constructor.newInstance(args);
+    } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw new ExtensionNotFoundException();
     }
   }
-
 }

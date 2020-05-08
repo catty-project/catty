@@ -124,6 +124,40 @@ public abstract class ReflectUtils {
     }
   }
 
+  public static <T> Constructor<T> resolveConstructor(Class<T> clz, Object... args)
+      throws NoSuchMethodException {
+    int argLength;
+    Class[] argTypes;
+    if (args == null || args.length == 0) {
+      argLength = 0;
+      argTypes = null;
+    } else {
+      argLength = args.length;
+      argTypes = new Class[args.length];
+      for (int i = 0; i < args.length; i++) {
+        argTypes[i] = args[i].getClass();
+      }
+    }
+    Constructor[] constructors = clz.getConstructors();
+    OUTER:
+    for (Constructor constructor : constructors) {
+      if (constructor.getParameterCount() != argLength) {
+        continue;
+      }
+      Class[] parameterTypes = constructor.getParameterTypes();
+      INNER:
+      for (int i = 0; i < argLength; i++) {
+        if (parameterTypes[i].isAssignableFrom(argTypes[i])) {
+          continue INNER;
+        } else {
+          continue OUTER;
+        }
+      }
+      return constructor;
+    }
+    throw new NoSuchMethodException();
+  }
+
   public static Object convertFromString(Class<?> required, String value) {
     if(required == String.class) {
       return value;

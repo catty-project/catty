@@ -41,6 +41,9 @@ import pink.catty.core.meta.MetaInfo;
  */
 public interface Invoker {
 
+  /**
+   * @return the meta info of this Invoker.
+   */
   MetaInfo getMeta();
 
   /**

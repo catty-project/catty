@@ -33,6 +33,34 @@ import org.slf4j.LoggerFactory;
 import pink.catty.core.service.ServiceModel;
 import pink.catty.core.utils.ReflectUtils;
 
+/**
+ * Meta info contains the whole structured information and information enters about an {@link
+ * pink.catty.core.invoker.Invoker} which mains an Invoker could be described from a MetaInfo and
+ * could be rebuild from a MetaInfo.
+ *
+ * This class is mainly for inner usage.
+ *
+ * As {@link pink.catty.core.invoker.Provider} and {@link pink.catty.core.invoker.Consumer} could be
+ * registered to {@link pink.catty.core.extension.spi.Registry} and could be build from the
+ * registered info, {@link MetaInfo} should be easily formatted to String or rebuild from String.
+ * And as there are lots of uncertain subclass of this class, I use reflect to format every fields
+ * (include parent classes) to String as "optionsA:a;optionB:b;.....optionN:n;" pattern, and also
+ * use {@link Introspector} to rebuild MetaInfo from a String with auto-type-conversion.
+ *
+ * {@link MetaInfo} is an abstract class that supports custom meta info to ensure the scalability.
+ *
+ * Each field type should be simple enough to convert with String, if could not, it should be
+ * treated specially in formatting and rebuilding.
+ *
+ * @see EndpointMeta
+ * @see ClientMeta
+ * @see ConsumerMeta
+ * @see ClusterMeta
+ * @see ServerMeta
+ * @see ProviderMeta
+ *
+ * @see MetaInfo#toString(MetaInfo)
+ */
 public abstract class MetaInfo {
 
   protected static Logger logger = LoggerFactory.getLogger(MetaInfo.class);
@@ -94,13 +122,13 @@ public abstract class MetaInfo {
     }
 
     if (metaInfo instanceof ProviderMeta || metaInfo instanceof ConsumerMeta) {
-      if(serviceModel == null) {
+      if (serviceModel == null) {
         return metaInfo;
       }
-      if(metaInfo instanceof ProviderMeta) {
+      if (metaInfo instanceof ProviderMeta) {
         ((ProviderMeta) metaInfo).setServiceModel(serviceModel);
       }
-      if(metaInfo instanceof ConsumerMeta) {
+      if (metaInfo instanceof ConsumerMeta) {
         ((ConsumerMeta) metaInfo).setServiceModel(serviceModel);
       }
     }
@@ -108,6 +136,9 @@ public abstract class MetaInfo {
     return metaInfo;
   }
 
+  /**
+   * each meta info has its own type.
+   */
   private MetaType metaType;
   private Map<String, String> customMeta = new HashMap<>();
 
