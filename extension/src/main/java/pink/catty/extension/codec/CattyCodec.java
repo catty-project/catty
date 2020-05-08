@@ -21,7 +21,6 @@ import pink.catty.core.CodecException;
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionType.CodecType;
 import pink.catty.core.extension.spi.Codec;
-import pink.catty.core.extension.spi.ProtobufPackageReader;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.DefaultResponse;
 import pink.catty.core.invoker.frame.Request;
