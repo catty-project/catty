@@ -70,7 +70,7 @@ public class MethodModel {
 
   private int timeout = -1; /* -1 means no timeout */
 
-  private boolean needReturn;
+  private boolean needReturn = true;
 
   public static MethodModel parse(Method method) {
     return new MethodModel(method);
@@ -98,7 +98,7 @@ public class MethodModel {
       if (!"".equals(function.name())) {
         this.name = function.name();
       }
-      if (function.alias() != null && function.alias().length > 0) {
+      if (function.alias().length > 0) {
         alias = new ArrayList<>(Arrays.asList(function.alias()));
       }
       this.needReturn = function.needReturn();
