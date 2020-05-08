@@ -38,7 +38,8 @@ public class MethodModel {
   private Map<String, Class<?>> checkedExceptions;
 
   /**
-   * If CompletionStage is super-interface of return type, this method is an async method.
+   * If CompletionStage is super-interface of return type, this method is treated as an async
+   * method.
    *
    * NOTICE: Future interface could not imply an async method.
    */
@@ -69,6 +70,8 @@ public class MethodModel {
 
   private int timeout = -1; /* -1 means no timeout */
 
+  private boolean needReturn;
+
   public static MethodModel parse(Method method) {
     return new MethodModel(method);
   }
@@ -98,6 +101,7 @@ public class MethodModel {
       if (function.alias() != null && function.alias().length > 0) {
         alias = new ArrayList<>(Arrays.asList(function.alias()));
       }
+      this.needReturn = function.needReturn();
     }
   }
 
@@ -139,6 +143,10 @@ public class MethodModel {
 
   public int getTimeout() {
     return timeout;
+  }
+
+  public boolean isNeedReturn() {
+    return needReturn;
   }
 
   private void resolveReturnTypes(Method method) {

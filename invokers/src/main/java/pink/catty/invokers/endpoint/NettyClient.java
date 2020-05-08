@@ -29,12 +29,13 @@ import pink.catty.core.Constants;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
+import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.endpoint.AbstractClient;
 import pink.catty.core.invoker.frame.DefaultResponse;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClientMeta;
+import pink.catty.core.service.MethodModel;
 
 public class NettyClient extends AbstractClient {
 
@@ -89,22 +90,36 @@ public class NettyClient extends AbstractClient {
 
   @Override
   public Response invoke(Request request, Invocation invocation) {
+    if (!clientChannel.isActive()) {
+      throw new EndpointInvalidException("ClientChannel closed");
+    }
+    MethodModel methodModel = invocation.getInvokedMethod();
     try {
       Response response = new DefaultResponse(request.getRequestId());
-      addCurrentTask(request.getRequestId(), response);
+
+      /*
+       * if the invoking method is not need return from provider, than should not listen this
+       * response, or will cause OOM.
+       */
+      if (methodModel.isNeedReturn()) {
+        addCurrentTask(request.getRequestId(), response);
+      }
       byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
       ByteBuf byteBuf = clientChannel.alloc().heapBuffer();
       byteBuf.writeBytes(msg);
-      if (clientChannel.isActive()) {
-        clientChannel.writeAndFlush(byteBuf);
-      } else {
-        throw new EndpointInvalidException("ClientChannel closed");
-      }
+      clientChannel.writeAndFlush(byteBuf).addListener(future -> {
+        if (!future.isSuccess()) {
+          if (future.cause() != null) {
+            logger.error("Client send request failed. ", future.cause());
+          } else {
+            logger.error("Client send request failed without cause. ");
+          }
+        }
+      });
       return response;
-    } catch (EndpointInvalidException e) {
-      throw e;
     } catch (Exception e) {
-      throw new EndpointInvalidException("ClientChannel invalid", e);
+      logger.error("ClientChannel invoke error", e);
+      throw new EndpointInvalidException("ClientChannel invoke error", e);
     }
   }
 }

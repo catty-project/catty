@@ -38,18 +38,18 @@ public @interface RpcMethod {
    *
    * NOTICE:
    *
-   * There are several timeout setting might be set at meantime such as RpcService setting, RpcMethod
-   * setting and Endpoint(client & server) setting. If every timeout options are set, Endpoint
-   * setting is the deadline, which means the timeout-event will be trigger when Endpoint's timeout
-   * reached even though RpcService timeout-setting or RpcMethod timeout-setting is longer than
-   * Endpoint's timeout. So I suggest you to set Endpoint's timeout longer than RpcService or RpcMethod
-   * setting.
+   * There are several timeout setting might be set at meantime such as RpcService setting,
+   * RpcMethod setting and Endpoint(client & server) setting. If every timeout options are set,
+   * Endpoint setting is the deadline, which means the timeout-event will be trigger when Endpoint's
+   * timeout reached even though RpcService timeout-setting or RpcMethod timeout-setting is longer
+   * than Endpoint's timeout. So I suggest you to set Endpoint's timeout longer than RpcService or
+   * RpcMethod setting.
    *
-   * When there are comparable setting of RpcService and RpcMethod, RpcService timeout-setting will be the
-   * deadline.
+   * When there are comparable setting of RpcService and RpcMethod, RpcService timeout-setting will
+   * be the deadline.
    *
-   * So, if you want the timeout-setting work well, Endpoint > RpcService > Method (timeout) will be a
-   * great setting.
+   * So, if you want the timeout-setting work well, Endpoint > RpcService > Method (timeout) will be
+   * a great setting.
    *
    * And you should also be careful about "retry-strategy", when timeout triggered might cause
    * severe problems.
@@ -68,9 +68,18 @@ public @interface RpcMethod {
   String name() default "";
 
   /**
-   * Alias, other names of this method. Each alias also need be unique in one RpcService. If does'nt,
-   * {@link DuplicatedMethodNameException} will be thrown.
+   * Alias, other names of this method. Each alias also need be unique in one RpcService. If
+   * does'nt, {@link DuplicatedMethodNameException} will be thrown.
    */
   String[] alias() default {};
+
+  /**
+   * If this method need rpc return. Only void return type will check this setting.
+   *
+   * If true, an void instance will be send back when this rpc is done. If false, client won't
+   * listen for return, and treat it as success only if tcp transmission is success, which will get
+   * better performance.
+   */
+  boolean needReturn() default true;
 
 }
