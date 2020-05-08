@@ -20,6 +20,8 @@ import pink.catty.core.CattyException;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.Provider;
+import pink.catty.core.invoker.endpoint.Empty;
+import pink.catty.core.invoker.endpoint.Void;
 import pink.catty.core.invoker.frame.DefaultResponse;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -64,7 +66,15 @@ public class ProviderInvoker implements Provider {
         CompletionStage<Object> future = (CompletionStage<Object>) value;
         response = AsyncUtils.newResponse(future, request.getRequestId());
       } else {
-        response.setValue(value);
+        if(value == null || value instanceof Void) {
+          if(methodModel.isNeedReturn()) {
+            response.setValue(Empty.getInstance());
+          } else {
+            response.setValue(Void.getInstance());
+          }
+        } else {
+          response.setValue(value);
+        }
       }
     } catch (Exception e) {
       // todo: deal runtime exception.

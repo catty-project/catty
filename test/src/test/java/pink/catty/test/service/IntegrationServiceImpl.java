@@ -22,9 +22,19 @@ import java.util.concurrent.TimeUnit;
 import pink.catty.test.service.exception.Test1CheckedException;
 import pink.catty.test.service.exception.Test2CheckedException;
 
-public class TestServiceImpl implements TestService {
+public class IntegrationServiceImpl implements IntegrationService {
 
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
+  @Override
+  public void say0(String name) {
+    // none
+  }
+
+  @Override
+  public void say1(String name) {
+    // none
+  }
 
   @Override
   public String echo(String name) {

@@ -19,6 +19,7 @@ import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.AbstractProvider;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Provider;
+import pink.catty.core.invoker.endpoint.Void;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.service.MethodModel;
@@ -70,6 +71,9 @@ public class ProviderSerialization extends AbstractProvider {
         finalBytes[0] = 1; // exception has been thrown.
         System.arraycopy(serialized, 0, finalBytes, 1, serialized.length);
       } else {
+        if (returnValue == Void.getInstance() && !methodModel.isNeedReturn()) {
+          return returnValue;
+        }
         try {
           serialized = serialization.serialize(returnValue);
           finalBytes = new byte[serialized.length + 1];

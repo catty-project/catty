@@ -16,6 +16,8 @@ package pink.catty.config;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
@@ -34,6 +36,8 @@ import pink.catty.invokers.cluster.RecoveryCluster;
 import pink.catty.invokers.consumer.ConsumerHandler;
 
 public class Reference<T> {
+
+  private static final Logger logger = LoggerFactory.getLogger(Reference.class);
 
   private static Cluster cluster;
 
@@ -154,5 +158,6 @@ public class Reference<T> {
     if (cluster != null) {
       cluster.destroy();
     }
+    logger.info("De-refer, service: {}", interfaceClass.getName());
   }
 }

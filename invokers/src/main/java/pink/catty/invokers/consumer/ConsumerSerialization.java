@@ -20,6 +20,7 @@ import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.AbstractConsumer;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Invocation;
+import pink.catty.core.invoker.endpoint.Empty;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -80,11 +81,17 @@ public class ConsumerSerialization extends AbstractConsumer {
           }
         }
       } else if (bytes[0] == 0) {
+        Object result;
         if (methodModel.isAsync()) {
-          return serialization.deserialize(data, methodModel.getGenericReturnType());
+          result = serialization.deserialize(data, methodModel.getGenericReturnType());
         } else {
-          return serialization.deserialize(data, methodModel.getReturnType());
+          if (methodModel.isNeedReturn() && methodModel.getReturnType() == Void.TYPE) {
+            result = serialization.deserialize(data, Empty.class);
+          } else {
+            result = serialization.deserialize(data, methodModel.getReturnType());
+          }
         }
+        return result;
       } else {
         return new Error("Unknown serialization head byte:" + bytes[0] + " except 0 or 1");
       }

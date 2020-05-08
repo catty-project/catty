@@ -72,8 +72,7 @@ public class ConsumerHandler<T>
 
     Response response = invoke(request, invocation);
 
-    // todo: If void-return should wait for a response of TCP need be configurable.
-    if (returnType == Void.TYPE) {
+    if (returnType == Void.TYPE && !methodModel.isNeedReturn()) {
       return null;
     }
     // async-method

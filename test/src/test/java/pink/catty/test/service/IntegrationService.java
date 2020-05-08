@@ -15,10 +15,17 @@
 package pink.catty.test.service;
 
 import java.util.concurrent.CompletableFuture;
+import pink.catty.core.service.RpcMethod;
 import pink.catty.test.service.exception.Test1CheckedException;
 import pink.catty.test.service.exception.Test2CheckedException;
 
-public interface TestService {
+public interface IntegrationService {
+
+  @RpcMethod(needReturn = false)
+  void say0(String name);
+
+  @RpcMethod(needReturn = true)
+  void say1(String name);
 
   String echo(String name);
 

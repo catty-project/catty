@@ -15,6 +15,7 @@
 package pink.catty.test.sdk;
 
 import java.util.concurrent.TimeUnit;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,13 +35,17 @@ public class SdkMultiSourceTest {
 
   private static final Logger logger = LoggerFactory.getLogger(SdkMultiSourceTest.class);
 
+  private static ProtocolConfig providerProtocol;
+
   private static AService aService;
   private static BService bService;
 
   private static Exporter exporter0;
   private static Exporter exporter1;
-//  private static Exporter exporter2;
-  private static ProtocolConfig providerProtocol;
+  //  private static Exporter exporter2;
+
+  private static Reference<AService> reference0;
+  private static Reference<BService> reference1;
 
   @BeforeClass
   public static void init() {
@@ -80,17 +85,25 @@ public class SdkMultiSourceTest {
     protocolConfig.setClusterType(ProtocolConfig.AUTO_RECOVERY);
     protocolConfig.setRecoveryPeriod(400);
 
-    Reference<AService> aReference = new Reference<>();
-    aReference.setClientConfig(clientConfig);
-    aReference.setProtocolConfig(protocolConfig);
-    aReference.setInterfaceClass(AService.class);
-    aService = aReference.refer();
+    reference0 = new Reference<>();
+    reference0.setClientConfig(clientConfig);
+    reference0.setProtocolConfig(protocolConfig);
+    reference0.setInterfaceClass(AService.class);
+    aService = reference0.refer();
 
-    Reference<BService> bReference = new Reference<>();
-    bReference.setClientConfig(clientConfig);
-    bReference.setProtocolConfig(protocolConfig);
-    bReference.setInterfaceClass(BService.class);
-    bService = bReference.refer();
+    reference1 = new Reference<>();
+    reference1.setClientConfig(clientConfig);
+    reference1.setProtocolConfig(protocolConfig);
+    reference1.setInterfaceClass(BService.class);
+    bService = reference1.refer();
+  }
+
+  @AfterClass
+  public static void destroy() {
+    reference0.derefer();
+    reference1.derefer();
+    exporter0.unexport();
+    exporter1.unexport();
   }
 
   @Test
