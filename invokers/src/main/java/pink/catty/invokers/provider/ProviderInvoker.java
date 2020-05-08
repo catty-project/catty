@@ -82,6 +82,8 @@ public class ProviderInvoker implements Provider {
         Throwable targetException = e.getCause();
         if (methodModel.containsCheckedException(targetException.getClass())) {
           response.setValue(targetException);
+        } else if(targetException instanceof RuntimeException) {
+          response.setValue(targetException);
         } else {
           response.setValue(e);
         }

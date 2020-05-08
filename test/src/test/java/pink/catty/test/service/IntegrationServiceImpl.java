@@ -74,7 +74,7 @@ public class IntegrationServiceImpl implements IntegrationService {
   public CompletableFuture<String> asyncException0(String name) {
     CompletableFuture<String> future = new CompletableFuture<>();
     executorService.submit(() -> {
-      future.completeExceptionally(new Exception());
+      future.completeExceptionally(new Exception(name));
     });
     return future;
   }
@@ -83,7 +83,7 @@ public class IntegrationServiceImpl implements IntegrationService {
   public CompletableFuture<String> asyncException1(String name) {
     CompletableFuture<String> future = new CompletableFuture<>();
     executorService.submit(() -> {
-      future.completeExceptionally(new Error());
+      future.completeExceptionally(new Error(name));
     });
     return future;
   }
@@ -92,7 +92,7 @@ public class IntegrationServiceImpl implements IntegrationService {
   public CompletableFuture<String> asyncException2(String name) {
     CompletableFuture<String> future = new CompletableFuture<>();
     executorService.submit(() -> {
-      future.completeExceptionally(new RuntimeException());
+      future.completeExceptionally(new RuntimeException(name));
     });
     return future;
   }

@@ -15,6 +15,7 @@
 package pink.catty.test.sdk;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -26,6 +27,8 @@ import pink.catty.config.Reference;
 import pink.catty.config.ServerConfig;
 import pink.catty.test.service.IntegrationService;
 import pink.catty.test.service.IntegrationServiceImpl;
+import pink.catty.test.service.exception.Test1CheckedException;
+import pink.catty.test.service.exception.Test2CheckedException;
 
 public class SdkCapabilityTest {
 
@@ -87,6 +90,54 @@ public class SdkCapabilityTest {
     } catch (Exception e) {
       Assert.fail();
     }
+  }
+
+  @Test(expected = Test1CheckedException.class)
+  public void testCheckedException() throws Exception {
+    integrationService.checkedException();
+  }
+
+  @Test(expected = Test2CheckedException.class)
+  public void testMultiCheckedException() throws Exception {
+    integrationService.multiCheckedException();
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testRuntimeException() {
+    integrationService.runtimeException();
+  }
+
+  @Test(expected = Exception.class)
+  public void testAsyncException0() throws Throwable {
+    String msg = UUID.randomUUID().toString();
+    try {
+      integrationService.asyncException0(msg).get();
+    } catch (ExecutionException e) {
+      throw e.getCause();
+    }
+    Assert.fail("No exception found");
+  }
+
+  @Test(expected = Error.class)
+  public void testAsyncException1() throws Throwable {
+    String msg = UUID.randomUUID().toString();
+    try {
+      integrationService.asyncException1(msg).get();
+    } catch (ExecutionException e) {
+      throw e.getCause();
+    }
+    Assert.fail("No exception found");
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testAsyncException2() throws Throwable {
+    String msg = UUID.randomUUID().toString();
+    try {
+      integrationService.asyncException2(msg).get();
+    } catch (ExecutionException e) {
+      throw e.getCause();
+    }
+    Assert.fail("No exception found");
   }
 
 }
