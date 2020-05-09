@@ -19,7 +19,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import pink.catty.core.CattyException;
+import pink.catty.core.RpcTimeoutException;
 import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.MethodNotFoundException;
 import pink.catty.core.invoker.cluster.Cluster;
@@ -98,11 +100,14 @@ public class ConsumerHandler<T>
     if (delay <= 0) {
       delay = invocation.getServiceModel().getTimeout();
     }
+    if (delay <= 0) {
+      delay = 30 * 1000;
+    }
 
-    if (delay > 0) {
+    try {
       response.await(delay, TimeUnit.MILLISECONDS);
-    } else {
-      response.await(30 * 1000, TimeUnit.MILLISECONDS);
+    } catch (TimeoutException e) {
+      throw new RpcTimeoutException("Timeout, except: " + delay, e);
     }
 
     Object returnValue = response.getValue();

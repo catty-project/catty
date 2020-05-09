@@ -25,6 +25,7 @@ import pink.catty.config.Exporter;
 import pink.catty.config.ProtocolConfig;
 import pink.catty.config.Reference;
 import pink.catty.config.ServerConfig;
+import pink.catty.core.RpcTimeoutException;
 import pink.catty.test.service.IntegrationService;
 import pink.catty.test.service.IntegrationServiceImpl;
 import pink.catty.test.service.exception.Test1CheckedException;
@@ -33,7 +34,6 @@ import pink.catty.test.service.exception.Test2CheckedException;
 public class SdkCapabilityTest {
 
   private static ProtocolConfig protocolConfig;
-
   private static Reference<IntegrationService> reference;
   private static Exporter exporter;
   private static IntegrationService integrationService;
@@ -74,6 +74,12 @@ public class SdkCapabilityTest {
   @Test
   public void testReturn() {
     integrationService.say1("");
+  }
+
+  @Test
+  public void testReturnNoUse() {
+    String uuid = UUID.randomUUID().toString();
+    Assert.assertEquals(uuid, integrationService.say2(uuid));
   }
 
   @Test
@@ -138,6 +144,21 @@ public class SdkCapabilityTest {
       throw e.getCause();
     }
     Assert.fail("No exception found");
+  }
+
+  @Test(expected = RpcTimeoutException.class)
+  public void testTimeout0() {
+    integrationService.testTimeout0();
+  }
+
+  @Test
+  public void testTimeout1() {
+    integrationService.testTimeout1();
+  }
+
+  @Test(expected = RpcTimeoutException.class)
+  public void testTimeout2() {
+    integrationService.testTimeout2();
   }
 
 }

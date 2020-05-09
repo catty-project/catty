@@ -16,9 +16,11 @@ package pink.catty.test.service;
 
 import java.util.concurrent.CompletableFuture;
 import pink.catty.core.service.RpcMethod;
+import pink.catty.core.service.RpcService;
 import pink.catty.test.service.exception.Test1CheckedException;
 import pink.catty.test.service.exception.Test2CheckedException;
 
+@RpcService(timeout = 200)
 public interface IntegrationService {
 
   @RpcMethod(needReturn = false)
@@ -26,6 +28,9 @@ public interface IntegrationService {
 
   @RpcMethod(needReturn = true)
   void say1(String name);
+
+  @RpcMethod(needReturn = false)
+  String say2(String name);
 
   String echo(String name);
 
@@ -54,4 +59,12 @@ public interface IntegrationService {
    * Completed with {@link RuntimeException}
    */
   CompletableFuture<String> asyncException2(String name);
+
+  @RpcMethod(timeout = 100)
+  void testTimeout0();
+
+  void testTimeout1();
+
+  void testTimeout2();
+
 }

@@ -37,6 +37,11 @@ public class IntegrationServiceImpl implements IntegrationService {
   }
 
   @Override
+  public String say2(String name) {
+    return name;
+  }
+
+  @Override
   public String echo(String name) {
     return name;
   }
@@ -95,5 +100,28 @@ public class IntegrationServiceImpl implements IntegrationService {
       future.completeExceptionally(new RuntimeException(name));
     });
     return future;
+  }
+
+  @Override
+  public void testTimeout0() {
+    sleep(150);
+  }
+
+  @Override
+  public void testTimeout1() {
+    sleep(150);
+  }
+
+  @Override
+  public void testTimeout2() {
+    sleep(300);
+  }
+
+  private static void sleep(int timeAsMilliSeconds) {
+    try {
+      TimeUnit.MILLISECONDS.sleep(timeAsMilliSeconds);
+    } catch (Exception e) {
+      // ignore
+    }
   }
 }

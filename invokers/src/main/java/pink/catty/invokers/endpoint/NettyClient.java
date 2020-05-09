@@ -101,7 +101,7 @@ public class NettyClient extends AbstractClient {
        * if the invoking method is not need return from provider, than should not listen this
        * response, or will cause OOM.
        */
-      if (methodModel.isNeedReturn()) {
+      if (methodModel.isNeedReturn() || methodModel.getReturnType() != Void.TYPE) {
         addCurrentTask(request.getRequestId(), response);
       }
       byte[] msg = getCodec().encode(request, DataTypeEnum.REQUEST);
