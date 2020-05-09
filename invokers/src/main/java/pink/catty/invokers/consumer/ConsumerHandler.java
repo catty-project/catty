@@ -36,12 +36,10 @@ public class ConsumerHandler<T>
     implements InvocationHandler {
 
   private Cluster cluster;
-  private Class<T> interfaceClazz;
   private ServiceModel serviceModel;
 
   public ConsumerHandler(ServiceModel<T> serviceModel, Cluster cluster) {
     this.cluster = cluster;
-    this.interfaceClazz = serviceModel.getInterfaceClass();
     this.serviceModel = serviceModel;
   }
 
@@ -49,14 +47,16 @@ public class ConsumerHandler<T>
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-    // todo: need better performance.
-    if (isLocalMethod(method)) {
+    /*
+     * check if method valid.
+     */
+    if (!serviceModel.getValidMethod().contains(method)) {
       throw new CattyException("Can not invoke local method: " + method.getName());
     }
 
     MethodModel methodModel = serviceModel.getMethodMeta(method);
     if (methodModel == null) {
-      throw new MethodNotFoundException("Method is invalid, method: " + methodModel.getName());
+      throw new MethodNotFoundException("Method is invalid, method: " + method.getName());
     }
 
     Request request = new DefaultRequest();
@@ -120,18 +120,6 @@ public class ConsumerHandler<T>
 
   private Response invoke(Request request, Invocation invocation) {
     return cluster.invoke(request, invocation);
-  }
-
-  private boolean isLocalMethod(Method method) {
-    if (method.getDeclaringClass().equals(Object.class)) {
-      try {
-        interfaceClazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
-        return false;
-      } catch (NoSuchMethodException e) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @SuppressWarnings("unchecked")

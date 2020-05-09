@@ -42,7 +42,7 @@ public class SdkCapabilityTest {
   public static void init() {
     protocolConfig = ProtocolConfig.defaultConfig();
     ServerConfig serverConfig = ServerConfig.builder()
-        .port(20550)
+        .port(20559)
         .build();
     exporter = new Exporter(serverConfig);
     exporter.setProtocolConfig(protocolConfig);
@@ -50,7 +50,7 @@ public class SdkCapabilityTest {
     exporter.export();
 
     ClientConfig clientConfig = ClientConfig.builder()
-        .addAddress("127.0.0.1:20550")
+        .addAddress("127.0.0.1:20559")
         .build();
 
     reference = new Reference<>();

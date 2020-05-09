@@ -58,11 +58,18 @@ public class ServiceModel<T> {
     this.validMethod = new HashSet<>();
     this.methodMetaMap = new HashMap<>();
 
+    /*
+     * add all valid object declaring method.
+     */
+    validMethod.addAll(ReflectUtils.getValidObjectDeclaringMethod(interfaceClass));
+
     List<Method> methods = ReflectUtils.getPublicMethod(interfaceClass);
     for (Method method : methods) {
       MethodModel methodModel = MethodModel.parse(method);
 
-      // method's name
+      /*
+       * method's name & alias
+       */
       String methodName = methodModel.getName();
       if (methodMap.containsKey(methodName)) {
         throw new DuplicatedMethodNameException(
@@ -71,10 +78,9 @@ public class ServiceModel<T> {
       }
       methodMap.put(methodName, method);
 
-      // method's alias
       List<String> methodAlias = methodModel.getAlias();
-      if(methodAlias != null && methodAlias.size() > 0) {
-        for(String alias : methodAlias) {
+      if (methodAlias != null && methodAlias.size() > 0) {
+        for (String alias : methodAlias) {
           if (methodMap.containsKey(alias)) {
             throw new DuplicatedMethodNameException(
                 "Duplicated method alias: " + alias + "#" + method

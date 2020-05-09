@@ -20,7 +20,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import pink.catty.core.CattyException;
@@ -33,6 +35,18 @@ public abstract class ReflectUtils {
   private static final String EMPTY_PARAM = "void";
   private static final String PARAM_CLASS_SPLIT = ",";
   private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
+
+  private static final Set<String> VALID_OBJECT_METHOD;
+
+  static {
+    VALID_OBJECT_METHOD = new HashSet<String>() {
+      {
+        add("toString");
+        add("equals");
+        add("hashCode");
+      }
+    };
+  }
 
   static {
     nameToClassCache.put("boolean", boolean.class);
@@ -53,6 +67,18 @@ public abstract class ReflectUtils {
       boolean isPublic = Modifier.isPublic(method.getModifiers());
       boolean isNotObjectClass = method.getDeclaringClass() != Object.class;
       if (isPublic && isNotObjectClass) {
+        ret.add(method);
+      }
+    }
+    return ret;
+  }
+
+  public static List<Method> getValidObjectDeclaringMethod(Class clazz) {
+    Method[] methods = clazz.getMethods();
+    List<Method> ret = new ArrayList<>();
+    for (Method method : methods) {
+      if(method.getDeclaringClass() == Object.class
+          && VALID_OBJECT_METHOD.contains(method.getName())) {
         ret.add(method);
       }
     }

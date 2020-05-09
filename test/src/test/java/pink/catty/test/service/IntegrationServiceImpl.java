@@ -109,7 +109,6 @@ public class IntegrationServiceImpl implements IntegrationService {
 
   @Override
   public void testTimeout1() {
-    sleep(150);
   }
 
   @Override

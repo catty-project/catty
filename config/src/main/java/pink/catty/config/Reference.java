@@ -39,7 +39,7 @@ public class Reference<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(Reference.class);
 
-  private static Cluster cluster;
+  private Cluster cluster;
 
   private Class<T> interfaceClass;
 
