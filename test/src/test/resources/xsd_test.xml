@@ -26,7 +26,7 @@
   <bean id="serviceB" class="pink.catty.test.service.BServiceImpl"/>
 
   <catty:protocol id="protocol" retry-times="3" recovery-period="5000"/>
-  <catty:client-config id="client" addresses="127.0.0.1:8080;127.0.0.1:8081" timeout="3000"/>
+
   <catty:server-config id="server1" port="8080" worker-num="2" min-worker-num="1" max-worker-num="2"/>
   <catty:server-config id="server2" port="8081" worker-num="2" min-worker-num="1" max-worker-num="2"/>
 
@@ -39,6 +39,8 @@
     <catty:service interface="pink.catty.test.service.BService" ref="serviceA"/>
     <catty:service interface="pink.catty.test.service.AService" ref="serviceB"/>
   </catty:exporter>
+
+  <catty:client-config id="client" addresses="127.0.0.1:8080;127.0.0.1:8081" timeout="3000"/>
 
   <catty:reference protocol="protocol" client-config="client" interface="pink.catty.test.service.AService"/>
 </beans>
