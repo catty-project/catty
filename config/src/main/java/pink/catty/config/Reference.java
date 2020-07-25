@@ -14,15 +14,13 @@
  */
 package pink.catty.config;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
-import pink.catty.core.extension.spi.InvokerChainBuilder;
+import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.cluster.Cluster;
@@ -34,6 +32,9 @@ import pink.catty.invokers.cluster.FailFastCluster;
 import pink.catty.invokers.cluster.FailOverCluster;
 import pink.catty.invokers.cluster.RecoveryCluster;
 import pink.catty.invokers.consumer.ConsumerHandler;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Reference<T> {
 
@@ -104,7 +105,7 @@ public class Reference<T> {
             newMetaInfo.setRemoteIp(address.getIp());
             newMetaInfo.setRemotePort(address.getPort());
 
-            InvokerChainBuilder chainBuilder = ExtensionFactory.getInvokerBuilder()
+            Protocol chainBuilder = ExtensionFactory.getProtocol()
                 .getExtensionSingleton(InvokerBuilderType.DIRECT);
             Consumer consumer = chainBuilder.buildConsumer(newMetaInfo);
             invokerHolderMap.put(newMetaInfo.toString(), consumer);

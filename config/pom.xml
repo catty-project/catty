@@ -37,6 +37,12 @@
       <artifactId>catty-extension</artifactId>
       <version>0.2.6</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>1.26</version>
+    </dependency>
   </dependencies>
 
 </project>

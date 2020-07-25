@@ -21,8 +21,8 @@ import pink.catty.core.meta.ServerMeta;
 
 public interface EndpointFactory {
 
-  Client createClient(ClientMeta clientMeta);
+  Client getClient(ClientMeta clientMeta);
 
-  Server createServer(ServerMeta serverMeta);
+  Server getServer(ServerMeta serverMeta);
 
 }

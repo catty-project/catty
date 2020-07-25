@@ -33,7 +33,7 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
   private static final Map<Integer, Server> serverCache = new ConcurrentHashMap<>();
 
   @Override
-  public Client createClient(ClientMeta clientMeta) {
+  public Client getClient(ClientMeta clientMeta) {
     ServerAddress address = new ServerAddress(clientMeta.getRemoteIp(), clientMeta.getRemotePort());
     Client client = clientCache.get(address);
     if(client != null && client.isClosed()) {
@@ -56,7 +56,7 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
   }
 
   @Override
-  public Server createServer(ServerMeta serverMeta) {
+  public Server getServer(ServerMeta serverMeta) {
     int port = serverMeta.getLocalPort();
     Server server = serverCache.get(port);
     if(server != null && server.isClosed()) {

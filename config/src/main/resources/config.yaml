@@ -1,0 +1,17 @@
+catty:
+  protocal:
+    serialization:
+    codec:
+    endpoint:
+    load-balance:
+    cluster:
+    retry-times:
+    recovery-period:
+    heartbeat-period:
+  provider:
+    port: 1234
+    max-thread: 200
+    min-thread: 100
+  consumer:
+    timeout:
+    address:

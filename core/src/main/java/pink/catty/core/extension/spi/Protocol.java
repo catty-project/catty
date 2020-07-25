@@ -19,7 +19,7 @@ import pink.catty.core.invoker.Provider;
 import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.meta.ProviderMeta;
 
-public interface InvokerChainBuilder {
+public interface Protocol {
 
   Consumer buildConsumer(ConsumerMeta metaInfo);
 

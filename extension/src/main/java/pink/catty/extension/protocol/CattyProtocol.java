@@ -12,13 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.extension.builder;
+package pink.catty.extension.protocol;
 
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
 import pink.catty.core.extension.spi.EndpointFactory;
-import pink.catty.core.extension.spi.InvokerChainBuilder;
+import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.Provider;
@@ -32,13 +32,13 @@ import pink.catty.invokers.provider.ProviderInvoker;
 import pink.catty.invokers.provider.ProviderSerialization;
 
 @Extension(InvokerBuilderType.DIRECT)
-public class CattyInvokerBuilder implements InvokerChainBuilder {
+public class CattyProtocol implements Protocol {
 
   @Override
   public Consumer buildConsumer(ConsumerMeta meta) {
     EndpointFactory factory = ExtensionFactory.getEndpointFactory()
         .getExtensionSingleton(meta.getEndpoint());
-    Client client = factory.createClient(meta);
+    Client client = factory.getClient(meta);
     Serialization serialization = ExtensionFactory
         .getSerialization()
         .getExtensionSingleton(meta.getSerialization());

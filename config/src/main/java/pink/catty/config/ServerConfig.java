@@ -15,8 +15,6 @@
 package pink.catty.config;
 
 import pink.catty.core.ServerAddress;
-import pink.catty.core.config.InnerServerConfig;
-import pink.catty.core.config.InnerServerConfig.InnerServerConfigBuilder;
 import pink.catty.core.utils.NetUtils;
 
 public class ServerConfig {
@@ -104,16 +102,6 @@ public class ServerConfig {
       }
     }
     return address;
-  }
-
-  public InnerServerConfigBuilder toInnerConfigBuilder() {
-    return InnerServerConfig.builder()
-        .address(address)
-        .needOrder(needOrder)
-        .port(port)
-        .workerThreadNum(workerThreadNum)
-        .minWorkerThreadNum(minWorkerThreadNum)
-        .maxWorkerThreadNum(maxWorkerThreadNum);
   }
 
   /**
