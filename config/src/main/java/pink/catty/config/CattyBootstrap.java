@@ -21,7 +21,7 @@ package pink.catty.config;
  */
 public class CattyBootstrap {
 
-    private static class ConsumerBootstrap<T> {
+    public static class ConsumerBootstrap<T> {
 
         private ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
         private ClientConfig.ClientConfigBuilder clientConfigBuilder = ClientConfig.builder();
@@ -103,7 +103,7 @@ public class CattyBootstrap {
         }
     }
 
-    private static class ProviderBootstrap {
+    public static class ProviderBootstrap {
 
         private ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
         private ServerConfig.ServerConfigBuilder serverConfigBuilder = ServerConfig.builder();

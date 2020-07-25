@@ -72,7 +72,7 @@ public class Exporter {
     this.protocolConfig = protocolConfig;
   }
 
-  public <T> void registerService(Class<T> interfaceClass, T serviceObject) {
+  public <T> Exporter registerService(Class<T> interfaceClass, T serviceObject) {
     ServerAddress address = serverConfig.getServerAddress();
 
     ServiceModel serviceModel = ServiceModel.parse(interfaceClass);
@@ -91,6 +91,7 @@ public class Exporter {
         .getExtensionSingleton(InvokerBuilderType.DIRECT);
     Provider provider = chainBuilder.buildProvider(metaInfo);
     serviceHandlers.put(serviceModel.getServiceName(), provider);
+    return this;
   }
 
   public void export() {
