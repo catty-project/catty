@@ -14,15 +14,15 @@
  */
 package pink.catty.core.extension.spi;
 
-import pink.catty.core.invoker.endpoint.Client;
-import pink.catty.core.invoker.endpoint.Server;
-import pink.catty.core.meta.ClientMeta;
-import pink.catty.core.meta.ServerMeta;
+import pink.catty.core.invoker.Consumer;
+import pink.catty.core.invoker.Provider;
+import pink.catty.core.meta.ConsumerMeta;
+import pink.catty.core.meta.ProviderMeta;
 
-public interface EndpointFactory {
+public interface Protocol {
 
-  Client getClient(ClientMeta clientMeta);
+  Consumer buildConsumer(ConsumerMeta metaInfo);
 
-  Server getServer(ServerMeta serverMeta);
+  Provider buildProvider(ProviderMeta metaInfo);
 
 }

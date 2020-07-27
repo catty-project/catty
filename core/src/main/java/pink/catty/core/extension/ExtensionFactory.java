@@ -14,34 +14,25 @@
  */
 package pink.catty.core.extension;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pink.catty.core.extension.spi.*;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.utils.ReflectUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import pink.catty.core.extension.spi.Codec;
-import pink.catty.core.extension.spi.EndpointFactory;
-import pink.catty.core.extension.spi.InvokerChainBuilder;
-import pink.catty.core.extension.spi.LoadBalance;
-import pink.catty.core.extension.spi.Registry;
-import pink.catty.core.extension.spi.Serialization;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.utils.ReflectUtils;
 
 /**
  * Catty has some build-in extension interface for customizing, such as: {@link Serialization}
- * {@link Invoker} {@link InvokerChainBuilder} {@link Codec} {@link LoadBalance} {@link
+ * {@link Invoker} {@link Protocol} {@link Codec} {@link LoadBalance} {@link
  * EndpointFactory} {@link Registry}. And there are also some build-in implements of those extension
  * interface you can find them in extension-module. You can use Reference and Exporter(you can find
  * both in config-module) to config different implements to make Catty work in another way.
@@ -76,7 +67,7 @@ public final class ExtensionFactory<T> {
   private static ExtensionFactory<Serialization> SERIALIZATION;
   private static ExtensionFactory<LoadBalance> LOAD_BALANCE;
   private static ExtensionFactory<Codec> CODEC;
-  private static ExtensionFactory<InvokerChainBuilder> INVOKER_BUILDER;
+  private static ExtensionFactory<Protocol> PROTOCOL;
   private static ExtensionFactory<EndpointFactory> ENDPOINT_FACTORY;
   private static ExtensionFactory<Registry> REGISTRY;
 
@@ -84,7 +75,7 @@ public final class ExtensionFactory<T> {
     SERIALIZATION = new ExtensionFactory<>(Serialization.class);
     LOAD_BALANCE = new ExtensionFactory<>(LoadBalance.class);
     CODEC = new ExtensionFactory<>(Codec.class);
-    INVOKER_BUILDER = new ExtensionFactory<>(InvokerChainBuilder.class);
+    PROTOCOL = new ExtensionFactory<>(Protocol.class);
     ENDPOINT_FACTORY = new ExtensionFactory<>(EndpointFactory.class);
     REGISTRY = new ExtensionFactory<>(Registry.class);
 
@@ -104,7 +95,7 @@ public final class ExtensionFactory<T> {
         add(SERIALIZATION);
         add(LOAD_BALANCE);
         add(CODEC);
-        add(INVOKER_BUILDER);
+        add(PROTOCOL);
         add(ENDPOINT_FACTORY);
         add(REGISTRY);
       }
@@ -212,8 +203,8 @@ public final class ExtensionFactory<T> {
     return CODEC;
   }
 
-  public static ExtensionFactory<InvokerChainBuilder> getInvokerBuilder() {
-    return INVOKER_BUILDER;
+  public static ExtensionFactory<Protocol> getProtocol() {
+    return PROTOCOL;
   }
 
   public static ExtensionFactory<EndpointFactory> getEndpointFactory() {

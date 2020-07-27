@@ -12,17 +12,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.extension.spi;
+package pink.catty.example.sample;
 
-import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Provider;
-import pink.catty.core.meta.ConsumerMeta;
-import pink.catty.core.meta.ProviderMeta;
+import pink.catty.config.CattyBootstrap;
+import pink.catty.example.IService;
+import pink.catty.example.IServiceImpl;
 
-public interface InvokerChainBuilder {
+public class Server {
 
-  Consumer buildConsumer(ConsumerMeta metaInfo);
-
-  Provider buildProvider(ProviderMeta metaInfo);
-
+  public static void main(String[] args) {
+    CattyBootstrap.provider()
+            .port(20550)
+            .getExporter()
+            .registerService(IService.class, new IServiceImpl())
+            .export();
+  }
 }

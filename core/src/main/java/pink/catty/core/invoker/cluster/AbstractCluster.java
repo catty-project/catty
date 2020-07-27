@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
-import pink.catty.core.extension.spi.InvokerChainBuilder;
+import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.invoker.AbstractMappedInvoker;
 import pink.catty.core.invoker.Consumer;
@@ -67,8 +67,8 @@ public abstract class AbstractCluster extends AbstractMappedInvoker<Consumer> im
     invokerList.forEach(EndpointUtils::destroyInvoker);
   }
 
-  protected InvokerChainBuilder getChainBuilder() {
-    return ExtensionFactory.getInvokerBuilder().getExtensionSingleton(InvokerBuilderType.DIRECT);
+  protected Protocol getChainBuilder() {
+    return ExtensionFactory.getProtocol().getExtensionSingleton(InvokerBuilderType.DIRECT);
   }
 
   abstract protected Response doInvoke(Consumer consumer, Request request,
