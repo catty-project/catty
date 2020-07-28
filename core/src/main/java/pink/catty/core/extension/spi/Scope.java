@@ -12,14 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package pink.catty.core.extension.spi;
 
-import java.util.List;
-import pink.catty.core.invoker.Invoker;
+public enum Scope {
 
-@SPI
-public interface LoadBalance {
+    SINGLETON,
 
-  <T extends Invoker> T select(List<T> invokers);
-
+    PROTOTYPE
 }

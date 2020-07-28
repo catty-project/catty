@@ -37,11 +37,11 @@ public class CattyProtocol implements Protocol {
   @Override
   public Consumer buildConsumer(ConsumerMeta meta) {
     EndpointFactory factory = ExtensionFactory.getEndpointFactory()
-        .getExtensionSingleton(meta.getEndpoint());
+        .getExtension(meta.getEndpoint());
     Client client = factory.getClient(meta);
     Serialization serialization = ExtensionFactory
         .getSerialization()
-        .getExtensionSingleton(meta.getSerialization());
+        .getExtension(meta.getSerialization());
     ConsumerClient consumerClient = new ConsumerClient(client, meta);
     Consumer serializationInvoker = new ConsumerSerialization(consumerClient, serialization);
     if (meta.getHealthCheckPeriod() <= 0) {
@@ -55,7 +55,7 @@ public class CattyProtocol implements Protocol {
   public Provider buildProvider(ProviderMeta meta) {
     Serialization serialization = ExtensionFactory
         .getSerialization()
-        .getExtensionSingleton(meta.getSerialization());
+        .getExtension(meta.getSerialization());
     ProviderInvoker providerInvoker = new ProviderInvoker(meta);
     return new ProviderSerialization(providerInvoker, serialization);
   }

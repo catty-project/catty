@@ -14,36 +14,53 @@
  */
 package pink.catty.core.extension;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import pink.catty.core.extension.spi.*;
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.utils.ReflectUtils;
-
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.JarURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import pink.catty.core.extension.spi.Codec;
+import pink.catty.core.extension.spi.EndpointFactory;
+import pink.catty.core.extension.spi.LoadBalance;
+import pink.catty.core.extension.spi.Protocol;
+import pink.catty.core.extension.spi.Registry;
+import pink.catty.core.extension.spi.SPI;
+import pink.catty.core.extension.spi.Scope;
+import pink.catty.core.extension.spi.Serialization;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.utils.ReflectUtils;
 
 /**
- * Catty has some build-in extension interface for customizing, such as: {@link Serialization}
- * {@link Invoker} {@link Protocol} {@link Codec} {@link LoadBalance} {@link
- * EndpointFactory} {@link Registry}. And there are also some build-in implements of those extension
- * interface you can find them in extension-module. You can use Reference and Exporter(you can find
- * both in config-module) to config different implements to make Catty work in another way.
- *
+ * Catty has some build-in extension interface to customizing, such as: {@link Serialization} {@link
+ * Invoker} {@link Protocol} {@link Codec} {@link LoadBalance} {@link EndpointFactory} {@link
+ * Registry}. And there are also some build-in implements of those extension interface you can find
+ * them in extension-module. You can use Reference and Exporter(you can find both in config-module)
+ * to specify different implements to make Catty work in different way.
+ * <p>
+ * A class that implements the extension interface is expected to have a constructor with no
+ * parameter.
+ * <p>
  * Every extension implements in extension-module will be auto registered in ExtensionFactory when
  * ExtensionFactory class initializing.
- *
+ * <p>
  * If you want to use you own implements, you can use {@link this#register(String, Object)} method
  * to add you own and specify your extension name. There is an example of extension usage in
  * example-module.
- *
+ * <p>
  * {@link Extension} annotation is for inner using to config extension's name, so your own extension
  * implements has no need to use this annotation.
  *
@@ -53,6 +70,7 @@ import java.util.jar.JarFile;
  * @see EndpointFactory
  * @see Registry
  * @see Invoker
+ * @since 0.2.7 SPI is supported.
  */
 public final class ExtensionFactory<T> {
 
@@ -63,25 +81,32 @@ public final class ExtensionFactory<T> {
   private static final int CLASS_SUFFIX_LENGTH = CLASS_SUFFIX.length();
   private static final String JAR_PROTOCOL = "jar";
   private static final String FILE_PROTOCOL = "file";
+  private static final String DEFAULT_CHARACTER = "utf-8";
+  private static final String PREFIX = "META-INF/services/";
 
-  private static ExtensionFactory<Serialization> SERIALIZATION;
-  private static ExtensionFactory<LoadBalance> LOAD_BALANCE;
-  private static ExtensionFactory<Codec> CODEC;
-  private static ExtensionFactory<Protocol> PROTOCOL;
-  private static ExtensionFactory<EndpointFactory> ENDPOINT_FACTORY;
-  private static ExtensionFactory<Registry> REGISTRY;
+  private static final Map<Class<?>, ExtensionFactory<?>> EXTENSION_FACTORY = new ConcurrentHashMap<>();
 
   static {
-    SERIALIZATION = new ExtensionFactory<>(Serialization.class);
-    LOAD_BALANCE = new ExtensionFactory<>(LoadBalance.class);
-    CODEC = new ExtensionFactory<>(Codec.class);
-    PROTOCOL = new ExtensionFactory<>(Protocol.class);
-    ENDPOINT_FACTORY = new ExtensionFactory<>(EndpointFactory.class);
-    REGISTRY = new ExtensionFactory<>(Registry.class);
+    EXTENSION_FACTORY.put(Serialization.class, new ExtensionFactory<>(Serialization.class));
+    EXTENSION_FACTORY.put(LoadBalance.class, new ExtensionFactory<>(LoadBalance.class));
+    EXTENSION_FACTORY.put(Codec.class, new ExtensionFactory<>(Codec.class));
+    EXTENSION_FACTORY.put(Protocol.class, new ExtensionFactory<>(Protocol.class));
+    EXTENSION_FACTORY.put(EndpointFactory.class, new ExtensionFactory<>(EndpointFactory.class));
+    EXTENSION_FACTORY.put(Registry.class, new ExtensionFactory<>(Registry.class));
 
     try {
+
+      /*
+       * First: Scan pink.catty.extension package and sub-package, register all extensions' instance to ExtensionFactory.
+       *
+       * Second: Pre-scan SPI file under META-INF/services/. SPI file should be composited of key-value pairs of each line.
+       *         In this stage, Catty would find all extension implement class and register name-class pair to ExtensionFactory.
+       *
+       */
+
       logger.debug("Extension: begin loading extension...");
       loadExtension();
+      preLoadSpi();
       logger.debug("Extension: loading extension finished...");
     } catch (ClassNotFoundException | IOException e) {
       throw new ExceptionInInitializerError(e);
@@ -90,16 +115,6 @@ public final class ExtensionFactory<T> {
 
   @SuppressWarnings("unchecked")
   private static void loadExtension() throws ClassNotFoundException, IOException {
-    List<ExtensionFactory> extensionFactories = new ArrayList<ExtensionFactory>() {
-      {
-        add(SERIALIZATION);
-        add(LOAD_BALANCE);
-        add(CODEC);
-        add(PROTOCOL);
-        add(ENDPOINT_FACTORY);
-        add(REGISTRY);
-      }
-    };
     Class<?>[] classes = getClasses(EXTENSION_PATH);
     for (Class<?> clz : classes) {
       if (!clz.isAnnotationPresent(Extension.class)) {
@@ -109,7 +124,7 @@ public final class ExtensionFactory<T> {
         continue;
       }
       Extension extension = clz.getAnnotation(Extension.class);
-      for (ExtensionFactory extensionFactory : extensionFactories) {
+      for (ExtensionFactory extensionFactory : EXTENSION_FACTORY.values()) {
         if (extensionFactory.getSupportedExtension().isAssignableFrom(clz)) {
           extensionFactory.register(extension.value(), clz);
           logger
@@ -119,7 +134,8 @@ public final class ExtensionFactory<T> {
     }
   }
 
-  private static Class[] getClasses(String packageName) throws ClassNotFoundException, IOException {
+  private static Class<?>[] getClasses(String packageName)
+      throws ClassNotFoundException, IOException {
     ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
     assert classLoader != null;
     String path = packageName.replace('.', '/');
@@ -136,7 +152,7 @@ public final class ExtensionFactory<T> {
         dirs.add(new File(resource.getFile()));
       }
     }
-    ArrayList<Class> classes = new ArrayList<>();
+    ArrayList<Class<?>> classes = new ArrayList<>();
     for (File directory : dirs) {
       classes.addAll(findClassesByDir(directory, packageName));
     }
@@ -146,9 +162,9 @@ public final class ExtensionFactory<T> {
     return classes.toArray(new Class[0]);
   }
 
-  private static List<Class> findClassesByDir(File directory, String packageName)
+  private static List<Class<?>> findClassesByDir(File directory, String packageName)
       throws ClassNotFoundException {
-    List<Class> classes = new ArrayList<>();
+    List<Class<?>> classes = new ArrayList<>();
     if (!directory.exists()) {
       return classes;
     }
@@ -168,9 +184,9 @@ public final class ExtensionFactory<T> {
     return classes;
   }
 
-  private static List<Class> findClassesByJar(JarFile jar, String packageName)
+  private static List<Class<?>> findClassesByJar(JarFile jar, String packageName)
       throws ClassNotFoundException {
-    List<Class> classes = new ArrayList<>();
+    List<Class<?>> classes = new ArrayList<>();
     Enumeration<JarEntry> entries = jar.entries();
     String packageDir = packageName.replace(".", File.separator);
     while (entries.hasMoreElements()) {
@@ -188,43 +204,102 @@ public final class ExtensionFactory<T> {
     return classes;
   }
 
+  @SuppressWarnings("unchecked")
+  private static void preLoadSpi() throws IOException, ClassNotFoundException {
+    for (ExtensionFactory factory : EXTENSION_FACTORY.values()) {
+      ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+      String fullName = PREFIX + factory.supportedExtension.getName();
+      Enumeration<URL> urls;
+      if (classLoader == null) {
+        urls = ClassLoader.getSystemResources(fullName);
+      } else {
+        urls = classLoader.getResources(fullName);
+      }
+
+      // spi file not found.
+      if (urls == null || !urls.hasMoreElements()) {
+        return;
+      }
+
+      while (urls.hasMoreElements()) {
+        URL url = urls.nextElement();
+        BufferedReader reader = new BufferedReader(
+            new InputStreamReader(url.openStream(), DEFAULT_CHARACTER));
+        String line;
+        while ((line = reader.readLine()) != null) {
+          line = line.trim();
+          if (line.length() == 0) {
+            return;
+          }
+
+          int ci = line.indexOf('#');
+          if (ci == 0) {
+            continue;
+          }
+
+          String[] split = line.split("=");
+          if (split.length != 2) {
+            throw new SpiSyntaxException("Each line must like 'name=com.a.b.ClassName'");
+          }
+
+          String name = split[0];
+          Class<?> implementClass = Class.forName(split[1]);
+          factory.register(name, implementClass);
+        }
+      }
+    }
+  }
 
   /* public static method */
 
-  public static ExtensionFactory<Serialization> getSerialization() {
-    return SERIALIZATION;
-  }
-
-  public static ExtensionFactory<LoadBalance> getLoadBalance() {
-    return LOAD_BALANCE;
+  /**
+   * Convenient functions to get inner extension factory.
+   */
+  public static ExtensionFactory<Protocol> getProtocol() {
+    return getExtensionFactory(Protocol.class);
   }
 
   public static ExtensionFactory<Codec> getCodec() {
-    return CODEC;
+    return getExtensionFactory(Codec.class);
   }
 
-  public static ExtensionFactory<Protocol> getProtocol() {
-    return PROTOCOL;
+  public static ExtensionFactory<Serialization> getSerialization() {
+    return getExtensionFactory(Serialization.class);
   }
 
   public static ExtensionFactory<EndpointFactory> getEndpointFactory() {
-    return ENDPOINT_FACTORY;
+    return getExtensionFactory(EndpointFactory.class);
+  }
+
+  public static ExtensionFactory<LoadBalance> getLoadBalance() {
+    return getExtensionFactory(LoadBalance.class);
   }
 
   public static ExtensionFactory<Registry> getRegistry() {
-    return REGISTRY;
+    return getExtensionFactory(Registry.class);
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <E> ExtensionFactory<E> getExtensionFactory(Class<E> extensionClass) {
+    return (ExtensionFactory<E>) EXTENSION_FACTORY.get(extensionClass);
   }
 
   /* static over */
 
   private final Class<T> supportedExtension;
-  private Map<String, T> extensionMap;
-  private Map<String, Class<? extends T>> extensionClassMap;
+  private final Map<String, T> extensionMap;
+  private final Map<String, Class<? extends T>> extensionClassMap;
+  private final Scope scope;
 
   public ExtensionFactory(Class<T> supportedExtension) {
     this.supportedExtension = supportedExtension;
     this.extensionMap = new HashMap<>();
     this.extensionClassMap = new HashMap<>();
+    SPI spi = supportedExtension.getAnnotation(SPI.class);
+    if (spi == null) {
+      throw new RuntimeException("Class has no SPI.class annotation, class: " + supportedExtension.getName());
+    }
+    scope = spi.scope();
   }
 
   public Class<T> getSupportedExtension() {
@@ -249,6 +324,16 @@ public final class ExtensionFactory<T> {
     extensionClassMap.put(name, extensionClass);
   }
 
+  public T getExtension(String name) {
+    if (scope == Scope.PROTOTYPE) {
+      return getExtensionPrototype(name);
+    } else if (scope == Scope.SINGLETON) {
+      return getExtensionSingleton(name);
+    } else {
+      return getExtensionPrototype(name);
+    }
+  }
+
   /**
    * Get an singleton instance of an extension.
    *
@@ -256,7 +341,7 @@ public final class ExtensionFactory<T> {
    * @param args extension's constructor's arguments.
    * @return an instance of extension.
    */
-  public T getExtensionSingleton(String name, Object... args) {
+  private T getExtensionSingleton(String name, Object... args) {
     Objects.requireNonNull(name, "null name");
     T extension = extensionMap.get(name);
     if (extension == null) {
@@ -268,7 +353,7 @@ public final class ExtensionFactory<T> {
             throw new ExtensionNotFoundException(
                 "Extension type: " + supportedExtension.getName() + " name: " + name);
           } else {
-            extension = getExtensionProtoType(name, args);
+            extension = getExtensionPrototype(name, args);
             register(name, extension);
           }
         }
@@ -284,7 +369,7 @@ public final class ExtensionFactory<T> {
    * @param args extension's constructor's arguments.
    * @return an instance of extension.
    */
-  public T getExtensionProtoType(String name, Object... args) {
+  private T getExtensionPrototype(String name, Object... args) {
     Objects.requireNonNull(name, "null name");
     Class<? extends T> extensionClass = extensionClassMap.get(name);
     if (extensionClass == null) {

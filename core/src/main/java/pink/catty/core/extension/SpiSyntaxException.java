@@ -12,14 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.extension.spi;
+package pink.catty.core.extension;
 
-import java.util.List;
-import pink.catty.core.invoker.Invoker;
+public class SpiSyntaxException extends RuntimeException {
 
-@SPI
-public interface LoadBalance {
+  public SpiSyntaxException() {
+  }
 
-  <T extends Invoker> T select(List<T> invokers);
+  public SpiSyntaxException(String message) {
+    super(message);
+  }
 
+  public SpiSyntaxException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public SpiSyntaxException(Throwable cause) {
+    super(cause);
+  }
+
+  public SpiSyntaxException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
 }

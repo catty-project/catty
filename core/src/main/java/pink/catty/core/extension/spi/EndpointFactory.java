@@ -19,6 +19,7 @@ import pink.catty.core.invoker.endpoint.Server;
 import pink.catty.core.meta.ClientMeta;
 import pink.catty.core.meta.ServerMeta;
 
+@SPI
 public interface EndpointFactory {
 
   Client getClient(ClientMeta clientMeta);
