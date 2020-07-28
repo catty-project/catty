@@ -218,7 +218,7 @@ public final class ExtensionFactory<T> {
 
       // spi file not found.
       if (urls == null || !urls.hasMoreElements()) {
-        return;
+        continue;
       }
 
       while (urls.hasMoreElements()) {
@@ -229,7 +229,7 @@ public final class ExtensionFactory<T> {
         while ((line = reader.readLine()) != null) {
           line = line.trim();
           if (line.length() == 0) {
-            return;
+            continue;
           }
 
           int ci = line.indexOf('#');
