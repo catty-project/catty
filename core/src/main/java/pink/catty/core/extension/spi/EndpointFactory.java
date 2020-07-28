@@ -20,7 +20,7 @@ import pink.catty.core.meta.ClientMeta;
 import pink.catty.core.meta.ServerMeta;
 
 /**
- * EndpointFactory creates Client & Server and caches them. Client & Server is an endpoint to
+ * EndpointFactory creates Client & Server and cache them. Client & Server is an endpoint to
  * communicate to remote. Different Client & Server may use different transport protocol and
  * different framework to implement remote data transport such as TCP & Netty.
  * <p>
