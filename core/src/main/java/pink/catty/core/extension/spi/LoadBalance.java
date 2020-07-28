@@ -17,6 +17,9 @@ package pink.catty.core.extension.spi;
 import java.util.List;
 import pink.catty.core.invoker.Invoker;
 
+/**
+ * LoadBalance is an SPI for client cluster.
+ */
 @SPI
 public interface LoadBalance {
 

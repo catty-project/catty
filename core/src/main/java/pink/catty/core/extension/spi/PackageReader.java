@@ -17,10 +17,10 @@ package pink.catty.core.extension.spi;
 import java.util.List;
 
 /**
- * Distinguish integral data package from byte-streaming.
+ * Distinguish integral data package from net transport's byte-streaming.
  *
  * @param <I> Different framework might have different encapsulation of byte-streaming such as
- * ByteBuffer from jdk, ByteBuf from netty and byte[].
+ * ByteBuffer from jdk, ByteBuf from Netty and byte[].
  */
 public interface PackageReader<I, O> {
 
