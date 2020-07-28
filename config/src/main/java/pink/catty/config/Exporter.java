@@ -97,7 +97,7 @@ public class Exporter {
   public void export() {
     if (registry == null && registryConfig != null) {
       registry = ExtensionFactory.getRegistry()
-          .getExtension(registryConfig.getRegistryType(), registryConfig);
+          .getExtension(registryConfig.getRegistryType());
       registry.open();
     }
     ServerAddress address = serverConfig.getServerAddress();
