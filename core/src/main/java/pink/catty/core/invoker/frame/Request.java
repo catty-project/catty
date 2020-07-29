@@ -14,6 +14,9 @@
  */
 package pink.catty.core.invoker.frame;
 
+import pink.catty.core.service.MethodModel;
+import pink.catty.core.service.ServiceModel;
+
 public interface Request {
 
   long getRequestId();
@@ -31,5 +34,11 @@ public interface Request {
   Object[] getArgsValue();
 
   void setArgsValue(Object[] argsValue);
+
+  Object getTarget();
+
+  MethodModel getInvokedMethod();
+
+  ServiceModel getServiceModel();
 
 }

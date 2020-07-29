@@ -14,6 +14,9 @@
  */
 package pink.catty.core.invoker.frame;
 
+import pink.catty.core.service.MethodModel;
+import pink.catty.core.service.ServiceModel;
+
 public class DefaultRequest implements Request {
 
   private long requestId;
@@ -21,8 +24,9 @@ public class DefaultRequest implements Request {
   private String methodName;
   private Object[] args;
 
-  public DefaultRequest() {
-  }
+  private ServiceModel serviceModel;
+  private MethodModel invokedMethod;
+  private Object target;
 
   public DefaultRequest(long requestId, String interfaceName, String methodName,
       Object[] args) {
@@ -30,6 +34,17 @@ public class DefaultRequest implements Request {
     this.interfaceName = interfaceName;
     this.methodName = methodName;
     this.args = args;
+  }
+
+  public DefaultRequest(long requestId, String interfaceName, String methodName,
+      Object[] args, ServiceModel serviceModel, MethodModel invokedMethod, Object target) {
+    this.requestId = requestId;
+    this.interfaceName = interfaceName;
+    this.methodName = methodName;
+    this.args = args;
+    this.serviceModel = serviceModel;
+    this.invokedMethod = invokedMethod;
+    this.target = target;
   }
 
   @Override
@@ -70,6 +85,21 @@ public class DefaultRequest implements Request {
   @Override
   public void setArgsValue(Object[] argsValue) {
     this.args = argsValue;
+  }
+
+  @Override
+  public Object getTarget() {
+    return target;
+  }
+
+  @Override
+  public MethodModel getInvokedMethod() {
+    return invokedMethod;
+  }
+
+  @Override
+  public ServiceModel getServiceModel() {
+    return serviceModel;
   }
 
   @Override

@@ -32,8 +32,8 @@ public final class ExtensionType {
     String CATTY = "catty";
   }
 
-  public interface InvokerBuilderType {
-    String DIRECT = "direct";
+  public interface ProtocolType {
+    String CATTY = "catty";
   }
 
   public interface RegistryType {

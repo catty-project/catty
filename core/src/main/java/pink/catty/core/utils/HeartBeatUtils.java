@@ -16,10 +16,8 @@ package pink.catty.core.utils;
 
 import java.util.UUID;
 import pink.catty.core.Constants;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
-import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.service.HeartBeatService;
 import pink.catty.core.service.MethodModel;
 import pink.catty.core.service.ServiceModel;
@@ -34,19 +32,16 @@ public abstract class HeartBeatUtils {
     METHOD_MODEL = HEART_BEAT_SERVICE_MODEL.getMethodMetaByName(Constants.HEARTBEAT_METHOD_NAME);
   }
 
-  public static Invocation buildHeartBeatInvocation(Object target, MetaInfo metaInfo) {
-    Invocation invocation = new Invocation();
-    invocation.setMetaInfo(metaInfo);
-    invocation.setTarget(target);
-    invocation.setServiceModel(HEART_BEAT_SERVICE_MODEL);
-    invocation.setInvokedMethod(METHOD_MODEL);
-    return invocation;
-  }
-
-  public static Request buildHeartBeatRequest() {
+  public static Request buildHeartBeatRequest(Object target) {
     String arg = UUID.randomUUID().toString();
     Object[] args = {arg};
     return new DefaultRequest(RequestIdGenerator.next(),
-        HEART_BEAT_SERVICE_MODEL.getServiceName(), METHOD_MODEL.getName(), args);
+        HEART_BEAT_SERVICE_MODEL.getServiceName(),
+        METHOD_MODEL.getName(),
+        args,
+        HEART_BEAT_SERVICE_MODEL,
+        METHOD_MODEL,
+        target
+    );
   }
 }

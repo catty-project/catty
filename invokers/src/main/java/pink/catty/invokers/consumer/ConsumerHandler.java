@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import pink.catty.core.CattyException;
 import pink.catty.core.RpcTimeoutException;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.MethodNotFoundException;
 import pink.catty.core.invoker.cluster.Cluster;
 import pink.catty.core.invoker.frame.DefaultRequest;
@@ -59,20 +58,18 @@ public class ConsumerHandler<T>
       throw new MethodNotFoundException("Method is invalid, method: " + method.getName());
     }
 
-    Request request = new DefaultRequest();
-    request.setRequestId(RequestIdGenerator.next());
-    request.setInterfaceName(serviceModel.getServiceName());
-    request.setMethodName(methodModel.getName());
-    request.setArgsValue(args);
+    Request request = new DefaultRequest(RequestIdGenerator.next(),
+        serviceModel.getServiceName(),
+        methodModel.getName(),
+        args,
+        serviceModel,
+        methodModel,
+        proxy
+    );
 
     Class<?> returnType = method.getReturnType();
 
-    Invocation invocation = new Invocation();
-    invocation.setInvokedMethod(methodModel);
-    invocation.setTarget(proxy);
-    invocation.setServiceModel(serviceModel);
-
-    Response response = invoke(request, invocation);
+    Response response = invoke(request);
 
     if (returnType == Void.TYPE && !methodModel.isNeedReturn()) {
       return null;
@@ -96,9 +93,9 @@ public class ConsumerHandler<T>
     }
 
     // sync-method
-    int delay = invocation.getInvokedMethod().getTimeout();
+    int delay = request.getInvokedMethod().getTimeout();
     if (delay <= 0) {
-      delay = invocation.getServiceModel().getTimeout();
+      delay = request.getServiceModel().getTimeout();
     }
     if (delay <= 0) {
       delay = 30 * 1000;
@@ -107,7 +104,8 @@ public class ConsumerHandler<T>
     try {
       response.await(delay, TimeUnit.MILLISECONDS);
     } catch (TimeoutException e) {
-      throw new RpcTimeoutException("Timeout, except: " + delay, e);
+      throw new RpcTimeoutException("Timeout, except: " + delay + " Info: " + request.toString(),
+          e);
     }
 
     Object returnValue = response.getValue();
@@ -118,8 +116,8 @@ public class ConsumerHandler<T>
     return response.getValue();
   }
 
-  private Response invoke(Request request, Invocation invocation) {
-    return cluster.invoke(request, invocation);
+  private Response invoke(Request request) {
+    return cluster.invoke(request);
   }
 
   @SuppressWarnings("unchecked")

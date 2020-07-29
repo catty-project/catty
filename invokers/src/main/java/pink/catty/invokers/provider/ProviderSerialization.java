@@ -17,7 +17,6 @@ package pink.catty.invokers.provider;
 import java.util.concurrent.CompletionStage;
 import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.AbstractProvider;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.endpoint.Void;
 import pink.catty.core.invoker.frame.Request;
@@ -39,10 +38,10 @@ public class ProviderSerialization extends AbstractProvider {
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
+  public Response invoke(Request request) {
     Object[] args = request.getArgsValue();
     if (args != null) {
-      MethodModel methodModel = invocation.getInvokedMethod();
+      MethodModel methodModel = request.getInvokedMethod();
       Class<?>[] parameterTypes = methodModel.getMethod().getParameterTypes();
       Object[] afterDeserialize = new Object[args.length];
       for (int i = 0; i < args.length; i++) {
@@ -55,8 +54,8 @@ public class ProviderSerialization extends AbstractProvider {
       request.setArgsValue(afterDeserialize);
     }
 
-    Response response = next.invoke(request, invocation);
-    MethodModel methodModel = invocation.getInvokedMethod();
+    Response response = next.invoke(request);
+    MethodModel methodModel = request.getInvokedMethod();
     Class<?> returnType =
         methodModel.isAsync() ? methodModel.getGenericReturnType() : methodModel.getReturnType();
 
@@ -90,5 +89,4 @@ public class ProviderSerialization extends AbstractProvider {
     });
     return AsyncUtils.newResponse(newResponse, request.getRequestId());
   }
-
 }

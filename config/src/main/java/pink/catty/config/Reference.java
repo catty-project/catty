@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
+import pink.catty.core.extension.ExtensionType.ProtocolType;
 import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.invoker.Consumer;
@@ -106,7 +106,7 @@ public class Reference<T> {
             newMetaInfo.setRemotePort(address.getPort());
 
             Protocol chainBuilder = ExtensionFactory.getProtocol()
-                .getExtension(InvokerBuilderType.DIRECT);
+                .getExtension(ProtocolType.CATTY);
             Consumer consumer = chainBuilder.buildConsumer(newMetaInfo);
             invokerHolderMap.put(newMetaInfo.toString(), consumer);
           }

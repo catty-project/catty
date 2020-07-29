@@ -16,7 +16,7 @@ package pink.catty.extension.protocol;
 
 import pink.catty.core.extension.Extension;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
+import pink.catty.core.extension.ExtensionType.ProtocolType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Serialization;
@@ -31,7 +31,7 @@ import pink.catty.invokers.consumer.ConsumerHealthCheck;
 import pink.catty.invokers.provider.ProviderInvoker;
 import pink.catty.invokers.provider.ProviderSerialization;
 
-@Extension(InvokerBuilderType.DIRECT)
+@Extension(ProtocolType.CATTY)
 public class CattyProtocol implements Protocol {
 
   @Override

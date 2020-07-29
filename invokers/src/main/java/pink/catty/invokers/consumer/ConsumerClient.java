@@ -15,7 +15,6 @@
 package pink.catty.invokers.consumer;
 
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.endpoint.Client;
 import pink.catty.core.invoker.frame.Request;
@@ -38,8 +37,8 @@ public class ConsumerClient implements Consumer {
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
-    return client.invoke(request, invocation);
+  public Response invoke(Request request) {
+    return client.invoke(request);
   }
 
   @Override

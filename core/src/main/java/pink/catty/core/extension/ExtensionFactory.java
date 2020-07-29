@@ -70,6 +70,7 @@ import pink.catty.core.utils.ReflectUtils;
  * @see EndpointFactory
  * @see Registry
  * @see Invoker
+ * @see SPI
  * @since 0.2.7 SPI is supported.
  */
 public final class ExtensionFactory<T> {

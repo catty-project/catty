@@ -18,12 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
+import pink.catty.core.extension.ExtensionType.ProtocolType;
 import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.invoker.AbstractMappedInvoker;
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClusterMeta;
@@ -48,7 +47,7 @@ public abstract class AbstractCluster extends AbstractMappedInvoker<Consumer> im
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
+  public Response invoke(Request request) {
     Consumer consumer;
     if(invokerList.size() <= 0) {
       throw new CattyException("No valid endpoint. MetaInfo: " + clusterMeta.toString());
@@ -58,8 +57,7 @@ public abstract class AbstractCluster extends AbstractMappedInvoker<Consumer> im
     } else {
       consumer = loadBalance.select(invokerList);
     }
-    invocation.setServiceModel(consumer.getMeta().getServiceModel());
-    return doInvoke(consumer, request, invocation);
+    return doInvoke(consumer, request);
   }
 
   @Override
@@ -68,9 +66,8 @@ public abstract class AbstractCluster extends AbstractMappedInvoker<Consumer> im
   }
 
   protected Protocol getChainBuilder() {
-    return ExtensionFactory.getProtocol().getExtension(InvokerBuilderType.DIRECT);
+    return ExtensionFactory.getProtocol().getExtension(ProtocolType.CATTY);
   }
 
-  abstract protected Response doInvoke(Consumer consumer, Request request,
-      Invocation invocation);
+  abstract protected Response doInvoke(Consumer consumer, Request request);
 }

@@ -19,7 +19,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ClusterMeta;
@@ -47,8 +46,7 @@ public class RecoveryCluster extends FailOverCluster {
   }
 
   @Override
-  protected void processError(Consumer consumer, Request request, Invocation invocation,
-      Throwable e) {
+  protected void processError(Consumer consumer, Request request, Throwable e) {
     final ConsumerMeta consumerMeta = consumer.getMeta();
     final String metaString = consumerMeta.toString();
 
@@ -76,10 +74,9 @@ public class RecoveryCluster extends FailOverCluster {
 
                 try {
                   Consumer newConsumer = getChainBuilder().buildConsumer(consumerMeta);
-                  Request heartBeat = HeartBeatUtils.buildHeartBeatRequest();
+                  Request heartBeat = HeartBeatUtils.buildHeartBeatRequest(this);
                   String except = (String) heartBeat.getArgsValue()[0];
-                  Invocation inv = HeartBeatUtils.buildHeartBeatInvocation(this, consumerMeta);
-                  Response heartBeatResp = newConsumer.invoke(heartBeat, inv);
+                  Response heartBeatResp = newConsumer.invoke(heartBeat);
                   heartBeatResp.await(defaultRecoveryDelay, TimeUnit.MILLISECONDS);
                   if (except.equals(heartBeatResp.getValue())) {
                     registerInvoker(metaString, newConsumer);

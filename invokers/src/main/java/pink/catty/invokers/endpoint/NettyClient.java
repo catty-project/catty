@@ -29,7 +29,6 @@ import pink.catty.core.Constants;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.endpoint.AbstractClient;
 import pink.catty.core.invoker.frame.DefaultResponse;
 import pink.catty.core.invoker.frame.Request;
@@ -89,11 +88,11 @@ public class NettyClient extends AbstractClient {
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
+  public Response invoke(Request request) {
     if (!clientChannel.isActive()) {
       throw new EndpointInvalidException("ClientChannel closed");
     }
-    MethodModel methodModel = invocation.getInvokedMethod();
+    MethodModel methodModel = request.getInvokedMethod();
     try {
       Response response = new DefaultResponse(request.getRequestId());
 

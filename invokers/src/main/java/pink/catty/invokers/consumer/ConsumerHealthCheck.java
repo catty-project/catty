@@ -22,7 +22,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import pink.catty.core.invoker.AbstractConsumer;
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ConsumerMeta;
@@ -53,10 +52,10 @@ public class ConsumerHealthCheck extends AbstractConsumer {
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
+  public Response invoke(Request request) {
     checkException();
     startTimer();
-    return getNext().invoke(request, invocation);
+    return getNext().invoke(request);
   }
 
   private void startTimer() {
@@ -83,11 +82,9 @@ public class ConsumerHealthCheck extends AbstractConsumer {
     @Override
     public void run() {
       try {
-        Request request = HeartBeatUtils.buildHeartBeatRequest();
+        Request request = HeartBeatUtils.buildHeartBeatRequest(ConsumerHealthCheck.this);
         String except = (String) request.getArgsValue()[0];
-        Invocation invocation = HeartBeatUtils
-            .buildHeartBeatInvocation(ConsumerHealthCheck.this, metaInfo);
-        Response response = invoke(request, invocation);
+        Response response = invoke(request);
         try {
           response.await(period, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {

@@ -21,8 +21,9 @@ import java.util.concurrent.ExecutorService;
 import pink.catty.core.CattyException;
 import pink.catty.core.Constants;
 import pink.catty.core.extension.spi.Codec;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Provider;
+import pink.catty.core.invoker.frame.DefaultRequest;
+import pink.catty.core.invoker.frame.DefaultResponse;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
 import pink.catty.core.meta.ServerMeta;
@@ -71,7 +72,7 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
+  public Response invoke(Request request) {
     String serviceName = request.getInterfaceName();
     Provider provider = getInvoker(serviceName);
     if (provider == null) {
@@ -79,9 +80,6 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
           "No such provider found! RpcService name: " + request.getInterfaceName());
     }
 
-    if (invocation == null) {
-      invocation = new Invocation();
-    }
     ServiceModel serviceModel = provider
         .getMeta()
         .getServiceModel();
@@ -89,10 +87,22 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
         .getMeta()
         .getServiceModel()
         .getMethodMetaByName(request.getMethodName());
-    invocation.setTarget(serviceModel.getTarget());
-    invocation.setServiceModel(serviceModel);
-    invocation.setInvokedMethod(methodModel);
-    return provider.invoke(request, invocation);
+
+    if (methodModel == null) {
+      Response response = new DefaultResponse(request.getRequestId());
+      response.setValue(
+          new CattyException("ServiceInvoker: can't find method: " + request.getMethodName()));
+      return response;
+    }
+
+    return provider.invoke(new DefaultRequest(request.getRequestId(),
+        request.getInterfaceName(),
+        request.getMethodName(),
+        request.getArgsValue(),
+        serviceModel,
+        methodModel,
+        serviceModel.getTarget()
+    ));
   }
 
   @Override
@@ -120,10 +130,12 @@ public abstract class AbstractServer extends AbstractEndpoint implements Server 
           Constants.THREAD_NUMBER * 2;
       executor = new HashLoopGroup(workerNum, HashableChooserFactory.INSTANCE);
     } else {
-      int minWorkerNum = serverMeta.getMinWorkerThreadNum() > 0 ? serverMeta.getMinWorkerThreadNum() :
-          Constants.THREAD_NUMBER * 2;
-      int maxWorkerNum = serverMeta.getMaxWorkerThreadNum() > 0 ? serverMeta.getMaxWorkerThreadNum() :
-          Constants.THREAD_NUMBER * 4;
+      int minWorkerNum =
+          serverMeta.getMinWorkerThreadNum() > 0 ? serverMeta.getMinWorkerThreadNum() :
+              Constants.THREAD_NUMBER * 2;
+      int maxWorkerNum =
+          serverMeta.getMaxWorkerThreadNum() > 0 ? serverMeta.getMaxWorkerThreadNum() :
+              Constants.THREAD_NUMBER * 4;
       executor = new StandardThreadExecutor(minWorkerNum, maxWorkerNum);
       ((StandardThreadExecutor) executor).prestartAllCoreThreads();
     }

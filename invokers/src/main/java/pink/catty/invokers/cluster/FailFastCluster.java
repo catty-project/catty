@@ -15,7 +15,6 @@
 package pink.catty.invokers.cluster;
 
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.cluster.AbstractCluster;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -28,7 +27,7 @@ public class FailFastCluster extends AbstractCluster {
   }
 
   @Override
-  protected Response doInvoke(Consumer consumer, Request request, Invocation invocation) {
-    return consumer.invoke(request, invocation);
+  protected Response doInvoke(Consumer consumer, Request request) {
+    return consumer.invoke(request);
   }
 }

@@ -20,7 +20,7 @@ import pink.catty.core.Constants;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
+import pink.catty.core.extension.ExtensionType.ProtocolType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Registry;
@@ -88,7 +88,7 @@ public class Exporter {
     metaInfo.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
     Protocol chainBuilder = ExtensionFactory.getProtocol()
-        .getExtension(InvokerBuilderType.DIRECT);
+        .getExtension(ProtocolType.CATTY);
     Provider provider = chainBuilder.buildProvider(metaInfo);
     serviceHandlers.put(serviceModel.getServiceName(), provider);
     return this;

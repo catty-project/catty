@@ -21,7 +21,6 @@ import pink.catty.core.CattyException;
 import pink.catty.core.EndpointInvalidException;
 import pink.catty.core.RpcTimeoutException;
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.cluster.AbstractCluster;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -36,17 +35,17 @@ public class FailOverCluster extends AbstractCluster {
   }
 
   @Override
-  protected Response doInvoke(Consumer consumer, Request request, Invocation invocation) {
+  protected Response doInvoke(Consumer consumer, Request request) {
     int retryTimes = clusterMeta.getRetryTimes();
-    int delay = invocation.getInvokedMethod().getTimeout();
+    int delay = request.getInvokedMethod().getTimeout();
     if (delay <= 0) {
-      delay = invocation.getServiceModel().getTimeout();
+      delay = request.getServiceModel().getTimeout();
     }
 
     Response response = null;
     for (int i = 0; i <= Math.max(retryTimes, invokerList.size()); i++) {
       try {
-        response = consumer.invoke(request, invocation);
+        response = consumer.invoke(request);
         if (delay >= 0) {
           try {
             response.await(delay, TimeUnit.MILLISECONDS);
@@ -62,7 +61,7 @@ public class FailOverCluster extends AbstractCluster {
             metaString, e);
         unregisterInvoker(metaString);
         EndpointUtils.destroyInvoker(consumer);
-        processError(consumer, request, invocation, e);
+        processError(consumer, request, e);
         if (invokerList.size() > 0) {
           consumer = loadBalance.select(invokerList);
         }
@@ -76,8 +75,7 @@ public class FailOverCluster extends AbstractCluster {
         "RecoveryCluster, after retry: " + retryTimes + ", not found valid endpoint.");
   }
 
-  protected void processError(Consumer consumer, Request request, Invocation invocation,
-      Throwable e) {
+  protected void processError(Consumer consumer, Request request, Throwable e) {
 
   }
 }
