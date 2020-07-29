@@ -88,7 +88,7 @@ public class Exporter {
     metaInfo.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
     Protocol chainBuilder = ExtensionFactory.getProtocol()
-        .getExtensionSingleton(InvokerBuilderType.DIRECT);
+        .getExtension(InvokerBuilderType.DIRECT);
     Provider provider = chainBuilder.buildProvider(metaInfo);
     serviceHandlers.put(serviceModel.getServiceName(), provider);
     return this;
@@ -97,7 +97,7 @@ public class Exporter {
   public void export() {
     if (registry == null && registryConfig != null) {
       registry = ExtensionFactory.getRegistry()
-          .getExtensionSingleton(registryConfig.getRegistryType(), registryConfig);
+          .getExtension(registryConfig.getRegistryType());
       registry.open();
     }
     ServerAddress address = serverConfig.getServerAddress();
@@ -110,7 +110,7 @@ public class Exporter {
     serverMeta.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
     EndpointFactory factory = ExtensionFactory.getEndpointFactory()
-        .getExtensionSingleton(protocolConfig.getEndpointType());
+        .getExtension(protocolConfig.getEndpointType());
     server = factory.getServer(serverMeta);
     if (server == null) {
       throw new NullPointerException("Server is not exist");

@@ -19,6 +19,13 @@ import pink.catty.core.invoker.Provider;
 import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.meta.ProviderMeta;
 
+/**
+ * Protocol tells how RPC works. Protocol defines not only codec which may be the most important
+ * part of a protocol that describes how to make a frame for transport and how to unpack it, but
+ * also defines how to serialization, ha, load-balance, and so on. So Protocol is a class to define
+ * how Consumer & Provider looks like, further more, to build Consumer & Provider from MetaInfo.
+ */
+@SPI
 public interface Protocol {
 
   Consumer buildConsumer(ConsumerMeta metaInfo);

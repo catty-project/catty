@@ -12,20 +12,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.extension.spi;
+package pink.catty.core.extension;
 
-import pink.catty.core.CodecException;
+public class SpiSyntaxException extends RuntimeException {
 
-@SPI
-public interface Codec<I, O> extends PackageReader<I, O> {
+  public SpiSyntaxException() {
+  }
 
-  byte[] encode(Object message, DataTypeEnum dataTypeEnum) throws CodecException;
+  public SpiSyntaxException(String message) {
+    super(message);
+  }
 
-  Object decode(byte[] data, DataTypeEnum dataTypeEnum) throws CodecException;
+  public SpiSyntaxException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
-  enum DataTypeEnum {
-    REQUEST,
-    RESPONSE,
-    ;
+  public SpiSyntaxException(Throwable cause) {
+    super(cause);
+  }
+
+  public SpiSyntaxException(String message, Throwable cause, boolean enableSuppression,
+      boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
   }
 }

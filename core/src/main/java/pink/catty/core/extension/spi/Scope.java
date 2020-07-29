@@ -12,20 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package pink.catty.core.extension.spi;
 
-import pink.catty.core.CodecException;
+public enum Scope {
 
-@SPI
-public interface Codec<I, O> extends PackageReader<I, O> {
+    SINGLETON,
 
-  byte[] encode(Object message, DataTypeEnum dataTypeEnum) throws CodecException;
-
-  Object decode(byte[] data, DataTypeEnum dataTypeEnum) throws CodecException;
-
-  enum DataTypeEnum {
-    REQUEST,
-    RESPONSE,
-    ;
-  }
+    PROTOTYPE
 }

@@ -39,7 +39,7 @@ public abstract class AbstractCluster extends AbstractMappedInvoker<Consumer> im
   public AbstractCluster(ClusterMeta clusterMeta) {
     this.clusterMeta = clusterMeta;
     this.loadBalance = ExtensionFactory.getLoadBalance()
-        .getExtensionProtoType(clusterMeta.getLoadBalance());
+        .getExtension(clusterMeta.getLoadBalance());
   }
 
   @Override
@@ -68,7 +68,7 @@ public abstract class AbstractCluster extends AbstractMappedInvoker<Consumer> im
   }
 
   protected Protocol getChainBuilder() {
-    return ExtensionFactory.getProtocol().getExtensionSingleton(InvokerBuilderType.DIRECT);
+    return ExtensionFactory.getProtocol().getExtension(InvokerBuilderType.DIRECT);
   }
 
   abstract protected Response doInvoke(Consumer consumer, Request request,

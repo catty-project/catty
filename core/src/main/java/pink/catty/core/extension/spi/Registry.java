@@ -18,6 +18,7 @@ import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.meta.MetaInfo;
 import java.util.List;
 
+@SPI
 public interface Registry {
 
   void open();

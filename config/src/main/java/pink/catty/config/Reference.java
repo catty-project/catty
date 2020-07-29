@@ -106,7 +106,7 @@ public class Reference<T> {
             newMetaInfo.setRemotePort(address.getPort());
 
             Protocol chainBuilder = ExtensionFactory.getProtocol()
-                .getExtensionSingleton(InvokerBuilderType.DIRECT);
+                .getExtension(InvokerBuilderType.DIRECT);
             Consumer consumer = chainBuilder.buildConsumer(newMetaInfo);
             invokerHolderMap.put(newMetaInfo.toString(), consumer);
           }

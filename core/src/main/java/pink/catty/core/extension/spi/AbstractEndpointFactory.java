@@ -43,7 +43,7 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
     if (client == null) {
       synchronized (clientCache) {
         if (!clientCache.containsKey(address)) {
-          Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(clientMeta.getCodec());
+          Codec codec = ExtensionFactory.getCodec().getExtension(clientMeta.getCodec());
           client = doCreateClient(clientMeta, codec);
           client.open();
           clientCache.put(address, client);
@@ -66,7 +66,7 @@ public abstract class AbstractEndpointFactory implements EndpointFactory {
     if (server == null) {
       synchronized (serverCache) {
         if (!serverCache.containsKey(port)) {
-          Codec codec = ExtensionFactory.getCodec().getExtensionSingleton(serverMeta.getCodec());
+          Codec codec = ExtensionFactory.getCodec().getExtension(serverMeta.getCodec());
           server = doCreateServer(serverMeta, codec);
           server.open();
           serverCache.put(port, server);
