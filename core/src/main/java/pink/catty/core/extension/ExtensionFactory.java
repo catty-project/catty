@@ -252,29 +252,60 @@ public final class ExtensionFactory<T> {
 
   /* public static method */
 
-  /**
+  /*
    * Convenient functions to get inner extension factory.
+   */
+
+  /**
+   * It is a shortcut for ExtensionFactory.getExtensionFactory(Protocol.class)
+   *
+   * @return ExtensionFactory<Protocol>
    */
   public static ExtensionFactory<Protocol> getProtocol() {
     return getExtensionFactory(Protocol.class);
   }
 
+  /**
+   * It is a shortcut for ExtensionFactory.getExtensionFactory(Codec.class)
+   *
+   * @return ExtensionFactory<Codec>
+   */
   public static ExtensionFactory<Codec> getCodec() {
     return getExtensionFactory(Codec.class);
   }
 
+  /**
+   * It is a shortcut for ExtensionFactory.getExtensionFactory(Serialization.class)
+   *
+   * @return ExtensionFactory<Serialization>
+   */
   public static ExtensionFactory<Serialization> getSerialization() {
     return getExtensionFactory(Serialization.class);
   }
 
+  /**
+   * It is a shortcut for ExtensionFactory.getExtensionFactory(EndpointFactory.class)
+   *
+   * @return ExtensionFactory<EndpointFactory>
+   */
   public static ExtensionFactory<EndpointFactory> getEndpointFactory() {
     return getExtensionFactory(EndpointFactory.class);
   }
 
+  /**
+   * It is a shortcut for ExtensionFactory.getExtensionFactory(LoadBalance.class)
+   *
+   * @return ExtensionFactory<LoadBalance>
+   */
   public static ExtensionFactory<LoadBalance> getLoadBalance() {
     return getExtensionFactory(LoadBalance.class);
   }
 
+  /**
+   * It is a shortcut for ExtensionFactory.getExtensionFactory(Registry.class)
+   *
+   * @return ExtensionFactory<Registry>
+   */
   public static ExtensionFactory<Registry> getRegistry() {
     return getExtensionFactory(Registry.class);
   }
