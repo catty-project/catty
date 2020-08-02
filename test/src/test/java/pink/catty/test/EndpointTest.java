@@ -34,7 +34,7 @@ public class EndpointTest {
 
     @BeforeClass
     public static void registerCodec() {
-        ExtensionFactory.getCodec().register(TEST_CODEC_TYPE, MockCodec.class);
+        ExtensionFactory.codec().register(TEST_CODEC_TYPE, MockCodec.class);
     }
 
     public static class MockCodec implements Codec {

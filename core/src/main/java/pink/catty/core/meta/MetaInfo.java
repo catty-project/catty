@@ -55,7 +55,7 @@ import pink.catty.core.utils.ReflectUtils;
  * @see EndpointMeta
  * @see ClientMeta
  * @see ConsumerMeta
- * @see ClusterMeta
+ * @see ConsumerMeta
  * @see ServerMeta
  * @see ProviderMeta
  *

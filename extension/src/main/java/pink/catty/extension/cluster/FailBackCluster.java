@@ -12,22 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.invokers.cluster;
+package pink.catty.extension.cluster;
 
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.ExtensionFactory;
+import pink.catty.core.extension.ExtensionType.ClusterType;
+import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.invoker.Consumer;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.invoker.LinkedInvoker;
+import pink.catty.core.invoker.endpoint.Client;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
-import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.service.HealthCheckException;
 import pink.catty.core.support.ConcurrentHashSet;
+import pink.catty.core.utils.EndpointUtils;
 import pink.catty.core.utils.HeartBeatUtils;
+import pink.catty.invokers.consumer.ConsumerClient;
 
-public class RecoveryCluster extends FailOverCluster {
+@Extension(ClusterType.FAIL_BACK)
+public class FailBackCluster extends FailOverCluster {
 
   private static final String TIMER_NAME = "CATTY_RECOVERY";
   private static final Set<ConsumerMeta> ON_RECOVERY;
@@ -38,26 +47,24 @@ public class RecoveryCluster extends FailOverCluster {
     ON_RECOVERY = new ConcurrentHashSet<>();
   }
 
-  private int defaultRecoveryDelay;
-
-  public RecoveryCluster(ClusterMeta clusterMeta) {
-    super(clusterMeta);
-    this.defaultRecoveryDelay = clusterMeta.getRecoveryPeriod();
-  }
-
   @Override
-  protected void processError(Consumer consumer, Request request, Throwable e) {
-    final ConsumerMeta consumerMeta = consumer.getMeta();
-    final String metaString = consumerMeta.toString();
+  public Response onError(Consumer invoker, Consumer failedConsumer, Request request,
+      RuntimeException e) {
+
+    EndpointUtils.destroyInvoker(failedConsumer);
+    final ConsumerMeta failedConsumerMeta = failedConsumer.getMeta();
+    final String metaString = failedConsumerMeta.toString();
+
+    int recoveryDelay = failedConsumerMeta.getRecoveryPeriod();
 
     /*
      * Avoid duplicate recovery job.
      */
     synchronized (ON_RECOVERY) {
-      if (ON_RECOVERY.contains(consumerMeta)) {
-        logger.info(
-            "Recovery job on this address was going on, new recovery job on this address would not be created again. address: {}",
-            consumerMeta);
+      if (ON_RECOVERY.contains(failedConsumerMeta)) {
+        logger.debug(
+            "Recovery job on this address was going on, new recovery job on this address would not be created again. meta: {}",
+            metaString);
       } else {
         TIMER.schedule(
             new TimerTask() {
@@ -73,15 +80,28 @@ public class RecoveryCluster extends FailOverCluster {
                 logger.info("Recovery: begin recovery of endpoint: {}", metaString);
 
                 try {
-                  Consumer newConsumer = getChainBuilder().buildConsumer(consumerMeta);
+                  EndpointFactory endpointFactory = ExtensionFactory.endpointFactory()
+                      .getExtension(failedConsumerMeta.getEndpoint());
+                  Client newClient = endpointFactory.getClient(failedConsumerMeta);
+                  newClient.open();
+
+                  Invoker next = failedConsumer.getNext();
+                  while (next instanceof LinkedInvoker) {
+                    if (((LinkedInvoker) next).getNext() instanceof ConsumerClient) {
+                      ConsumerClient newConsumerClient = new ConsumerClient(newClient,
+                          failedConsumerMeta);
+                    } else {
+                      next = failedConsumer.getNext();
+                    }
+                  }
+
                   Request heartBeat = HeartBeatUtils.buildHeartBeatRequest(this);
                   String except = (String) heartBeat.getArgsValue()[0];
-                  Response heartBeatResp = newConsumer.invoke(heartBeat);
-                  heartBeatResp.await(defaultRecoveryDelay, TimeUnit.MILLISECONDS);
+                  Response heartBeatResp = failedConsumer.invoke(heartBeat);
+                  heartBeatResp.await(recoveryDelay, TimeUnit.MILLISECONDS);
                   if (except.equals(heartBeatResp.getValue())) {
-                    registerInvoker(metaString, newConsumer);
                     logger.info("Recovery: endpoint recovery succeed! endpoint: {}", metaString);
-                    ON_RECOVERY.remove(consumerMeta);
+                    ON_RECOVERY.remove(failedConsumerMeta);
                     cancel();
                   } else {
                     throw new HealthCheckException(
@@ -93,10 +113,11 @@ public class RecoveryCluster extends FailOverCluster {
                       metaString, e0);
                 }
               }
-            }, defaultRecoveryDelay, defaultRecoveryDelay);
+            }, recoveryDelay, recoveryDelay);
 
-        ON_RECOVERY.add(consumerMeta);
+        ON_RECOVERY.add(failedConsumerMeta);
       }
     }
+    return super.onError(invoker, failedConsumer, request, e);
   }
 }

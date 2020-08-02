@@ -33,8 +33,10 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pink.catty.core.extension.spi.Cluster;
 import pink.catty.core.extension.spi.Codec;
 import pink.catty.core.extension.spi.EndpointFactory;
+import pink.catty.core.extension.spi.Filter;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Registry;
@@ -70,6 +72,8 @@ import pink.catty.core.utils.ReflectUtils;
  * @see EndpointFactory
  * @see Registry
  * @see Invoker
+ * @see Cluster
+ * @see Filter
  * @see SPI
  * @since 0.2.7 SPI is supported.
  */
@@ -94,6 +98,8 @@ public final class ExtensionFactory<T> {
     EXTENSION_FACTORY.put(Protocol.class, new ExtensionFactory<>(Protocol.class));
     EXTENSION_FACTORY.put(EndpointFactory.class, new ExtensionFactory<>(EndpointFactory.class));
     EXTENSION_FACTORY.put(Registry.class, new ExtensionFactory<>(Registry.class));
+    EXTENSION_FACTORY.put(Cluster.class, new ExtensionFactory<>(Cluster.class));
+    EXTENSION_FACTORY.put(Filter.class, new ExtensionFactory<>(Filter.class));
 
     try {
 
@@ -262,7 +268,7 @@ public final class ExtensionFactory<T> {
    *
    * @return ExtensionFactory<Protocol>
    */
-  public static ExtensionFactory<Protocol> getProtocol() {
+  public static ExtensionFactory<Protocol> protocol() {
     return getExtensionFactory(Protocol.class);
   }
 
@@ -271,7 +277,7 @@ public final class ExtensionFactory<T> {
    *
    * @return ExtensionFactory<Codec>
    */
-  public static ExtensionFactory<Codec> getCodec() {
+  public static ExtensionFactory<Codec> codec() {
     return getExtensionFactory(Codec.class);
   }
 
@@ -280,7 +286,7 @@ public final class ExtensionFactory<T> {
    *
    * @return ExtensionFactory<Serialization>
    */
-  public static ExtensionFactory<Serialization> getSerialization() {
+  public static ExtensionFactory<Serialization> serialization() {
     return getExtensionFactory(Serialization.class);
   }
 
@@ -289,7 +295,7 @@ public final class ExtensionFactory<T> {
    *
    * @return ExtensionFactory<EndpointFactory>
    */
-  public static ExtensionFactory<EndpointFactory> getEndpointFactory() {
+  public static ExtensionFactory<EndpointFactory> endpointFactory() {
     return getExtensionFactory(EndpointFactory.class);
   }
 
@@ -298,7 +304,7 @@ public final class ExtensionFactory<T> {
    *
    * @return ExtensionFactory<LoadBalance>
    */
-  public static ExtensionFactory<LoadBalance> getLoadBalance() {
+  public static ExtensionFactory<LoadBalance> loadBalance() {
     return getExtensionFactory(LoadBalance.class);
   }
 
@@ -307,8 +313,26 @@ public final class ExtensionFactory<T> {
    *
    * @return ExtensionFactory<Registry>
    */
-  public static ExtensionFactory<Registry> getRegistry() {
+  public static ExtensionFactory<Registry> registry() {
     return getExtensionFactory(Registry.class);
+  }
+
+  /**
+   * It is a shortcut for ExtensionFactory.getExtensionFactory(Cluster.class)
+   *
+   * @return ExtensionFactory<Cluster>
+   */
+  public static ExtensionFactory<Cluster> cluster() {
+    return getExtensionFactory(Cluster.class);
+  }
+
+  /**
+   * It is a shortcut for ExtensionFactory.getExtensionFactory(Filter.class)
+   *
+   * @return ExtensionFactory<Filter>
+   */
+  public static ExtensionFactory<Filter> filter() {
+    return getExtensionFactory(Filter.class);
   }
 
   @SuppressWarnings("unchecked")
@@ -329,7 +353,8 @@ public final class ExtensionFactory<T> {
     this.extensionClassMap = new HashMap<>();
     SPI spi = supportedExtension.getAnnotation(SPI.class);
     if (spi == null) {
-      throw new RuntimeException("Class has no SPI.class annotation, class: " + supportedExtension.getName());
+      throw new RuntimeException(
+          "Class has no SPI.class annotation, class: " + supportedExtension.getName());
     }
     scope = spi.scope();
   }
@@ -356,6 +381,15 @@ public final class ExtensionFactory<T> {
     extensionClassMap.put(name, extensionClass);
   }
 
+  /**
+   * Get extension instance of this ExtensionFactory with required name.
+   * <p>
+   * If extension with required name not found, ExtensionNotFoundException was thrown.
+   *
+   * @param name extension name
+   * @return extension instance of required name.
+   * @throws ExtensionNotFoundException
+   */
   public T getExtension(String name) {
     if (scope == Scope.PROTOTYPE) {
       return getExtensionPrototype(name);

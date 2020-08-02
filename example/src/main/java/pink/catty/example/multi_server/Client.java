@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 import pink.catty.config.ClientConfig;
 import pink.catty.config.ProtocolConfig;
 import pink.catty.config.Reference;
+import pink.catty.core.extension.ExtensionType.ClusterType;
 import pink.catty.example.IService;
 
 public class Client {
@@ -30,7 +31,7 @@ public class Client {
         .build();
 
     ProtocolConfig protocolConfig = new ProtocolConfig();
-    protocolConfig.setClusterType(ProtocolConfig.AUTO_RECOVERY);
+    protocolConfig.setClusterType(ClusterType.FAIL_FAST);
     protocolConfig.setRecoveryPeriod(3000);
 
     Reference<IService> reference = new Reference<>();

@@ -20,4 +20,6 @@ public interface InvokerRegistry<T extends Invoker> {
 
   T unregisterInvoker(String serviceIdentify);
 
+  T getInvoker(String invokerIdentify);
+
 }

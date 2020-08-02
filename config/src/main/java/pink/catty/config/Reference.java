@@ -16,25 +16,16 @@ package pink.catty.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import pink.catty.core.ServerAddress;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.ProtocolType;
+import pink.catty.core.extension.spi.Cluster;
 import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.cluster.Cluster;
-import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.meta.ConsumerMeta;
-import pink.catty.core.meta.MetaInfo;
 import pink.catty.core.service.ServiceModel;
-import pink.catty.invokers.cluster.FailFastCluster;
-import pink.catty.invokers.cluster.FailOverCluster;
-import pink.catty.invokers.cluster.RecoveryCluster;
 import pink.catty.invokers.consumer.ConsumerHandler;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Reference<T> {
 
@@ -86,59 +77,24 @@ public class Reference<T> {
         if (ref == null) {
           ServiceModel serviceModel = ServiceModel.parse(interfaceClass);
 
-          ClusterMeta clusterMeta = new ClusterMeta();
-          clusterMeta.setServiceModel(serviceModel);
-          clusterMeta.setSerialization(protocolConfig.getSerializationType());
-          clusterMeta.setCodec(protocolConfig.getCodecType());
-          clusterMeta.setEndpoint(protocolConfig.getEndpointType());
-          clusterMeta.setHealthCheckPeriod(protocolConfig.getHeartbeatPeriod());
-          clusterMeta.setLoadBalance(protocolConfig.getLoadBalanceType());
-          clusterMeta.setRetryTimes(protocolConfig.getRetryTimes());
-          clusterMeta.setRecoveryPeriod(protocolConfig.getRecoveryPeriod());
-          String metaString = clusterMeta.toString();
+          ConsumerMeta consumerMeta = new ConsumerMeta();
+          consumerMeta.setServiceModel(serviceModel);
+          consumerMeta.setSerialization(protocolConfig.getSerializationType());
+          consumerMeta.setCodec(protocolConfig.getCodecType());
+          consumerMeta.setEndpoint(protocolConfig.getEndpointType());
+          consumerMeta.setHealthCheckPeriod(protocolConfig.getHeartbeatPeriod());
+          consumerMeta.setLoadBalance(protocolConfig.getLoadBalanceType());
+          consumerMeta.setRetryTimes(protocolConfig.getRetryTimes());
+          consumerMeta.setRecoveryPeriod(protocolConfig.getRecoveryPeriod());
+          consumerMeta.setDirectAddress(clientConfig.getAddresses());
 
-          buildCluster(clusterMeta);
-          Map<String, Consumer> invokerHolderMap = new ConcurrentHashMap<>();
-          for (ServerAddress address : clientConfig.getAddresses()) {
-            ConsumerMeta newMetaInfo = MetaInfo.parseOf(metaString, ConsumerMeta.class,
-                serviceModel);
-            newMetaInfo.setRemoteIp(address.getIp());
-            newMetaInfo.setRemotePort(address.getPort());
-
-            Protocol chainBuilder = ExtensionFactory.getProtocol()
-                .getExtension(ProtocolType.CATTY);
-            Consumer consumer = chainBuilder.buildConsumer(newMetaInfo);
-            invokerHolderMap.put(newMetaInfo.toString(), consumer);
-          }
-          cluster.setInvokerMap(invokerHolderMap);
-
-          ref = ConsumerHandler.getProxy(serviceModel, cluster);
-
-          serviceModel.setTarget(ref);
+          Protocol protocol = ExtensionFactory.protocol().getExtension(ProtocolType.CATTY);
+          Consumer consumer = protocol.buildConsumer(consumerMeta);
+          ref = ConsumerHandler.getProxy(consumer);
         }
       }
     }
     return ref;
-  }
-
-  private void buildCluster(ClusterMeta metaInfo) {
-    if (cluster == null) {
-      synchronized (Reference.class) {
-        if (cluster == null) {
-          String clusterStrategy = protocolConfig.getClusterType();
-          switch (clusterStrategy) {
-            case ProtocolConfig.AUTO_RECOVERY:
-              cluster = new RecoveryCluster(metaInfo);
-              break;
-            case ProtocolConfig.FAIL_FAST:
-              cluster = new FailFastCluster(metaInfo);
-              break;
-            case ProtocolConfig.FAIL_OVER:
-              cluster = new FailOverCluster(metaInfo);
-          }
-        }
-      }
-    }
   }
 
   private boolean useRegistry() {

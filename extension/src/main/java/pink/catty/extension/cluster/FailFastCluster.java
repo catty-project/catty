@@ -12,22 +12,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.invokers.cluster;
+package pink.catty.extension.cluster;
 
+import pink.catty.core.extension.Extension;
+import pink.catty.core.extension.ExtensionType.ClusterType;
+import pink.catty.core.extension.spi.AbstractCluster;
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.cluster.AbstractCluster;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
-import pink.catty.core.meta.ClusterMeta;
 
+@Extension(ClusterType.FAIL_FAST)
 public class FailFastCluster extends AbstractCluster {
 
-  public FailFastCluster(ClusterMeta clusterMeta) {
-    super(clusterMeta);
-  }
-
   @Override
-  protected Response doInvoke(Consumer consumer, Request request) {
-    return consumer.invoke(request);
+  public Response onError(Consumer invoker, Consumer failedConsumer, Request request,
+      RuntimeException e) {
+    logger.error("FailFastCluster, meta: {}", failedConsumer.getMeta(), e);
+    throw e;
   }
 }

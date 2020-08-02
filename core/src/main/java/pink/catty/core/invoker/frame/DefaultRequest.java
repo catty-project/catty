@@ -14,10 +14,11 @@
  */
 package pink.catty.core.invoker.frame;
 
+import pink.catty.core.AbstractAttribute;
 import pink.catty.core.service.MethodModel;
 import pink.catty.core.service.ServiceModel;
 
-public class DefaultRequest implements Request {
+public class DefaultRequest extends AbstractAttribute implements Request {
 
   private long requestId;
   private String interfaceName;

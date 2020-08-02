@@ -22,8 +22,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import pink.catty.core.CattyException;
 import pink.catty.core.RpcTimeoutException;
+import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.MethodNotFoundException;
-import pink.catty.core.invoker.cluster.Cluster;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -34,17 +34,17 @@ import pink.catty.core.utils.RequestIdGenerator;
 public class ConsumerHandler<T>
     implements InvocationHandler {
 
-  private Cluster cluster;
-  private ServiceModel serviceModel;
+  private final Consumer consumer;
 
-  public ConsumerHandler(ServiceModel<T> serviceModel, Cluster cluster) {
-    this.cluster = cluster;
-    this.serviceModel = serviceModel;
+  public ConsumerHandler(Consumer consumer) {
+    this.consumer = consumer;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+
+    ServiceModel<T> serviceModel = consumer.getMeta().getServiceModel();
 
     /*
      * check if method valid.
@@ -117,13 +117,16 @@ public class ConsumerHandler<T>
   }
 
   private Response invoke(Request request) {
-    return cluster.invoke(request);
+    return consumer.invoke(request);
   }
 
   @SuppressWarnings("unchecked")
-  public static <E> E getProxy(ServiceModel serviceModel, Cluster cluster) {
+  public static <E> E getProxy(Consumer consumer) {
+    ServiceModel<E> serviceModel = consumer.getMeta().getServiceModel();
     Class<E> clazz = serviceModel.getInterfaceClass();
-    return (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
-        new ConsumerHandler(serviceModel, cluster));
+    E proxy =  (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
+        new ConsumerHandler<E>(consumer));
+    serviceModel.setTarget(proxy);
+    return proxy;
   }
 }

@@ -87,7 +87,7 @@ public class Exporter {
     metaInfo.setServiceModel(serviceModel);
     metaInfo.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
-    Protocol chainBuilder = ExtensionFactory.getProtocol()
+    Protocol chainBuilder = ExtensionFactory.protocol()
         .getExtension(ProtocolType.CATTY);
     Provider provider = chainBuilder.buildProvider(metaInfo);
     serviceHandlers.put(serviceModel.getServiceName(), provider);
@@ -96,7 +96,7 @@ public class Exporter {
 
   public void export() {
     if (registry == null && registryConfig != null) {
-      registry = ExtensionFactory.getRegistry()
+      registry = ExtensionFactory.registry()
           .getExtension(registryConfig.getRegistryType());
       registry.open();
     }
@@ -109,7 +109,7 @@ public class Exporter {
     serverMeta.setEndpoint(protocolConfig.getEndpointType());
     serverMeta.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
-    EndpointFactory factory = ExtensionFactory.getEndpointFactory()
+    EndpointFactory factory = ExtensionFactory.endpointFactory()
         .getExtension(protocolConfig.getEndpointType());
     server = factory.getServer(serverMeta);
     if (server == null) {

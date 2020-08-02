@@ -44,4 +44,11 @@ public final class ExtensionType {
     String NETTY = "netty";
   }
 
+  public interface ClusterType {
+    String FAIL_FAST = "failfast";
+    String FAIL_OVER = "failover";
+    String FAIL_SAFE = "failsafe";
+    String FAIL_BACK = "failback";
+  }
+
 }

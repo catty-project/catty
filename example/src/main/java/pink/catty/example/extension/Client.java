@@ -25,7 +25,7 @@ public class Client {
   private static final String MY_SLB = "MyLittleCatty";
 
   public static void main(String[] args) {
-    ExtensionFactory.getLoadBalance().register(MY_SLB, MyLoadBalance.class);
+    ExtensionFactory.loadBalance().register(MY_SLB, MyLoadBalance.class);
 
     ClientConfig clientConfig = ClientConfig.builder()
         .addAddress("127.0.0.1:20550")

@@ -14,11 +14,12 @@
  */
 package pink.catty.core.invoker.endpoint;
 
-import pink.catty.core.invoker.MappedInvoker;
+import pink.catty.core.invoker.Invoker;
+import pink.catty.core.invoker.InvokerRegistry;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.meta.ServerMeta;
 
-public interface Server extends Endpoint, MappedInvoker<Provider> {
+public interface Server extends Endpoint, InvokerRegistry<Provider>, Invoker {
 
   @Override
   ServerMeta getMeta();

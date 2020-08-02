@@ -1,5 +1,6 @@
 package pink.catty.config;
 
+import pink.catty.core.extension.ExtensionType.ClusterType;
 import pink.catty.core.extension.ExtensionType.CodecType;
 import pink.catty.core.extension.ExtensionType.EndpointFactoryType;
 import pink.catty.core.extension.ExtensionType.LoadBalanceType;
@@ -7,15 +8,11 @@ import pink.catty.core.extension.ExtensionType.SerializationType;
 
 public class ProtocolConfig {
 
-  public static final String FAIL_OVER = "failover";
-  public static final String FAIL_FAST = "failfast";
-  public static final String AUTO_RECOVERY = "auto-recovery";
-
   private String serializationType = SerializationType.HESSIAN2;
   private String codecType = CodecType.CATTY;
   private String endpointType = EndpointFactoryType.NETTY;
   private String loadBalanceType = LoadBalanceType.RANDOM;
-  private String clusterType = FAIL_FAST;
+  private String clusterType = ClusterType.FAIL_FAST;
   private int retryTimes;
   private int recoveryPeriod;
   private int heartbeatPeriod;

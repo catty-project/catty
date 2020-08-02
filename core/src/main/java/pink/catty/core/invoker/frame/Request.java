@@ -14,10 +14,11 @@
  */
 package pink.catty.core.invoker.frame;
 
+import pink.catty.core.Attribute;
 import pink.catty.core.service.MethodModel;
 import pink.catty.core.service.ServiceModel;
 
-public interface Request {
+public interface Request extends Attribute {
 
   long getRequestId();
 

@@ -14,17 +14,30 @@
  */
 package pink.catty.core.meta;
 
+import java.util.List;
+import pink.catty.core.ServerAddress;
 import pink.catty.core.service.ServiceModel;
 
 public class ConsumerMeta extends ClientMeta {
 
   private static final int DEFAULT_HEALTH_CHECK_PERIOD = 10 * 1000;
 
+  private transient ServiceModel serviceModel;
+
   private String version;
   private String group;
   private String serviceName;
   private int healthCheckPeriod = DEFAULT_HEALTH_CHECK_PERIOD;
-  private transient ServiceModel serviceModel;
+  private List<ServerAddress> directAddress;
+  private List<String> filterNames;
+
+  /*
+   * Cluster
+   */
+  private String cluster;
+  private String loadBalance;
+  private int retryTimes;
+  private int recoveryPeriod = 3 * 1000;
 
   public ConsumerMeta() {
     super(MetaType.CONSUMER);
@@ -70,10 +83,58 @@ public class ConsumerMeta extends ClientMeta {
     return serviceModel;
   }
 
+  public String getCluster() {
+    return cluster;
+  }
+
+  public void setCluster(String cluster) {
+    this.cluster = cluster;
+  }
+
+  public String getLoadBalance() {
+    return loadBalance;
+  }
+
+  public void setLoadBalance(String loadBalance) {
+    this.loadBalance = loadBalance;
+  }
+
+  public int getRetryTimes() {
+    return retryTimes;
+  }
+
+  public void setRetryTimes(int retryTimes) {
+    this.retryTimes = retryTimes;
+  }
+
+  public int getRecoveryPeriod() {
+    return recoveryPeriod;
+  }
+
+  public void setRecoveryPeriod(int recoveryPeriod) {
+    this.recoveryPeriod = recoveryPeriod;
+  }
+
   public void setServiceModel(ServiceModel serviceModel) {
     this.serviceModel = serviceModel;
     this.version = serviceModel.getVersion();
     this.group = serviceModel.getGroup();
     this.serviceName = serviceModel.getServiceName();
+  }
+
+  public List<ServerAddress> getDirectAddress() {
+    return directAddress;
+  }
+
+  public void setDirectAddress(List<ServerAddress> directAddress) {
+    this.directAddress = directAddress;
+  }
+
+  public List<String> getFilterNames() {
+    return filterNames;
+  }
+
+  public void setFilterNames(List<String> filterNames) {
+    this.filterNames = filterNames;
   }
 }

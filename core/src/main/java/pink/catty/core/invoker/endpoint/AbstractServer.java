@@ -36,19 +36,14 @@ import pink.catty.core.support.worker.StandardThreadExecutor;
 
 public abstract class AbstractServer extends AbstractEndpoint implements Server {
 
-  private ServerMeta serverMeta;
+  private final Map<String, Provider> invokerMap = new ConcurrentHashMap<>();
+  private final ServerMeta serverMeta;
   private ExecutorService executor;
-  private volatile Map<String, Provider> invokerMap = new ConcurrentHashMap<>();
 
   public AbstractServer(ServerMeta serverMeta, Codec codec) {
     super(codec);
     this.serverMeta = serverMeta;
     createExecutor();
-  }
-
-  @Override
-  public void setInvokerMap(Map<String, Provider> invokerMap) {
-    this.invokerMap = invokerMap;
   }
 
   @Override
