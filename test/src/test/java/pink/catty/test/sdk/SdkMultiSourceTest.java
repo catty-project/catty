@@ -85,6 +85,7 @@ public class SdkMultiSourceTest {
     ProtocolConfig protocolConfig = new ProtocolConfig();
     protocolConfig.setClusterType(ClusterType.FAIL_BACK);
     protocolConfig.setRecoveryPeriod(400);
+    protocolConfig.setRetryTimes(1);
 
     reference0 = new Reference<>();
     reference0.setClientConfig(clientConfig);

@@ -6,13 +6,13 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
-import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.spi.Cluster;
 import pink.catty.core.extension.spi.LoadBalance;
 import pink.catty.core.invoker.AbstractConsumer;
 import pink.catty.core.invoker.Consumer;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
+import pink.catty.core.meta.ConsumerMeta;
 
 public class ConsumerCluster extends AbstractConsumer {
 
@@ -22,27 +22,18 @@ public class ConsumerCluster extends AbstractConsumer {
 
   private final Cluster cluster;
   private final LoadBalance loadBalance;
+  private final ConsumerMeta consumerMeta;
 
-  public ConsumerCluster(Cluster cluster, LoadBalance loadBalance) {
+  public ConsumerCluster(ConsumerMeta consumerMeta, Cluster cluster, LoadBalance loadBalance) {
     super(null);
+    this.consumerMeta = consumerMeta;
     this.cluster = cluster;
     this.loadBalance = loadBalance;
   }
 
-  public ConsumerCluster(Consumer next) {
-    super(next);
-
-    /*
-     * get Cluster instance.
-     */
-    String clusterType = getMeta().getCluster();
-    this.cluster = ExtensionFactory.cluster().getExtension(clusterType);
-
-    /*
-     * get LoadBalance instance.
-     */
-    String loadBalanceType = getMeta().getCluster();
-    this.loadBalance = ExtensionFactory.loadBalance().getExtension(loadBalanceType);
+  @Override
+  public ConsumerMeta getMeta() {
+    return this.consumerMeta;
   }
 
   @SuppressWarnings("unchecked")

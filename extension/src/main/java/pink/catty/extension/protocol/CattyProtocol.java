@@ -54,7 +54,7 @@ public class CattyProtocol implements Protocol {
     LoadBalance loadBalance = ExtensionFactory.loadBalance().getExtension(meta.getLoadBalance());
 
     // 3.Create ClusterInvoker
-    Consumer consumer = new ConsumerCluster(cluster, loadBalance);
+    Consumer consumer = new ConsumerCluster(meta, cluster, loadBalance);
 
     // 4.Check if direct address set. Build Cluster.
     ServiceModel serviceModel = meta.getServiceModel();
@@ -69,25 +69,25 @@ public class CattyProtocol implements Protocol {
         // Create ConsumerClient.
         EndpointFactory factory = ExtensionFactory
             .endpointFactory()
-            .getExtension(meta.getEndpoint());
-        Client client = factory.getClient(meta);
-        toRegister = new ConsumerClient(client, meta);
+            .getExtension(newMetaInfo.getEndpoint());
+        Client client = factory.getClient(newMetaInfo);
+        toRegister = new ConsumerClient(client, newMetaInfo);
 
         // Create SerializationConsumer
         Serialization serialization = ExtensionFactory
             .serialization()
-            .getExtension(meta.getSerialization());
+            .getExtension(newMetaInfo.getSerialization());
         toRegister = new ConsumerSerialization(toRegister, serialization);
 
         // Create HealthCheckConsumer
-        if (meta.getHealthCheckPeriod() > 0) {
+        if (newMetaInfo.getHealthCheckPeriod() > 0) {
           toRegister = new ConsumerHealthCheck(toRegister);
         }
 
         // Wrap Filter
-        if (meta.getFilterNames() != null && meta.getFilterNames().size() > 0) {
-          for (int i = meta.getFilterNames().size() - 1; i >= 0; i--) {
-            String filterName = meta.getFilterNames().get(i);
+        if (newMetaInfo.getFilterNames() != null && newMetaInfo.getFilterNames().size() > 0) {
+          for (int i = newMetaInfo.getFilterNames().size() - 1; i >= 0; i--) {
+            String filterName = newMetaInfo.getFilterNames().get(i);
             Filter filter = ExtensionFactory
                 .filter()
                 .getExtension(filterName);

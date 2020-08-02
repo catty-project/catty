@@ -93,13 +93,13 @@ public class ConsumerHandler<T>
     }
 
     // sync-method
-    int delay = request.getInvokedMethod().getTimeout();
-    if (delay <= 0) {
-      delay = request.getServiceModel().getTimeout();
-    }
-    if (delay <= 0) {
-      delay = 30 * 1000;
-    }
+//    int delay = request.getInvokedMethod().getTimeout();
+//    if (delay <= 0) {
+//      delay = request.getServiceModel().getTimeout();
+//    }
+//    if (delay <= 0) {
+    int delay = 30 * 1000;
+//    }
 
     try {
       response.await(delay, TimeUnit.MILLISECONDS);
@@ -124,7 +124,7 @@ public class ConsumerHandler<T>
   public static <E> E getProxy(Consumer consumer) {
     ServiceModel<E> serviceModel = consumer.getMeta().getServiceModel();
     Class<E> clazz = serviceModel.getInterfaceClass();
-    E proxy =  (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
+    E proxy = (E) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz},
         new ConsumerHandler<E>(consumer));
     serviceModel.setTarget(proxy);
     return proxy;

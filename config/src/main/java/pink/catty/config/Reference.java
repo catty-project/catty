@@ -83,6 +83,7 @@ public class Reference<T> {
           consumerMeta.setCodec(protocolConfig.getCodecType());
           consumerMeta.setEndpoint(protocolConfig.getEndpointType());
           consumerMeta.setHealthCheckPeriod(protocolConfig.getHeartbeatPeriod());
+          consumerMeta.setCluster(protocolConfig.getClusterType());
           consumerMeta.setLoadBalance(protocolConfig.getLoadBalanceType());
           consumerMeta.setRetryTimes(protocolConfig.getRetryTimes());
           consumerMeta.setRecoveryPeriod(protocolConfig.getRecoveryPeriod());

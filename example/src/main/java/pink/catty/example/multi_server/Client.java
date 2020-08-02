@@ -19,7 +19,6 @@ import pink.catty.config.ClientConfig;
 import pink.catty.config.ProtocolConfig;
 import pink.catty.config.Reference;
 import pink.catty.core.extension.ExtensionType.ClusterType;
-import pink.catty.example.IService;
 
 public class Client {
 
@@ -31,8 +30,9 @@ public class Client {
         .build();
 
     ProtocolConfig protocolConfig = new ProtocolConfig();
-    protocolConfig.setClusterType(ClusterType.FAIL_FAST);
+    protocolConfig.setClusterType(ClusterType.FAIL_BACK);
     protocolConfig.setRecoveryPeriod(3000);
+    protocolConfig.setRetryTimes(2);
 
     Reference<IService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);
@@ -42,13 +42,8 @@ public class Client {
     IService service = reference.refer();
 
     for (int i = 0; i < 10000; i++) {
-      System.out.println(service.say0());
       sleep();
-      System.out.println(service.say1("catty1"));
-      sleep();
-      System.out.println(service.say1("catty2"));
-      sleep();
-      System.out.println(service.say1("catty3"));
+      System.out.println(service.say());
     }
   }
 

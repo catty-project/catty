@@ -45,10 +45,10 @@ public final class ExtensionType {
   }
 
   public interface ClusterType {
-    String FAIL_FAST = "failfast";
-    String FAIL_OVER = "failover";
-    String FAIL_SAFE = "failsafe";
-    String FAIL_BACK = "failback";
+    String FAIL_FAST = "fail-fast";
+    String FAIL_OVER = "fail-over";
+    String FAIL_SAFE = "fail-safe";
+    String FAIL_BACK = "fail-back";
   }
 
 }
