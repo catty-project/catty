@@ -93,13 +93,14 @@ public class ConsumerHandler<T>
     }
 
     // sync-method
-//    int delay = request.getInvokedMethod().getTimeout();
-//    if (delay <= 0) {
-//      delay = request.getServiceModel().getTimeout();
-//    }
-//    if (delay <= 0) {
-    int delay = 30 * 1000;
-//    }
+    int delay = request.getInvokedMethod().getTimeout();
+    if (delay <= 0) {
+      delay = request.getServiceModel().getTimeout();
+    }
+    if (delay <= 0) {
+//    int delay = 30 * 1000;
+      delay = 30 * 1000;
+    }
 
     try {
       response.await(delay, TimeUnit.MILLISECONDS);
