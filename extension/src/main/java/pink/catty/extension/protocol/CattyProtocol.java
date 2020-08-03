@@ -108,6 +108,11 @@ public class CattyProtocol implements Protocol {
               public Response invoke(Request request) {
                 return filter.filter(last, request);
               }
+
+              @Override
+              public void setNext(Invoker invoker) {
+                last.setNext(invoker);
+              }
             };
           }
         }
@@ -151,6 +156,11 @@ public class CattyProtocol implements Protocol {
           @Override
           public Response invoke(Request request) {
             return filter.filter(last, request);
+          }
+
+          @Override
+          public void setNext(Invoker invoker) {
+            last.setNext(invoker);
           }
         };
       }

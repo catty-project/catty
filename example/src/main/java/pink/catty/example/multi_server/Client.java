@@ -32,7 +32,7 @@ public class Client {
     ProtocolConfig protocolConfig = new ProtocolConfig();
     protocolConfig.setClusterType(ClusterType.FAIL_BACK);
     protocolConfig.setRecoveryPeriod(3000);
-    protocolConfig.setRetryTimes(2);
+    protocolConfig.setRetryTimes(1);
 
     Reference<IService> reference = new Reference<>();
     reference.setClientConfig(clientConfig);

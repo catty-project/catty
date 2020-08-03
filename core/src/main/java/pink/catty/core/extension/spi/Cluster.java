@@ -40,7 +40,7 @@ import pink.catty.core.meta.MetaInfo;
  *
  * Cluster
  */
-@SPI(scope = Scope.SINGLETON)
+@SPI(scope = Scope.PROTOTYPE)
 public interface Cluster extends InvokerRegistry<Consumer>, NotifyListener {
 
   void destroy();

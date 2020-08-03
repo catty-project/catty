@@ -23,7 +23,7 @@ import pink.catty.core.meta.ConsumerMeta;
 
 public class ConsumerClient implements Consumer {
 
-  private Client client;
+  private volatile Client client;
   private ConsumerMeta consumerMeta;
 
   public ConsumerClient(Client client, ConsumerMeta consumerMeta) {
@@ -44,5 +44,12 @@ public class ConsumerClient implements Consumer {
   @Override
   public Invoker getNext() {
     return client;
+  }
+
+  @Override
+  public void setNext(Invoker invoker) {
+    if (invoker instanceof Client) {
+      this.client = (Client) invoker;
+    }
   }
 }

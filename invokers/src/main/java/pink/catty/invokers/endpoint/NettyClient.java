@@ -79,10 +79,10 @@ public class NettyClient extends AbstractClient {
 
   @Override
   protected void doClose() {
-    if (clientChannel != null) {
+    if (clientChannel != null && clientChannel.isActive()) {
       clientChannel.close();
     }
-    if (nioEventLoopGroup != null) {
+    if (nioEventLoopGroup != null && !nioEventLoopGroup.isShutdown()) {
       nioEventLoopGroup.shutdownGracefully();
     }
   }
@@ -118,6 +118,12 @@ public class NettyClient extends AbstractClient {
       return response;
     } catch (Exception e) {
       logger.error("ClientChannel invoke error", e);
+
+      /*
+       * Auto close.
+       */
+      close();
+
       throw new EndpointInvalidException("ClientChannel invoke error", e);
     }
   }

@@ -109,15 +109,16 @@ public class FailBackCluster extends FailOverCluster {
         EndpointFactory endpointFactory = ExtensionFactory.endpointFactory()
             .getExtension(failedConsumerMeta.getEndpoint());
         Client newClient = endpointFactory.getClient(failedConsumerMeta);
-        newClient.open();
 
-        Invoker next = failedConsumer.getNext();
+        Invoker next = failedConsumer;
         while (next instanceof LinkedInvoker) {
           if (((LinkedInvoker) next).getNext() instanceof ConsumerClient) {
             ConsumerClient newConsumerClient = new ConsumerClient(newClient,
                 failedConsumerMeta);
+            ((LinkedInvoker) next).setNext(newConsumerClient);
+            break;
           } else {
-            next = failedConsumer.getNext();
+            next = ((LinkedInvoker) next).getNext();
           }
         }
 

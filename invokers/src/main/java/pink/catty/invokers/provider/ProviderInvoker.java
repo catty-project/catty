@@ -45,6 +45,11 @@ public class ProviderInvoker implements Provider {
     return null;
   }
 
+  @Override
+  public void setNext(Invoker invoker) {
+    throw new UnsupportedOperationException();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public Response invoke(Request request) {

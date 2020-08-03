@@ -88,6 +88,7 @@ public class Reference<T> {
           consumerMeta.setRetryTimes(protocolConfig.getRetryTimes());
           consumerMeta.setRecoveryPeriod(protocolConfig.getRecoveryPeriod());
           consumerMeta.setDirectAddress(clientConfig.getAddresses());
+          consumerMeta.setTimeout(clientConfig.getTimeout());
 
           Protocol protocol = ExtensionFactory.protocol().getExtension(ProtocolType.CATTY);
           Consumer consumer = protocol.buildConsumer(consumerMeta);

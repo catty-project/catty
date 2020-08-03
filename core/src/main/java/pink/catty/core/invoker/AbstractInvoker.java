@@ -16,7 +16,7 @@ package pink.catty.core.invoker;
 
 public abstract class AbstractInvoker implements LinkedInvoker {
 
-  protected Invoker next;
+  protected volatile Invoker next;
 
   public AbstractInvoker(Invoker next) {
     this.next = next;
@@ -27,4 +27,8 @@ public abstract class AbstractInvoker implements LinkedInvoker {
     return next;
   }
 
+  @Override
+  public void setNext(Invoker invoker) {
+    this.next = invoker;
+  }
 }
