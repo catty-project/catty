@@ -98,7 +98,6 @@ public class ConsumerHandler<T>
       delay = request.getServiceModel().getTimeout();
     }
     if (delay <= 0) {
-//    int delay = 30 * 1000;
       delay = 30 * 1000;
     }
 
