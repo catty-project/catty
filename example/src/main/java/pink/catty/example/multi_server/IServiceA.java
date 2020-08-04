@@ -12,15 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker;
+package pink.catty.example.multi_server;
 
-import java.util.Map;
+public class IServiceA implements IService {
 
-public interface MappedInvoker<T extends Invoker>
-    extends Invoker, InvokerRegistry<T> {
-
-  void setInvokerMap(Map<String, T> invokerMap);
-
-  T getInvoker(String invokerIdentify);
+  @Override
+  public String say() {
+    return "A";
+  }
 
 }

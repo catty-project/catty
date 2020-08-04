@@ -26,6 +26,7 @@ import pink.catty.config.Exporter;
 import pink.catty.config.ProtocolConfig;
 import pink.catty.config.Reference;
 import pink.catty.config.ServerConfig;
+import pink.catty.core.extension.ExtensionType.ClusterType;
 import pink.catty.test.service.AService;
 import pink.catty.test.service.AServiceImpl;
 import pink.catty.test.service.BService;
@@ -82,8 +83,9 @@ public class SdkMultiSourceTest {
         .build();
 
     ProtocolConfig protocolConfig = new ProtocolConfig();
-    protocolConfig.setClusterType(ProtocolConfig.AUTO_RECOVERY);
+    protocolConfig.setClusterType(ClusterType.FAIL_BACK);
     protocolConfig.setRecoveryPeriod(400);
+    protocolConfig.setRetryTimes(1);
 
     reference0 = new Reference<>();
     reference0.setClientConfig(clientConfig);

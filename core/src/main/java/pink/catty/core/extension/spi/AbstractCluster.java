@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Catty Project
+ * Copyright 2019 The Catty Project
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,25 +12,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker.cluster;
+package pink.catty.core.extension.spi;
 
+import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pink.catty.core.config.RegistryConfig;
-import pink.catty.core.extension.spi.Registry.NotifyListener;
+import pink.catty.core.invoker.AbstractInvokerRegistry;
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.MappedInvoker;
-import pink.catty.core.meta.ClusterMeta;
 import pink.catty.core.meta.MetaInfo;
+import pink.catty.core.utils.EndpointUtils;
 
-public interface Cluster extends MappedInvoker<Consumer>, NotifyListener {
+public abstract class AbstractCluster extends AbstractInvokerRegistry<Consumer> implements Cluster {
 
-  void destroy();
+  protected Logger logger = LoggerFactory.getLogger(getClass());
 
   @Override
-  default void notify(RegistryConfig registryConfig, List<MetaInfo> metaInfoCollection) {
-
+  public synchronized void destroy() {
+    invokerMap.values().forEach(EndpointUtils::destroyInvoker);
   }
 
   @Override
-  ClusterMeta getMeta();
+  public List<Consumer> listConsumer() {
+    return Collections.unmodifiableList(invokerList);
+  }
+
+  @Override
+  public void notify(RegistryConfig registryConfig, List<MetaInfo> metaInfoCollection) {
+
+  }
 }

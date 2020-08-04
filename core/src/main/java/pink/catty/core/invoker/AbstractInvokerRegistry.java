@@ -14,30 +14,16 @@
  */
 package pink.catty.core.invoker;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class AbstractMappedInvoker<T extends Invoker>
-    implements MappedInvoker<T> {
+public abstract class AbstractInvokerRegistry<T extends Invoker>
+    implements InvokerRegistry<T> {
 
-  protected Map<String, T> invokerMap;
-  protected List<T> invokerList;
-
-  public AbstractMappedInvoker() {
-    this(new ConcurrentHashMap<>());
-  }
-
-  public AbstractMappedInvoker(Map<String, T> invokerMap) {
-    this.invokerMap = invokerMap;
-  }
-
-  @Override
-  public synchronized void setInvokerMap(Map<String, T> invokerMap) {
-    this.invokerMap = invokerMap;
-    this.invokerList = new ArrayList<>(invokerMap.values());
-  }
+  protected Map<String, T> invokerMap = new ConcurrentHashMap<>();
+  protected List<T> invokerList = new LinkedList<>();
 
   @Override
   public synchronized void registerInvoker(String serviceIdentify, T invoker) {
@@ -53,7 +39,7 @@ public abstract class AbstractMappedInvoker<T extends Invoker>
   }
 
   @Override
-  public synchronized T getInvoker(String invokerIdentify) {
+  public T getInvoker(String invokerIdentify) {
     return invokerMap.get(invokerIdentify);
   }
 }

@@ -19,7 +19,6 @@ import pink.catty.core.CattyException;
 import pink.catty.core.extension.spi.Serialization;
 import pink.catty.core.invoker.AbstractConsumer;
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.endpoint.Empty;
 import pink.catty.core.invoker.frame.DefaultRequest;
 import pink.catty.core.invoker.frame.Request;
@@ -41,11 +40,16 @@ public class ConsumerSerialization extends AbstractConsumer {
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
-    request = new DefaultRequest(request.getRequestId(), request.getInterfaceName(),
-        request.getMethodName(), request.getArgsValue());
+  public Response invoke(Request request) {
+    request = new DefaultRequest(request.getRequestId(),
+        request.getInterfaceName(),
+        request.getMethodName(),
+        request.getArgsValue(),
+        request.getServiceModel(),
+        request.getInvokedMethod(),
+        request.getTarget()
+    );
 
-    MethodModel methodModel = invocation.getInvokedMethod();
     Object[] args = request.getArgsValue();
     if (args != null) {
       Object[] afterSerialize = new Object[args.length];
@@ -55,8 +59,9 @@ public class ConsumerSerialization extends AbstractConsumer {
       request.setArgsValue(afterSerialize);
     }
 
-    Response response = next.invoke(request, invocation);
+    Response response = next.invoke(request);
 
+    MethodModel methodModel = request.getInvokedMethod();
     CompletionStage<Object> newResponse = response.thenApply(returnValue -> {
       if (!(returnValue instanceof byte[])) {
         return returnValue;

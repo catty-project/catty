@@ -17,4 +17,6 @@ package pink.catty.core.invoker;
 public interface LinkedInvoker extends Invoker {
 
   Invoker getNext();
+
+  void setNext(Invoker invoker);
 }

@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pink.catty.core.CattyException;
 import pink.catty.core.extension.spi.Codec.DataTypeEnum;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.endpoint.Void;
 import pink.catty.core.invoker.frame.Request;
 import pink.catty.core.invoker.frame.Response;
@@ -64,7 +63,7 @@ public class ServerChannelHandler extends ChannelDuplexHandler {
   }
 
   private void processRequest(ChannelHandlerContext ctx, Request request) {
-    Response response = nettyServer.invoke(request, new Invocation());
+    Response response = nettyServer.invoke(request);
     response.whenComplete((value, throwable) -> {
       if (value == null || value instanceof Void) {
         return;

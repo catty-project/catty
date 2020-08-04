@@ -12,15 +12,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker.endpoint;
+package pink.catty.example.multi_server;
 
-import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.InvokerRegistry;
-import pink.catty.core.invoker.Provider;
-import pink.catty.core.meta.ServerMeta;
+import pink.catty.config.Exporter;
+import pink.catty.config.ProtocolConfig;
+import pink.catty.config.ServerConfig;
 
-public interface Server extends Endpoint, InvokerRegistry<Provider>, Invoker {
+public class ServerB {
 
-  @Override
-  ServerMeta getMeta();
+  public static void main(String[] args) {
+    ServerConfig serverConfig = ServerConfig.builder()
+        .port(20551)
+        .build();
+
+    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
+
+    Exporter exporter = new Exporter(serverConfig);
+    exporter.setProtocolConfig(protocolConfig);
+    exporter.registerService(IService.class, new IServiceB());
+    exporter.export();
+  }
 }

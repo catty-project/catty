@@ -40,12 +40,6 @@ public class ServerAddress {
     }
   }
 
-  public ServerAddress(String ip, int port, String address) {
-    this.ip = ip;
-    this.port = port;
-    this.address = address;
-  }
-
   public ServerAddress(String ip, int port) {
     this.ip = ip;
     this.port = port;

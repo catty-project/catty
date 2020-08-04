@@ -92,7 +92,7 @@
           <xsd:documentation><![CDATA[ LoadBalance. ]]></xsd:documentation>
         </xsd:annotation>
       </xsd:attribute>
-      <xsd:attribute name="cluster" type="xsd:string" default="auto-recovery">
+      <xsd:attribute name="cluster" type="xsd:string" default="fail-fast">
         <xsd:annotation>
           <xsd:documentation><![CDATA[ Cluster Type. ]]></xsd:documentation>
         </xsd:annotation>

@@ -16,7 +16,10 @@ package pink.catty.core.extension.spi;
 
 import pink.catty.core.CodecException;
 
-@SPI
+/**
+ * Encode & Decode data frame to & from network.
+ */
+@SPI(scope = Scope.SINGLETON)
 public interface Codec<I, O> extends PackageReader<I, O> {
 
   byte[] encode(Object message, DataTypeEnum dataTypeEnum) throws CodecException;

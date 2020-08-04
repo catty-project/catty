@@ -15,7 +15,6 @@
 package pink.catty.invokers.consumer;
 
 import pink.catty.core.invoker.Consumer;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.endpoint.Client;
 import pink.catty.core.invoker.frame.Request;
@@ -24,7 +23,7 @@ import pink.catty.core.meta.ConsumerMeta;
 
 public class ConsumerClient implements Consumer {
 
-  private Client client;
+  private volatile Client client;
   private ConsumerMeta consumerMeta;
 
   public ConsumerClient(Client client, ConsumerMeta consumerMeta) {
@@ -38,12 +37,19 @@ public class ConsumerClient implements Consumer {
   }
 
   @Override
-  public Response invoke(Request request, Invocation invocation) {
-    return client.invoke(request, invocation);
+  public Response invoke(Request request) {
+    return client.invoke(request);
   }
 
   @Override
   public Invoker getNext() {
     return client;
+  }
+
+  @Override
+  public void setNext(Invoker invoker) {
+    if (invoker instanceof Client) {
+      this.client = (Client) invoker;
+    }
   }
 }

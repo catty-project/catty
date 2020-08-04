@@ -49,11 +49,10 @@ public interface Invoker {
   /**
    *
    * @param request rpc request
-   * @param invocation rpc invoke invocation arguments.
    * @return rpc return
    * @throws CattyException If inner error occurred. CattyException will be
    * thrown.
    */
-  Response invoke(Request request, Invocation invocation);
+  Response invoke(Request request);
 
 }

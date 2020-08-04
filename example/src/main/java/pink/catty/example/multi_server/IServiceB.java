@@ -14,24 +14,11 @@
  */
 package pink.catty.example.multi_server;
 
-import pink.catty.config.Exporter;
-import pink.catty.config.ProtocolConfig;
-import pink.catty.config.ServerConfig;
-import pink.catty.example.IService;
-import pink.catty.example.IServiceImpl;
+public class IServiceB implements IService {
 
-public class Server2 {
-
-  public static void main(String[] args) {
-    ServerConfig serverConfig = ServerConfig.builder()
-        .port(20551)
-        .build();
-
-    ProtocolConfig protocolConfig = ProtocolConfig.defaultConfig();
-
-    Exporter exporter = new Exporter(serverConfig);
-    exporter.setProtocolConfig(protocolConfig);
-    exporter.registerService(IService.class, new IServiceImpl());
-    exporter.export();
+  @Override
+  public String say() {
+    return "B";
   }
+
 }

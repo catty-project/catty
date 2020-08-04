@@ -12,15 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package pink.catty.core.invoker.endpoint;
+package pink.catty.core.extension.spi;
 
 import pink.catty.core.invoker.Invoker;
-import pink.catty.core.invoker.InvokerRegistry;
-import pink.catty.core.invoker.Provider;
-import pink.catty.core.meta.ServerMeta;
+import pink.catty.core.invoker.frame.Request;
+import pink.catty.core.invoker.frame.Response;
 
-public interface Server extends Endpoint, InvokerRegistry<Provider>, Invoker {
+@SPI(scope = Scope.PROTOTYPE)
+public interface Filter {
 
-  @Override
-  ServerMeta getMeta();
+  Response filter(Invoker invoker, Request request);
+
 }

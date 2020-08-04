@@ -12,8 +12,8 @@ public class SpiTest {
 
   @Test
   public void testSpi() {
-    Codec test1 = ExtensionFactory.getCodec().getExtension("test1");
-    Codec test2 = ExtensionFactory.getCodec().getExtension("test2");
+    Codec test1 = ExtensionFactory.codec().getExtension("test1");
+    Codec test2 = ExtensionFactory.codec().getExtension("test2");
     Assert.assertSame(DEFAULT_1, test1.decode(null, null));
     Assert.assertSame(DEFAULT_2, test2.decode(null, null));
   }

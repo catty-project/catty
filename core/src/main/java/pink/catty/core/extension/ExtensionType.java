@@ -32,8 +32,8 @@ public final class ExtensionType {
     String CATTY = "catty";
   }
 
-  public interface InvokerBuilderType {
-    String DIRECT = "direct";
+  public interface ProtocolType {
+    String CATTY = "catty";
   }
 
   public interface RegistryType {
@@ -42,6 +42,13 @@ public final class ExtensionType {
 
   public interface EndpointFactoryType {
     String NETTY = "netty";
+  }
+
+  public interface ClusterType {
+    String FAIL_FAST = "fail-fast";
+    String FAIL_OVER = "fail-over";
+    String FAIL_SAFE = "fail-safe";
+    String FAIL_BACK = "fail-back";
   }
 
 }

@@ -21,7 +21,6 @@ public enum MetaType {
   SERVER,
   CONSUMER,
   PROVIDER,
-  CLUSTER,
   ;
 
 }

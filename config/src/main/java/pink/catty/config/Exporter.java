@@ -20,7 +20,7 @@ import pink.catty.core.Constants;
 import pink.catty.core.ServerAddress;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
-import pink.catty.core.extension.ExtensionType.InvokerBuilderType;
+import pink.catty.core.extension.ExtensionType.ProtocolType;
 import pink.catty.core.extension.spi.EndpointFactory;
 import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Registry;
@@ -35,7 +35,11 @@ import pink.catty.core.service.ServiceModel;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Exporter is the entrance of RPC-server.
+ *
+ * Exporter instance and service instances are 1 on n.
+ */
 public class Exporter {
 
   private static final Logger logger = LoggerFactory.getLogger(Exporter.class);
@@ -61,7 +65,6 @@ public class Exporter {
 
   public void setServerConfig(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
-
   }
 
   public void setRegistryConfig(RegistryConfig registryConfig) {
@@ -87,8 +90,8 @@ public class Exporter {
     metaInfo.setServiceModel(serviceModel);
     metaInfo.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
-    Protocol chainBuilder = ExtensionFactory.getProtocol()
-        .getExtension(InvokerBuilderType.DIRECT);
+    Protocol chainBuilder = ExtensionFactory.protocol()
+        .getExtension(ProtocolType.CATTY);
     Provider provider = chainBuilder.buildProvider(metaInfo);
     serviceHandlers.put(serviceModel.getServiceName(), provider);
     return this;
@@ -96,7 +99,7 @@ public class Exporter {
 
   public void export() {
     if (registry == null && registryConfig != null) {
-      registry = ExtensionFactory.getRegistry()
+      registry = ExtensionFactory.registry()
           .getExtension(registryConfig.getRegistryType());
       registry.open();
     }
@@ -109,7 +112,7 @@ public class Exporter {
     serverMeta.setEndpoint(protocolConfig.getEndpointType());
     serverMeta.setWorkerThreadNum(serverConfig.getWorkerThreadNum());
 
-    EndpointFactory factory = ExtensionFactory.getEndpointFactory()
+    EndpointFactory factory = ExtensionFactory.endpointFactory()
         .getExtension(protocolConfig.getEndpointType());
     server = factory.getServer(serverMeta);
     if (server == null) {

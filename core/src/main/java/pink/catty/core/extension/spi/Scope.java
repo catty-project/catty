@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package pink.catty.core.extension.spi;
 
 public enum Scope {

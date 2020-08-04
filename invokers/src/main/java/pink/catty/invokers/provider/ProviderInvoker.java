@@ -16,8 +16,6 @@ package pink.catty.invokers.provider;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletionStage;
-import pink.catty.core.CattyException;
-import pink.catty.core.invoker.Invocation;
 import pink.catty.core.invoker.Invoker;
 import pink.catty.core.invoker.Provider;
 import pink.catty.core.invoker.endpoint.Empty;
@@ -47,21 +45,20 @@ public class ProviderInvoker implements Provider {
     return null;
   }
 
+  @Override
+  public void setNext(Invoker invoker) {
+    throw new UnsupportedOperationException();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
-  public Response invoke(Request request, Invocation invocation) {
+  public Response invoke(Request request) {
     Response response = new DefaultResponse(request.getRequestId());
-    String methodName = request.getMethodName();
-    MethodModel methodModel = invocation.getInvokedMethod();
-
-    if (methodModel == null) {
-      response.setValue(new CattyException("ServiceInvoker: can't find method: " + methodName));
-      return response;
-    }
+    MethodModel methodModel = request.getInvokedMethod();
 
     try {
       Object[] argsValue = request.getArgsValue();
-      Object value = methodModel.getMethod().invoke(invocation.getTarget(), argsValue);
+      Object value = methodModel.getMethod().invoke(request.getTarget(), argsValue);
       if (methodModel.isAsync()) {
         CompletionStage<Object> future = (CompletionStage<Object>) value;
         response = AsyncUtils.newResponse(future, request.getRequestId());
