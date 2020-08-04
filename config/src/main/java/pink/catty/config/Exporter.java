@@ -35,7 +35,11 @@ import pink.catty.core.service.ServiceModel;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * Exporter is the entrance of RPC-server.
+ *
+ * Exporter instance and service instances are 1 on n.
+ */
 public class Exporter {
 
   private static final Logger logger = LoggerFactory.getLogger(Exporter.class);
@@ -61,7 +65,6 @@ public class Exporter {
 
   public void setServerConfig(ServerConfig serverConfig) {
     this.serverConfig = serverConfig;
-
   }
 
   public void setRegistryConfig(RegistryConfig registryConfig) {

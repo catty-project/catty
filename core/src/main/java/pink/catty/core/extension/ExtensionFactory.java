@@ -75,7 +75,7 @@ import pink.catty.core.utils.ReflectUtils;
  * @see Cluster
  * @see Filter
  * @see SPI
- * @since 0.2.7 SPI is supported.
+ * @since 0.2.7 SPI is supported. You could use SPI protocol to load your own extension implements.
  */
 public final class ExtensionFactory<T> {
 

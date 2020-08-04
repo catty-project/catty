@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import pink.catty.core.config.RegistryConfig;
 import pink.catty.core.extension.ExtensionFactory;
 import pink.catty.core.extension.ExtensionType.ProtocolType;
-import pink.catty.core.extension.spi.Cluster;
 import pink.catty.core.extension.spi.Protocol;
 import pink.catty.core.extension.spi.Registry;
 import pink.catty.core.invoker.Consumer;
@@ -27,26 +26,38 @@ import pink.catty.core.meta.ConsumerMeta;
 import pink.catty.core.service.ServiceModel;
 import pink.catty.invokers.consumer.ConsumerHandler;
 
+/**
+ * Reference is the entrance to the RPC client. After all required configs were set, invoking
+ * refer() method could get a proxy instance for service interface.
+ *
+ * Reference instance and service interface's proxy instance are 1 on 1.
+ *
+ * @param <T> service type
+ * @see ClientConfig
+ * @see ProtocolConfig
+ */
 public class Reference<T> {
 
   private static final Logger logger = LoggerFactory.getLogger(Reference.class);
 
-  private Cluster cluster;
-
+  /**
+   * RPC-service's interface, refer() method will return an instance of this class.
+   */
   private Class<T> interfaceClass;
 
+  /**
+   * ClientConfig defines how client works.
+   */
   private ClientConfig clientConfig;
 
-  private RegistryConfig registryConfig;
-
+  /**
+   * ProtocolConfig defines how consumer works, like how to load-balance, ha, health-check,
+   */
   private ProtocolConfig protocolConfig;
 
+  private RegistryConfig registryConfig;
   private Registry registry;
-
   private volatile T ref;
-
-  public Reference() {
-  }
 
   public void setClientConfig(ClientConfig clientConfig) {
     this.clientConfig = clientConfig;
@@ -68,9 +79,17 @@ public class Reference<T> {
     return interfaceClass;
   }
 
+  /**
+   * Create and cache the instance of 'interfaceClass'.
+   *
+   * @return instance of interfaceClass
+   */
   public T refer() {
     if (clientConfig == null) {
       throw new NullPointerException("ClientConfig can't be null");
+    }
+    if (protocolConfig == null) {
+      throw new NullPointerException("ProtocolConfig can't be null");
     }
     if (ref == null) {
       synchronized (this) {
@@ -113,9 +132,6 @@ public class Reference<T> {
     if (registry != null && registry.isOpen()) {
       registry.close();
       registry = null;
-    }
-    if (cluster != null) {
-      cluster.destroy();
     }
     logger.info("De-refer, service: {}", interfaceClass.getName());
   }

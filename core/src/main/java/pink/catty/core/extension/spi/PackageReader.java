@@ -19,8 +19,9 @@ import java.util.List;
 /**
  * Distinguish integral data package from net transport's byte-streaming.
  *
- * @param <I> Different framework might have different encapsulation of byte-streaming such as
- * ByteBuffer from jdk, ByteBuf from Netty and byte[].
+ * @param <I>
+ * @param <O> Different framework might have different encapsulation of byte-streaming such as
+ *            ByteBuffer from jdk, ByteBuf from Netty and byte[].
  */
 public interface PackageReader<I, O> {
 
@@ -28,7 +29,7 @@ public interface PackageReader<I, O> {
    * Reading data package received from tcp or other stream completely.
    *
    * @param data data received from tcp.
-   * @param out integral data
+   * @param out  integral data
    * @return return the rest of data.
    * @throws BrokenDataPackageException If reading data package occurs some error.
    */
